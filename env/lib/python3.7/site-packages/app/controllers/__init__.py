@@ -7,7 +7,7 @@ app = Flask(__name__)
 search_service = SearchService()
 crud_service = CrudService()
 
+from app.controllers import bulk_controller
 from app.controllers import crud_controller
 from app.controllers import errors_controller
-from app.controllers import generate_controller
 from app.controllers import search_controller

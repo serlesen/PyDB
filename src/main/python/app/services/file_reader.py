@@ -1,27 +1,45 @@
 import json
 import os.path
+from app.tools.query_tool import QueryTool
 
 class FileReader(object):
 
-    MAX_DOC_PER_FILE = 1000
+    MAX_DOC_PER_FILE = 100000
 
-    def find(self, key, value):
+    def find(self, query):
         counter = 0
         while True:
             counter += 1
             fname = 'data/data' + str(counter) + '.txt'
             if os.path.isfile(fname) is False:
                 return None
-            result = self.find_in_file(fname, key, value)
-            if result is not None:
-                return result
+            results = self.find_in_file(fname, query)
+            if len(results) > 0:
+                return results
 
-    def find_in_file(self, fname, key, value):
+    def find_in_file(self, fname, query):
         file = open(fname, "r")
+        results = []
         for line in file:
             doc = json.loads(line)
-            if key in doc and doc[key] == value:
-                return doc
+            if query.match(doc):
+                results.append(doc)
+        return results
+
+    def append_bulk(self, docs):
+        counter = 0
+        while True:
+            counter += 1
+            fname = 'data/data' + str(counter) + '.txt'
+            if os.path.isfile(fname):
+                size = self.file_len(fname)
+                if size > self.MAX_DOC_PER_FILE:
+                    continue
+            file = open(fname, "a")
+            for doc in docs:
+                normalized_doc = self.normalize(doc)
+                file.write(self.to_str(normalized_doc) + '\n')
+            return "Done"
         return None
 
     def append(self, doc):
@@ -51,8 +69,8 @@ class FileReader(object):
             fname = 'data/data' + str(counter) + '.txt'
             if os.path.isfile(fname) is False:
                 return None
-            result = self.find_in_file(fname, 'id', id)
-            if result is not None:
+            results = self.find_in_file(fname, QueryTool({'filter': {'id', id}}))
+            if len(results) > 0:
                 file = open(fname, "r+")
                 lines = file.readlines()
                 file.seek(0)
