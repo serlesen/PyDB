@@ -1,28 +1,28 @@
 import json
 import os.path
-from app.tools.query_tool import QueryTool
+from app.tools.filter_tool import FilterTool
 
 class FileReader(object):
 
     MAX_DOC_PER_FILE = 100000
 
-    def find(self, query):
+    def find(self, search_context):
         counter = 0
         while True:
             counter += 1
             fname = 'data/data' + str(counter) + '.txt'
             if os.path.isfile(fname) is False:
                 return None
-            results = self.find_in_file(fname, query)
+            results = self.find_in_file(fname, search_context.filter)
             if len(results) > 0:
                 return results
 
-    def find_in_file(self, fname, query):
+    def find_in_file(self, fname, search_filter)
         file = open(fname, "r")
         results = []
         for line in file:
             doc = json.loads(line)
-            if query.match(doc):
+            if search_filter.match(doc):
                 results.append(doc)
         return results
 
@@ -69,7 +69,7 @@ class FileReader(object):
             fname = 'data/data' + str(counter) + '.txt'
             if os.path.isfile(fname) is False:
                 return None
-            results = self.find_in_file(fname, QueryTool({'filter': {'id', id}}))
+            results = self.find_in_file(fname, FilterTool({'filter': {'id', id}}))
             if len(results) > 0:
                 file = open(fname, "r+")
                 lines = file.readlines()
