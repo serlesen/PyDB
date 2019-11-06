@@ -13,17 +13,19 @@ class FileReader(object):
             fname = 'data/data' + str(counter) + '.txt'
             if os.path.isfile(fname) is False:
                 return None
-            results = self.find_in_file(fname, search_context.filter)
-            if len(results) > 0:
+            results = self.find_in_file(fname, search_context)
+            if results not empty:
                 return results
 
-    def find_in_file(self, fname, search_filter)
+    def find_in_file(self, fname, search_context)
         file = open(fname, "r")
         results = []
         for line in file:
             doc = json.loads(line)
-            if search_filter.match(doc):
+            if search_context.filter.match(doc):
                 results.append(doc)
+                if len(results) == search_context.size:
+                    return results
         return results
 
     def append_bulk(self, docs):
@@ -69,8 +71,8 @@ class FileReader(object):
             fname = 'data/data' + str(counter) + '.txt'
             if os.path.isfile(fname) is False:
                 return None
-            results = self.find_in_file(fname, FilterTool({'filter': {'id', id}}))
-            if len(results) > 0:
+            results = self.find_in_file(fname, SearchContext({'filter': {'id', id}, 'size': 1}))
+            if results not empty:
                 file = open(fname, "r+")
                 lines = file.readlines()
                 file.seek(0)
