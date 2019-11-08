@@ -13,9 +13,7 @@ Jinja2==2.10.3
 MarkupSafe==1.1.1
 mccabe==0.6.1
 pkginfo==1.5.0.1
-pybuilder==0.12.0.dev20190116131423
 pycodestyle==2.5.0
-PyDB==1.0.dev0
 pyflakes==2.1.1
 Pygments==2.4.2
 pypandoc==1.4
