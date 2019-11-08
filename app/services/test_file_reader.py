@@ -39,6 +39,19 @@ class FileReaderTest(unittest.TestCase):
     def test_read_file_length(self):
         self.assertEqual(self.file_reader.file_len('data-test/data1.txt'), 3)
 
+    def test_update_value(self):
+        self.file_reader.update(2, {'id': 2, 'first_name': 'John', 'last_name': 'Doe'})
+        self.assertEqual(self.file_reader.file_len('data-test/data1.txt'), 3)
+
+        search_context = SearchContext({'filter': {'first_name': 'John'}})
+        results = self.file_reader.find(search_context)
+        self.assertEqual(len(results), 1)
+
+        self.file_reader.update(2, {'id': 2, 'first_name': 'name2', 'last_name': 'last name2'})
+        results = self.file_reader.find(search_context)
+        self.assertIsNone(results)
+
+
     def suite():
         return unittest.TestLoader().loadTestsFromTestCase(FileReaderTest)
 
