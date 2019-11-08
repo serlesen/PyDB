@@ -7,11 +7,11 @@ from app.tools.database_context import DatabaseContext
 
 class FileReader(object):
 
-    def find(self, search_context):
+    def find(self, collection, search_context):
         counter = 0
         while True:
             counter += 1
-            fname = DatabaseContext.DATA_FOLDER + 'data' + str(counter) + '.txt'
+            fname = DatabaseContext.DATA_FOLDER + collection + '/data' + str(counter) + '.txt'
             if os.path.isfile(fname) is False:
                 return None
             results = self.find_in_file(fname, search_context)
@@ -29,11 +29,11 @@ class FileReader(object):
                         return results
             return results
 
-    def append_bulk(self, docs):
+    def append_bulk(self, collection, docs):
         counter = 0
         while True:
             counter += 1
-            fname = DatabaseContext.DATA_FOLDER + 'data' + str(counter) + '.txt'
+            fname = DatabaseContext.DATA_FOLDER + collection + '/data' + str(counter) + '.txt'
             if os.path.isfile(fname):
                 size = self.file_len(fname)
                 if size >= DatabaseContext.MAX_DOC_PER_FILE:
@@ -41,21 +41,21 @@ class FileReader(object):
             with open(fname, "a") as file:
                 for doc in docs:
                     normalized_doc = self.normalize(doc)
-                    file.write(self.to_str(normalized_doc) + '\n')
+                    file.write(json.dumps(normalized_doc) + '\n')
                 return "Done"
         return None
 
-    def append(self, doc):
+    def append(self, collection, doc):
         counter = 0
         while True:
             counter += 1
-            fname = DatabaseContext.DATA_FOLDER + 'data' + str(counter) + '.txt'
+            fname = DatabaseContext.DATA_FOLDER + collection + '/data' + str(counter) + '.txt'
             if os.path.isfile(fname):
                 if self.file_len(fname) >= DatabaseContext.MAX_DOC_PER_FILE:
                     continue
             with open(fname, "a") as file:
                 normalized_doc = self.normalize(doc)
-                file.write(self.to_str(normalized_doc) + '\n')
+                file.write(json.dumps(normalized_doc) + '\n')
                 return normalized_doc
         return None
 
@@ -66,11 +66,11 @@ class FileReader(object):
                 pass
         return i
 
-    def update(self, id, doc):
+    def update(self, collection, id, doc):
         counter = 0
         while True:
             counter += 1
-            fname = DatabaseContext.DATA_FOLDER + 'data' + str(counter) + '.txt'
+            fname = DatabaseContext.DATA_FOLDER + collection + '/data' + str(counter) + '.txt'
             if os.path.isfile(fname) is False:
                 return None
             results = self.find_in_file(fname, SearchContext({'filter': {'id': id}, 'size': 1}))
@@ -89,7 +89,7 @@ class FileReader(object):
                                     continue
                                 normalized_doc = self.normalize(doc)
                                 updated = normalized_doc
-                                line = self.to_str(normalized_doc) + '\n'
+                                line = json.dumps(normalized_doc) + '\n'
                         file.write(line)
                     return updated
 
@@ -99,5 +99,3 @@ class FileReader(object):
             normalized_doc[k.lower()] = doc[k]
         return normalized_doc
 
-    def to_str(self, doc):
-        return str(doc).replace('\'', '"')

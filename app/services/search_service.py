@@ -3,5 +3,5 @@ from app.services import file_reader
 
 class SearchService(object):
 
-    def search(self, search_context):
-        return file_reader.find(search_context)
+    def search(self, collection, search_context):
+        return file_reader.find(collection, search_context)
