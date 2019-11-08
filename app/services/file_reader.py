@@ -1,16 +1,17 @@
 import json
 import os.path
+
 from app.tools.filter_tool import FilterTool
+from app.tools.search_context import SearchContext
+from app.tools.database_context import DatabaseContext
 
 class FileReader(object):
-
-    MAX_DOC_PER_FILE = 100000
 
     def find(self, search_context):
         counter = 0
         while True:
             counter += 1
-            fname = 'data/data' + str(counter) + '.txt'
+            fname = DatabaseContext.DATA_FOLDER + 'data' + str(counter) + '.txt'
             if os.path.isfile(fname) is False:
                 return None
             results = self.find_in_file(fname, search_context)
@@ -32,10 +33,10 @@ class FileReader(object):
         counter = 0
         while True:
             counter += 1
-            fname = 'data/data' + str(counter) + '.txt'
+            fname = DatabaseContext.DATA_FOLDER + 'data' + str(counter) + '.txt'
             if os.path.isfile(fname):
                 size = self.file_len(fname)
-                if size > self.MAX_DOC_PER_FILE:
+                if size >= DatabaseContext.MAX_DOC_PER_FILE:
                     continue
             with open(fname, "a") as file:
                 for doc in docs:
@@ -48,9 +49,9 @@ class FileReader(object):
         counter = 0
         while True:
             counter += 1
-            fname = 'data/data' + str(counter) + '.txt'
+            fname = DatabaseContext.DATA_FOLDER + 'data' + str(counter) + '.txt'
             if os.path.isfile(fname):
-                if self.file_len(fname) > self.MAX_DOC_PER_FILE:
+                if self.file_len(fname) >= DatabaseContext.MAX_DOC_PER_FILE:
                     continue
             with open(fname, "a") as file:
                 normalized_doc = self.normalize(doc)
@@ -59,19 +60,20 @@ class FileReader(object):
         return None
 
     def file_len(self, fname):
+        i = 0
         with open(fname) as f:
-            for i, l in enumerate(f):
+            for i, l in enumerate(f, 1):
                 pass
-        return i + 1
+        return i
 
     def update(self, id, doc):
         counter = 0
         while True:
             counter += 1
-            fname = 'data/data' + str(counter) + '.txt'
+            fname = DatabaseContext.DATA_FOLDER + 'data' + str(counter) + '.txt'
             if os.path.isfile(fname) is False:
                 return None
-            results = self.find_in_file(fname, SearchContext({'filter': {'id', id}, 'size': 1}))
+            results = self.find_in_file(fname, SearchContext({'filter': {'id': id}, 'size': 1}))
             if len(results) > 0:
                 with open(fname, "r+") as file:
                     lines = file.readlines()

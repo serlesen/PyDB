@@ -1,4 +1,5 @@
 from app.tools.filter_tool import FilterTool
+from app.tools.database_context import DatabaseContext
 
 class SearchContext(object):
 
@@ -11,17 +12,17 @@ class SearchContext(object):
         if 'size' in query:
             self.size = query['size']
         else:
-            self.size = 10
+            self.size = DatabaseContext.DEFAULT_RESULTS_SIZE
 
         if 'skip' in query:
             self.skip = query['skip']
         else:
-            self.skip = 0
+            self.skip = DatabaseContext.DEFAULT_RESULTS_SKIP
 
         if 'sort' in query:
             self.sort = query['sort']
         else:
-            self.sort = None
+            self.sort = DatabaseContext.DEFAULT_RESULTS_SORT
 
         if 'map' in query:
             self.map = query['map']
