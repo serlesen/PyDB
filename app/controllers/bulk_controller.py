@@ -1,7 +1,9 @@
+import random, string
+
 from flask import Flask, request, abort, make_response, jsonify
 from app.controllers import app
 from app.controllers import crud_service
-import random, string
+from app.tools.collection_meta_data import CollectionMetaData
 
 @app.route('/<collection>/bulk')
 def bulk(collection):
@@ -17,7 +19,7 @@ def bulk(collection):
                          "salary":15352,
                          "email":"my.email@google.com"
                     })
-        crud_service.bulk_insert(collection, l)
+        crud_service.bulk_insert(CollectionMetaData(collection), l)
     return "Done"
 
 def randomString(stringLength=10):
