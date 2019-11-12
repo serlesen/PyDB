@@ -78,7 +78,7 @@ class FileReader(object):
                                 updated = normalized_doc
                                 line = json.dumps(normalized_doc) + '\n'
                         file.write(line)
-                if self.file_len(pname) == 0:
+                if doc is None and self.file_len(pname) == 0:
                     col_meta_data.remove_last_data_file()
                 return updated
         return None
