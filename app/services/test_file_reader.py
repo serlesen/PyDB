@@ -11,12 +11,12 @@ class FileReaderTest(unittest.TestCase):
         self.file_reader = FileReader()
 
     def test_find_doc_in_file(self):
-        search_context = SearchContext({'filter': {'id': 3}})
+        search_context = SearchContext({'$filter': {'id': 3}})
         results = self.file_reader.find_in_file('data-test/col/data1.txt', search_context)
         self.assertEqual(len(results), 1)
 
     def test_find_doc_in_second_file(self):
-        search_context = SearchContext({'filter': {'id': 12}})
+        search_context = SearchContext({'$filter': {'id': 12}})
         results = self.file_reader.find('col', search_context)
         self.assertEqual(len(results), 1)
 
@@ -43,7 +43,7 @@ class FileReaderTest(unittest.TestCase):
         self.file_reader.update('col', 2, {'id': 2, 'first_name': 'John', 'last_name': 'Doe'})
         self.assertEqual(self.file_reader.file_len('data-test/col/data1.txt'), 3)
 
-        search_context = SearchContext({'filter': {'first_name': 'John'}})
+        search_context = SearchContext({'$filter': {'first_name': 'John'}})
         results = self.file_reader.find('col', search_context)
         self.assertEqual(len(results), 1)
 

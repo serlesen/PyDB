@@ -3,8 +3,8 @@ from app.controllers import app
 from app.controllers import crud_service
 import random, string
 
-@app.route('/generate')
-def generate():
+@app.route('/<collection>/bulk')
+def bulk(collection):
     for i in range(250):
         l = []
         for j in range(1000):
@@ -17,7 +17,7 @@ def generate():
                          "salary":15352,
                          "email":"my.email@google.com"
                     })
-        crud_service.bulk_insert(l)
+        crud_service.bulk_insert(collection, l)
     return "Done"
 
 def randomString(stringLength=10):

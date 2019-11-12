@@ -12,7 +12,7 @@ def create(collection):
 
 @app.route('/<collection>/<id>')
 def get(collection, id):
-    result = search_service.search(collection, SearchContext({"filter":{"id":int(id)}}))
+    result = search_service.search(collection, SearchContext({"$filter":{"id":int(id)}}))
     if result is None or len(result) != 1:
         abort(404)
     return result[0]

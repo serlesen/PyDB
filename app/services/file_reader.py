@@ -73,7 +73,7 @@ class FileReader(object):
             fname = DatabaseContext.DATA_FOLDER + collection + '/data' + str(counter) + '.txt'
             if os.path.isfile(fname) is False:
                 return None
-            results = self.find_in_file(fname, SearchContext({'filter': {'id': id}, 'size': 1}))
+            results = self.find_in_file(fname, SearchContext({'$filter': {'id': id}, 'size': 1}))
             if len(results) > 0:
                 with open(fname, "r+") as file:
                     lines = file.readlines()

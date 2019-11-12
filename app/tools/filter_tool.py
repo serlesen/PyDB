@@ -4,7 +4,7 @@ class FilterTool(object):
         self.search_filter = search_filter
 
     def match(self, doc):
-        f = self.search_filter['filter']
+        f = self.search_filter['$filter']
         return self.match_filter(doc, f)
 
     def match_filter(self, doc, filter_list):
@@ -14,7 +14,7 @@ class FilterTool(object):
 
     def match_and(self, doc, filter_list):
         for k in filter_list.keys():
-            if k == 'filter':
+            if k == '$filter':
                 return self.match_filter(doc, filter_list[k])
             if k not in doc:
                 return False
