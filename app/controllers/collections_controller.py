@@ -7,6 +7,14 @@ from app.controllers import collections_service
 def create_collection(collection):
     return collections_service.create(collection)
 
+@app.rout('/collections/<collection>/index/<field>', methods=['POST'])
+def create_index(collection, field):
+    return collections_service.create_index(collection, field)
+
 @app.route('/collections/<collection>', methods=['DELETE'])
 def delete_collection(collection):
     return collections_service.remove(collection)
+
+@app.rout('/collections/<collection>/index/<field>', methods=['DELETE'])
+def delete_index(collection, field):
+    return collections_service.remove_index(collection, field)

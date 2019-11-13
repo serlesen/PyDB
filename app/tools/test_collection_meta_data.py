@@ -20,6 +20,16 @@ class CollectionMetaDataTest(unittest.TestCase):
         meta_data = CollectionMetaData('col')
         self.assertListEqual(meta_data.enumerate_data_fnames(), ['data1.txt', 'data2.txt'])
 
+    def test_add_remove_index(self):
+        meta_data = CollectionMetaData('col')
+
+        result = meta_data.add_index('id')
+        self.assertEqual(result['status'], 'done')
+        self.assertEqual(meta_data.indexes['id'], 'id.idx')
+
+        meta_data.remove_index('id')
+        self.assertEqual(result['status'], 'done')
+        self.assertTrue('id' not in meta_data.indexes)
 
     def suite():
         return unittest.TestLoader.loadTestsFromTestCase(CollectionMetaDataTest)

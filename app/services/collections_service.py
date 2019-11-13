@@ -16,8 +16,16 @@ class CollectionsService(object):
 
         return {'status': 'done'}
 
+    def create_index(self, collection, field):
+        col_meta_data = CollectionMetaData(collection)
+        return col_meta_data.add_index(field)
+
     def remove(self, collection):
         if os.path.exists(DatabaseContext.DATA_FOLDER + collection):
             shutil.rmtree(DatabaseContext.DATA_FOLDER + collection)
             return {'status': 'done'}
         return {'status': 'missing collection'}
+
+    def remove_index(self, collection, field):
+        col_meta_data = CollectionMetaData(collection)
+        return col_meta_data.remove_index(field)
