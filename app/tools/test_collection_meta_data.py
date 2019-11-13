@@ -14,11 +14,11 @@ class CollectionMetaDataTest(unittest.TestCase):
 
     def test_last_data_file(self):
         meta_data = CollectionMetaData('col')
-        self.assertEqual(meta_data.last_data_fname(), 'data2.txt')
+        self.assertEqual(meta_data.last_data_fname(), 'data2.bin')
 
     def test_enumerate_file_names(self):
         meta_data = CollectionMetaData('col')
-        self.assertListEqual(meta_data.enumerate_data_fnames(), ['data1.txt', 'data2.txt'])
+        self.assertListEqual(meta_data.enumerate_data_fnames(), ['data1.bin', 'data2.bin'])
 
     def test_add_remove_index(self):
         meta_data = CollectionMetaData('col')

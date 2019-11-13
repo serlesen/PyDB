@@ -1,3 +1,0 @@
-{"id": 1, "first_name": "name1", "last_name": "last name1"}
-{"id": 2, "first_name": "name2", "last_name": "last name2"}
-{"id": 3, "first_name": "name3", "last_name": "last name3"}

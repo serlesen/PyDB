@@ -9,7 +9,7 @@ from app.tools.database_context import DatabaseContext
 class CollectionMetaData(object):
 
     META_DATA_FILE_NAME = 'meta_data.txt'
-    DATA_FILE_NAME = 'data{}.txt'
+    DATA_FILE_NAME = 'data{}.bin'
     INDEX_FILE_NAME = '{}.idx'
 
     def __init__(self, collection):
