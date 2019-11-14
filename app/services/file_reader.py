@@ -31,8 +31,11 @@ class FileReader(object):
         if self.file_len(pname) >= DatabaseContext.MAX_DOC_PER_FILE:
            pname = DatabaseContext.DATA_FOLDER + col_meta_data.collection + '/' + col_meta_data.next_data_fname() 
 
-        with open(pname, 'rb') as file:
-            docs = pickle.load(file)
+        if os.path.exists(pname):
+            with open(pname, 'rb') as file:
+                docs = pickle.load(file)
+        else:
+            docs = []
            
         with open(pname, 'wb') as file:
             for doc in input_docs:
@@ -46,8 +49,11 @@ class FileReader(object):
         if self.file_len(pname) >= DatabaseContext.MAX_DOC_PER_FILE:
            pname = DatabaseContext.DATA_FOLDER + col_meta_data.collection + '/' + col_meta_data.next_data_fname() 
  
-        with open(pname, 'rb') as file:
-            docs = pickle.load(file)
+        if os.path.exists(pname):
+            with open(pname, 'rb') as file:
+                docs = pickle.load(file)
+        else:
+            docs = []
 
         with open(pname, "wb") as file:
             normalized_doc = self.normalize(doc)
@@ -58,7 +64,7 @@ class FileReader(object):
     def file_len(self, pname):
         if os.path.exists(pname) is False:
             return 0
-        with open(pname, 'rb') as f:
+        with open(pname, 'rb') as file:
             docs = pickle.load(file)
             return len(docs)
 
@@ -75,13 +81,15 @@ class FileReader(object):
                     for doc in docs:
                         if updated is None:
                             if doc["id"] == id:
+                                docs.remove(doc)
                                 if input_doc is None:
                                     updated = doc
-                                    continue
-                                normalized_doc = self.normalize(input_doc)
-                                updated = normalized_doc
-                                docs.append(normalized_doc)
-                    file.write(pickel.dumps(docs))
+                                else:
+                                    normalized_doc = self.normalize(input_doc)
+                                    updated = normalized_doc
+                                    docs.append(normalized_doc)
+                    file.write(pickle.dumps(docs))
+
                 if input_doc is None and self.file_len(pname) == 0:
                     col_meta_data.remove_last_data_file()
                 return updated
