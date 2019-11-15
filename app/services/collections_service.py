@@ -3,8 +3,12 @@ import shutil
 
 from app.tools.collection_meta_data import CollectionMetaData
 from app.tools.database_context import DatabaseContext
+from app.services.indexes_service import IndexesService
 
 class CollectionsService(object):
+
+    def __init__(self):
+        self.indexes_service = IndexesService()
 
     def create(self, collection):
         if os.path.exists(DatabaseContext.DATA_FOLDER + collection):
@@ -17,8 +21,7 @@ class CollectionsService(object):
         return {'status': 'done'}
 
     def create_index(self, collection, field):
-        col_meta_data = CollectionMetaData(collection)
-        return col_meta_data.add_index(field)
+        return self.indexes_service.build_index(CollectionMetaData(collection), field)
 
     def remove(self, collection):
         if os.path.exists(DatabaseContext.DATA_FOLDER + collection):
@@ -27,5 +30,4 @@ class CollectionsService(object):
         return {'status': 'missing collection'}
 
     def remove_index(self, collection, field):
-        col_meta_data = CollectionMetaData(collection)
-        return col_meta_data.remove_index(field)
+        return self.indexes_service.remove_index(CollectionMetaData(collection), field)

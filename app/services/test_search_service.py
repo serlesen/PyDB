@@ -12,7 +12,7 @@ class SearchServiceTest(unittest.TestCase):
         DatabaseContext.DATA_FOLDER = 'data-test/'
         self.search_service = SearchService()
 
-    @timeout_decorator.timeout(1.5)
+    @timeout_decorator.timeout(2)
     def test_search_over_250000_docs(self):
         self.search_service.search(CollectionMetaData('big-col'), SearchContext({'$filter': {'id': 249994}}))
 
