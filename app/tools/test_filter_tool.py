@@ -73,5 +73,15 @@ class FilterToolTest(unittest.TestCase):
 
         self.assertFalse(search_filter.match({'last_name': 'ln2', 'address': 'somewhere2'}))
 
+    def test_exists_field(self):
+        search_filter = FilterTool({'$filter': {'first_name': '$exists'}})
+
+        self.assertTrue(search_filter.match({'first_name': 'John', 'last_name': 'Doe'}))
+
+    def test_doesnt_exists_field(self):
+        search_filter = FilterTool({'$filter': {'first_name1': '$exists'}})
+
+        self.assertFalse(search_filter.match({'first_name': 'John', 'last_name': 'Doe'}))
+
     def suite():
         return unittest.TestLoader().loadTestsFromTestCase(FilterToolTest)

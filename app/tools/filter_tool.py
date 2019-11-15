@@ -21,9 +21,19 @@ class FilterTool(object):
             if isinstance(filter_list[k], list):
                 if not self.match_in(doc[k], filter_list[k]):
                     return False
+            elif filter_list[k] == '$exists':
+                if not self.match_exists(doc, k, True):
+                    return False
             elif doc[k] != filter_list[k]:
                 return False
         return True
+
+    def match_exists(self, doc, field, exists):
+        if field in doc and exists:
+            return True
+        if field not in doc and not exists:
+            return True
+        return False
 
     def match_in(self, val, filter_list):
         return val in filter_list
