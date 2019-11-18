@@ -10,7 +10,6 @@ class CollectionMetaData(object):
 
     META_DATA_FILE_NAME = 'meta_data.txt'
     DATA_FILE_NAME = 'data{}.bin'
-    INDEX_FILE_NAME = '{}.idx'
 
     def __init__(self, collection):
         self.collection = collection
@@ -25,10 +24,10 @@ class CollectionMetaData(object):
             self.counter = int(file.readline())
             self.indexes = eval(file.readline())
 
-    def add_index(self, field):
+    def add_index(self, field, count):
         if field in self.indexes:
             return {'status': 'already existing'}
-        self.indexes[field] = self.INDEX_FILE_NAME.format(field)
+        self.indexes[field] = count
         self.update_meta_data(str(self.indexes), 2)
         return {'status': 'done'}
             

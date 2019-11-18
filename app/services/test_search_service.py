@@ -16,5 +16,10 @@ class SearchServiceTest(unittest.TestCase):
     def test_search_over_250000_docs(self):
         self.search_service.search(CollectionMetaData('big-col'), SearchContext({'$filter': {'id': 249994}}))
 
+    @timeout_decorator.timeout(2)
+    def test_search_over_250000_docs_with_index(self):
+        self.search_service.search(CollectionMetaData('big-col-with-index'), SearchContext({'$filter': {'id': 249994}}))
+
+
     def suite():
         return unittest.TestLoader.loadTestsFromTestCase(SearchServiceTest)
