@@ -22,17 +22,16 @@ class IndexesService(object):
             if filter_tool.match(d):
                 resulting_docs.append(d)
 
-
         pname = DatabaseContext.DATA_FOLDER + col_meta_data.collection + '/' + self.INDEX_FILE_NAME.format(field)
         if os.path.exists(pname):
             return {'status': 'already existing'}
 
         values = {}
-        for doc in resulting_docs:
+        for i, doc in enumerate(resulting_docs):
             key = doc[field]
             if key not in values:
                 values[key] = []
-            values[key].append(doc)
+            values[key].append(i)
 
         with open(pname, 'wb') as file:
             file.write(pickle.dumps(values))

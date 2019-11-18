@@ -10,6 +10,7 @@ class SearchServiceTest(unittest.TestCase):
 
     def setUp(self):
         DatabaseContext.DATA_FOLDER = 'data-test/'
+        DatabaseContext.MAX_DOC_PER_FILE = 100000
         self.search_service = SearchService()
 
     def test_find_doc_in_file(self):
@@ -22,13 +23,17 @@ class SearchServiceTest(unittest.TestCase):
         results = self.search_service.search(CollectionMetaData('col'), search_context)
         self.assertEqual(len(results), 1)
 
-    @timeout_decorator.timeout(2)
+    @timeout_decorator.timeout(2.5)
     def test_search_over_250000_docs(self):
-        self.search_service.search(CollectionMetaData('big-col'), SearchContext({'$filter': {'id': 249994}}))
+        results = self.search_service.search(CollectionMetaData('big-col'), SearchContext({'$filter': {'id': 449994}}))
+        self.assertEqual(len(results), 1)
+        self.assertEqual(results[0]['id'], 449994)
 
-    @timeout_decorator.timeout(2)
+    @timeout_decorator.timeout(1)
     def test_search_over_250000_docs_with_index(self):
-        self.search_service.search(CollectionMetaData('big-col-with-index'), SearchContext({'$filter': {'id': 249994}}))
+        results = self.search_service.search(CollectionMetaData('big-col-with-index'), SearchContext({'$filter': {'id': 449994}}))
+        self.assertEqual(len(results), 1)
+        self.assertEqual(results[0]['id'], 449994)
 
 
     def suite():

@@ -14,7 +14,8 @@ class SearchService(object):
         if indexed_value != None:
             k = list(indexed_value.keys())[0]
             v = indexed_value[k]
-            docs = self.indexes_service.find_all(col_meta_data, k, v)
+            lines = self.indexes_service.find_all(col_meta_data, k, v)
+            docs = self.file_reader.find_by_line(col_meta_data, lines)
             res = self.find_in_docs(docs, search_context)
             return res
         docs = self.file_reader.find_all(col_meta_data)

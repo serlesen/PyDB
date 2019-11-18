@@ -14,6 +14,24 @@ class FileReader(object):
                 results.extend(pickle.load(file))
         return results
 
+    def find_by_line(self, col_meta_data, lines):
+        lines_it = iter(lines)
+        l = next(lines_it)
+        results = []
+        try:
+            for i, fname in enumerate(col_meta_data.enumerate_data_fnames()):
+                if l > (i + 1) * DatabaseContext.MAX_DOC_PER_FILE:
+                    continue
+                pname = DatabaseContext.DATA_FOLDER + col_meta_data.collection + '/' + fname
+                with open(pname, "rb") as file:
+                    current_docs = pickle.load(file)
+                    while l < (i + 1) * DatabaseContext.MAX_DOC_PER_FILE:
+                        current_line = l - i * DatabaseContext.MAX_DOC_PER_FILE
+                        results.append(current_docs[current_line])
+                        l = next(lines_it)
+        except StopIteration:    
+            return results
+
     def find_one_in_file(self, pname, filter_tool):
         with open(pname, "rb") as file:
             docs = pickle.load(file)
