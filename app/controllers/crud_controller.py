@@ -14,7 +14,7 @@ def create(collection):
 @app.route('/<collection>/<id>')
 def get(collection, id):
     result = search_service.search(CollectionMetaData(collection), SearchContext({"$filter":{"id":int(id)}}))
-    if result is None or len(result) != 1:
+    if len(result) != 1:
         abort(404)
     return result[0]
 
@@ -23,13 +23,13 @@ def update(collection, id):
     if not request.json:
         abort(405)
     result = crud_service.update(CollectionMetaData(collection), int(id), request.json)
-    if result is None or len(result) != 1:
+    if len(result) != 1:
         abort(404)
     return result[0]
 
 @app.route('/<collection>/<id>', methods=['DELETE'])
 def delete(collection, id):
     result = crud_service.update(CollectionMetaData(collection), int(id), None)
-    if result is None or len(result) != 1:
+    if len(result) != 1:
         abort(404)
     return result[0]

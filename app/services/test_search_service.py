@@ -12,6 +12,16 @@ class SearchServiceTest(unittest.TestCase):
         DatabaseContext.DATA_FOLDER = 'data-test/'
         self.search_service = SearchService()
 
+    def test_find_doc_in_file(self):
+        search_context = SearchContext({'$filter': {'id': 3}})
+        results = self.search_service.search(CollectionMetaData('col'), search_context)
+        self.assertEqual(len(results), 1)
+
+    def test_find_doc_in_second_file(self):
+        search_context = SearchContext({'$filter': {'id': 12}})
+        results = self.search_service.search(CollectionMetaData('col'), search_context)
+        self.assertEqual(len(results), 1)
+
     @timeout_decorator.timeout(2)
     def test_search_over_250000_docs(self):
         self.search_service.search(CollectionMetaData('big-col'), SearchContext({'$filter': {'id': 249994}}))

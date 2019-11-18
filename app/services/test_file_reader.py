@@ -3,7 +3,7 @@ import unittest
 from app.services.file_reader import FileReader
 from app.tools.collection_meta_data import CollectionMetaData
 from app.tools.database_context import DatabaseContext
-from app.tools.search_context import SearchContext
+from app.tools.filter_tool import FilterTool
 
 class FileReaderTest(unittest.TestCase):
 
@@ -11,15 +11,10 @@ class FileReaderTest(unittest.TestCase):
         DatabaseContext.DATA_FOLDER = 'data-test/'
         self.file_reader = FileReader()
 
-    def test_find_doc_in_file(self):
-        search_context = SearchContext({'$filter': {'id': 3}})
-        results = self.file_reader.find_in_file('data-test/col/data1.bin', search_context)
-        self.assertEqual(len(results), 1)
-
-    def test_find_doc_in_second_file(self):
-        search_context = SearchContext({'$filter': {'id': 12}})
-        results = self.file_reader.find(CollectionMetaData('col'), search_context)
-        self.assertEqual(len(results), 1)
+    def test_find_one_doc_in_file(self):
+        filter_tool = FilterTool({'$filter': {'id': 3}})
+        result = self.file_reader.find_one_in_file('data-test/col/data1.bin', filter_tool)
+        self.assertEqual(result['id'], 3)
 
     def test_append_and_remove_doc_in_file(self):
         DatabaseContext.MAX_DOC_PER_FILE = 10000
@@ -45,12 +40,13 @@ class FileReaderTest(unittest.TestCase):
         self.file_reader.update(CollectionMetaData('col'), 2, {'id': 2, 'first_name': 'John', 'last_name': 'Doe'})
         self.assertEqual(self.file_reader.file_len('data-test/col/data1.bin'), 3)
 
-        search_context = SearchContext({'$filter': {'first_name': 'John'}})
-        results = self.file_reader.find(CollectionMetaData('col'), search_context)
-        self.assertEqual(len(results), 1)
+        filter_tool = FilterTool({'$filter': {'first_name': 'John'}})
+        result = self.file_reader.find_one_in_file('data-test/col/data1.bin', filter_tool)
+        self.assertEqual(result['id'], 2)
+        self.assertEqual(result['first_name'], 'John')
 
         self.file_reader.update(CollectionMetaData('col'), 2, {'id': 2, 'first_name': 'name2', 'last_name': 'last name2'})
-        results = self.file_reader.find(CollectionMetaData('col'), search_context)
+        results = self.file_reader.find_one_in_file('data-test/col/data1.bin', filter_tool)
         self.assertIsNone(results)
 
 

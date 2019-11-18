@@ -6,6 +6,9 @@ class SearchContext(object):
     def __init__(self, query):
         if '$filter' in query:
             self.filter = FilterTool(query)
+            self.filter_keys = []
+            for k in query['$filter'].keys():
+                self.filter_keys.append({k: query['$filter'][k]})
         else:
             self.filter = None
 

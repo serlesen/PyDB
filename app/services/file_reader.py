@@ -2,29 +2,25 @@ import _pickle as pickle
 import os.path
 
 from app.tools.filter_tool import FilterTool
-from app.tools.search_context import SearchContext
 from app.tools.database_context import DatabaseContext
 
 class FileReader(object):
 
-    def find(self, col_meta_data, search_context):
+    def find_all(self, col_meta_data):
+        results = []
         for fname in col_meta_data.enumerate_data_fnames():
             pname = DatabaseContext.DATA_FOLDER + col_meta_data.collection + '/' + fname
-            results = self.find_in_file(pname, search_context)
-            if len(results) > 0:
-                return results
-        return None
+            with open(pname, "rb") as file:
+                results.extend(pickle.load(file))
+        return results
 
-    def find_in_file(self, pname, search_context):
+    def find_one_in_file(self, pname, filter_tool):
         with open(pname, "rb") as file:
-            results = []
             docs = pickle.load(file)
             for doc in docs:
-                if search_context.filter.match(doc):
-                    results.append(doc)
-                    if len(results) == search_context.size:
-                        return results
-            return results
+                if filter_tool.match(doc):
+                    return doc
+            return None
 
     def append_bulk(self, col_meta_data, input_docs):
         pname = DatabaseContext.DATA_FOLDER + col_meta_data.collection + '/' + col_meta_data.last_data_fname()
@@ -68,11 +64,12 @@ class FileReader(object):
             docs = pickle.load(file)
             return len(docs)
 
+    # TODO also update the index
     def update(self, col_meta_data, id, input_doc):
         for fname in col_meta_data.enumerate_data_fnames():
             pname = DatabaseContext.DATA_FOLDER + col_meta_data.collection + '/' + fname
-            results = self.find_in_file(pname, SearchContext({'$filter': {'id': id}, 'size': 1}))
-            if len(results) > 0:
+            results = self.find_one_in_file(pname, FilterTool({'$filter': {'id': id}, 'size': 1}))
+            if results is not None:
                 with open(pname, "rb+") as file:
                     docs = pickle.load(file)
                     file.seek(0)
@@ -93,7 +90,7 @@ class FileReader(object):
                 if input_doc is None and self.file_len(pname) == 0:
                     col_meta_data.remove_last_data_file()
                 return updated
-        return None
+        return []
 
     def normalize(self, doc):
         normalized_doc = {}

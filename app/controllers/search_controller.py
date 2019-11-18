@@ -12,6 +12,6 @@ def search(collection):
     if not ArgumentParser.validate(request.json):
         abort(400)
     result = search_service.search(CollectionMetaData(collection), SearchContext(request.json))
-    if result is None:
+    if len(result) == 0:
         abort(404)
     return result
