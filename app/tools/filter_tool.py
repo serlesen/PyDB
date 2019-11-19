@@ -16,14 +16,19 @@ class FilterTool(object):
         for k in filter_list.keys():
             if k == '$filter':
                 return self.match_filter(doc, filter_list[k])
-            if k not in doc:
-                return False
-            if isinstance(filter_list[k], list):
+            elif isinstance(filter_list[k], list):
                 if not self.match_in(doc[k], filter_list[k]):
                     return False
+            elif isinstance(filter_list[k], dict):
+                inner_dict_key = list(filter_list[k].keys())[0]
+                if inner_dict_key == '$exists':
+                    if not self.match_exists(doc, k, filter_list[k][inner_dict_key]):
+                        return False
             elif filter_list[k] == '$exists':
                 if not self.match_exists(doc, k, True):
                     return False
+            elif k not in doc:
+                return False
             elif doc[k] != filter_list[k]:
                 return False
         return True
