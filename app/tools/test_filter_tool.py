@@ -73,16 +73,6 @@ class FilterToolTest(unittest.TestCase):
 
         self.assertFalse(search_filter.match({'last_name': 'ln2', 'address': 'somewhere2'}))
 
-    def test_exists_field(self):
-        search_filter = FilterTool({'$filter': {'first_name': '$exists'}})
-
-        self.assertTrue(search_filter.match({'first_name': 'John', 'last_name': 'Doe'}))
-
-    def test_doesnt_exists_field(self):
-        search_filter = FilterTool({'$filter': {'first_name1': '$exists'}})
-
-        self.assertFalse(search_filter.match({'first_name': 'John', 'last_name': 'Doe'}))
-
     def test_inner_dict_exists_field(self):
         search_filter = FilterTool({'$filter': {'first_name': {'$exists': True}}})
 
@@ -122,6 +112,21 @@ class FilterToolTest(unittest.TestCase):
         search_filter = FilterTool({'$filter': {'first_name': {'$reg': '.*nh$'}}})
 
         self.assertFalse(search_filter.match({'first_name': 'John', 'last_name': 'Smith'}))
+
+    def test_inner_doc(self):
+        search_filter = FilterTool({'$filter': {'user.first_name': 'John'}})
+
+        self.assertTrue(search_filter.match({'user': {'first_name': 'John', 'last_name': 'Smith'}}))
+
+    def test_fail_inner_doc_as_missing(self):
+        search_filter = FilterTool({'$filter': {'user.name': 'John'}})
+
+        self.assertFalse(search_filter.match({'user': {'first_name': 'John', 'last_name': 'Smith'}}))
+
+    def test_fail_inner_doc(self):
+        search_filter = FilterTool({'$filter': {'user.last_name': 'Doe'}})
+
+        self.assertFalse(search_filter.match({'user': {'first_name': 'John', 'last_name': 'Smith'}}))
 
     def suite():
         return unittest.TestLoader().loadTestsFromTestCase(FilterToolTest)

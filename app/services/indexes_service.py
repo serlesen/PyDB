@@ -16,7 +16,7 @@ class IndexesService(object):
 
     def build_index(self, col_meta_data, field):
         docs = self.file_reader.find_all(col_meta_data)
-        filter_tool = FilterTool({'$filter': {field: '$exists'}})
+        filter_tool = FilterTool({'$filter': {field: {'$exists': True}}})
         resulting_docs = []
         for d in docs:
             if filter_tool.match(d):

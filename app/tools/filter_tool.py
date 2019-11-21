@@ -18,20 +18,32 @@ class FilterTool(object):
         for k in filter_list.keys():
             if k == '$filter':
                 return self.match_filter(doc, filter_list[k])
+            elif '.' in k:
+                if not self.match_inner_doc(doc, k, filter_list):
+                    return False
             elif isinstance(filter_list[k], list):
                 if not self.match_in(doc[k], filter_list[k]):
                     return False
             elif isinstance(filter_list[k], dict):
                 if not self.match_inner_dict(doc, k, filter_list[k]):
                     return False
-            elif filter_list[k] == '$exists':
-                if not self.match_exists(doc, k, True):
-                    return False
             elif k not in doc:
                 return False
             elif doc[k] != filter_list[k]:
                 return False
         return True
+
+    def match_inner_doc(self, doc, field_def, filter_list):
+        fields = field_def.split('.')
+        inner_doc = doc
+        last_key = fields[0]
+        for f in fields:
+            if f in inner_doc:
+                inner_doc = inner_doc[f]
+                last_key = f
+            else:
+                return False
+        return self.match_filter({last_key :inner_doc}, {last_key : filter_list[field_def]})
 
     def match_inner_dict(self, doc, field, inner_dict):
         inner_dict_key = list(inner_dict.keys())[0]
