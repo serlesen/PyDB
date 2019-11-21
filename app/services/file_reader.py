@@ -82,7 +82,6 @@ class FileReader(object):
             docs = pickle.load(file)
             return len(docs)
 
-    # TODO also update the index
     def update(self, col_meta_data, id, input_doc):
         for fname in col_meta_data.enumerate_data_fnames():
             pname = DatabaseContext.DATA_FOLDER + col_meta_data.collection + '/' + fname
@@ -97,18 +96,16 @@ class FileReader(object):
                         if updated is None:
                             if doc["id"] == id:
                                 docs.remove(doc)
-                                if input_doc is None:
-                                    updated = doc
-                                else:
-                                    normalized_doc = self.normalize(input_doc)
-                                    updated = normalized_doc
-                                    docs.append(normalized_doc)
+                                normalized_doc = self.normalize(input_doc)
+                                updated = normalized_doc
+                                docs.append(normalized_doc)
                     file.write(pickle.dumps(docs))
 
                 if input_doc is None and self.file_len(pname) == 0:
                     col_meta_data.remove_last_data_file()
                 return updated
         return []
+
 
     def normalize(self, doc):
         normalized_doc = {}

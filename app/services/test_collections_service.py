@@ -2,13 +2,23 @@ import unittest
 import os
 
 from app.services.collections_service import CollectionsService
+from app.test.collections_simulator import CollectionsSimulator
+from app.tools.collection_meta_data import CollectionMetaData
 from app.tools.database_context import DatabaseContext
 
 class CollectionsServiceTest(unittest.TestCase):
 
+    @classmethod
+    def setUpClass(cls):
+        CollectionsSimulator.build_single_col('col')
+
     def setUp(self):
-        DatabaseContext.DATA_FOLDER = 'data-test/'
+        # instanciate the service to test
         self.collections_service = CollectionsService()
+
+    @classmethod
+    def tearDownClass(cls):
+        CollectionsSimulator.clean()
 
     def test_create_collection(self):
         result = self.collections_service.create('new_col')

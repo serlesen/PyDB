@@ -1,12 +1,20 @@
 import unittest
+import os
+import _pickle as pickle
 
+from app.test.collections_simulator import CollectionsSimulator
 from app.tools.collection_meta_data import CollectionMetaData
 from app.tools.database_context import DatabaseContext
 
 class CollectionMetaDataTest(unittest.TestCase):
 
-    def setUp(self):
-        DatabaseContext.DATA_FOLDER = 'data-test/'
+    @classmethod
+    def setUpClass(cls):
+        CollectionsSimulator.build_single_col('col')
+
+    @classmethod
+    def tearDownClass(cls):
+        CollectionsSimulator.clean()
 
     def test_read_counter(self):
         meta_data = CollectionMetaData('col')

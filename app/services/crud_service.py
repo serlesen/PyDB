@@ -15,4 +15,4 @@ class CrudService(object):
         return self.file_reader.update(col_meta_data, id, doc)
 
     def delete(self, col_meta_data, id):
-        return self.file_reader.update(col_meta_data, id, None)
+        return self.file_reader.update(col_meta_data, id, {})

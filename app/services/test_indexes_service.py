@@ -1,13 +1,23 @@
 import unittest
+import os
+import _pickle as pickle
 
 from app.services.indexes_service import IndexesService
+from app.test.collections_simulator import CollectionsSimulator
 from app.tools.collection_meta_data import CollectionMetaData
 from app.tools.database_context import DatabaseContext
 
 class IndexesServiceTest(unittest.TestCase):
 
+    @classmethod
+    def setUpClass(cls):
+        CollectionsSimulator.build_single_col('col')
+
+    @classmethod
+    def tearDownClass(cls):
+        CollectionsSimulator.clean()
+
     def setUp(self):
-        DatabaseContext.DATA_FOLDER = 'data-test/'
         self.indexes_service = IndexesService()
 
     def test_create_index(self):
