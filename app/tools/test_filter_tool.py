@@ -103,5 +103,15 @@ class FilterToolTest(unittest.TestCase):
 
         self.assertFalse(search_filter.match({'first_name': 'John', 'last_name': 'Doe'}))
 
+    def test_comparison_successfull(self):
+        search_filter = FilterTool({'$filter': {'age': {'$gt': 40}}})
+
+        self.assertTrue(search_filter.match({'id': 15, 'age': 50}))
+
+    def test_fail_comparison(self):
+        search_filter = FilterTool({'$filter': {'age': {'$lt': 40}}})
+
+        self.assertFalse(search_filter.match({'id': 15, 'age': 50}))
+
     def suite():
         return unittest.TestLoader().loadTestsFromTestCase(FilterToolTest)

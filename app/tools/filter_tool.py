@@ -24,6 +24,9 @@ class FilterTool(object):
                 if inner_dict_key == '$exists':
                     if not self.match_exists(doc, k, filter_list[k][inner_dict_key]):
                         return False
+                elif inner_dict_key in ['$gt', '$lt', '$gte', '$lte']:
+                    if not self.match_comparison(doc, k, filter_list[k][inner_dict_key], inner_dict_key):
+                        return False
             elif filter_list[k] == '$exists':
                 if not self.match_exists(doc, k, True):
                     return False
@@ -33,12 +36,23 @@ class FilterTool(object):
                 return False
         return True
 
+    def match_comparison(self, doc, field, val, comparison):
+        if field not in doc:
+            return False
+        if comparison == '$gt':
+            return doc[field] > val
+        if comparison == '$lt':
+            return doc[field] < val
+        if comparison == '$gte':
+            return doc[field] >= val
+        if comparison == '$lte':
+            return doc[field] <= val
+        return False
+
     def match_exists(self, doc, field, exists):
         if field in doc and exists:
             return True
-        if field not in doc and not exists:
-            return True
-        return False
+        return field not in doc and not exists
 
     def match_in(self, val, filter_list):
         return val in filter_list
