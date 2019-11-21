@@ -3,7 +3,11 @@ from app.tools.database_context import DatabaseContext
 
 class SearchContext(object):
 
-    def __init__(self, query):
+    def __init__(self, raw_auery):
+        query = {}
+        for k in raw_query.keys():
+            query[k.lower()] = raw_query[k]
+
         if '$filter' in query:
             self.filter = FilterTool(query)
             self.filter_keys = []
