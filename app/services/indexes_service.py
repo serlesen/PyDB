@@ -38,11 +38,20 @@ class IndexesService(object):
 
         return col_meta_data.add_index(field, len(resulting_docs))
 
-    def find_all(self, col_meta_data, field, value):
+    def find_all(self, col_meta_data, field, filter_tool):
         pname = DatabaseContext.DATA_FOLDER + col_meta_data.collection + '/' + self.INDEX_FILE_NAME.format(field)
 
         with open(pname, 'rb') as file:
-            return pickle.load(file)[value]
+            match_value = filter_tool.search_filter['$filter'][field]
+            results = []
+            if isinstance(match_value, dict) or isinstance(match_value, list):
+                values = pickle.load(file)
+                for k in values.keys():
+                    if filter_tool.match({field, k}):
+                        results.extend(values[k])
+            else:
+                results.extend(pickle.load(file)[match_value])
+            return results
 
     def remove_index(self, col_meta_data, field):
         pname = DatabaseContext.DATA_FOLDER + col_meta_data.collection + '/' + self.INDEX_FILE_NAME.format(field)

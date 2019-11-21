@@ -2,6 +2,7 @@ import datetime
 
 from app.services.file_reader import FileReader
 from app.services.indexes_service import IndexesService
+from app.tools.filter_tool import FilterTool
 
 class SearchService(object):
 
@@ -13,8 +14,7 @@ class SearchService(object):
         indexed_value = self.find_field_in_index(col_meta_data, search_context)
         if indexed_value != None:
             k = list(indexed_value.keys())[0]
-            v = indexed_value[k]
-            lines = self.indexes_service.find_all(col_meta_data, k, v)
+            lines = self.indexes_service.find_all(col_meta_data, k, FilterTool({'$filter': indexed_value}))
             docs = self.file_reader.find_by_line(col_meta_data, lines)
             res = self.find_in_docs(docs, search_context)
             return res
@@ -23,13 +23,16 @@ class SearchService(object):
 
     def find_field_in_index(self, col_meta_data, search_context):
         best_indexed_value = None
+        best_indexed_value_count = 0
         for indexed_value in search_context.filter_keys:
             k = list(indexed_value.keys())[0]
             if k in col_meta_data.indexes:
                 if best_indexed_value == None:
                     best_indexed_value = indexed_value
-                elif col_meta_data.indexes[best_indexed_value] < col_meta_data.indexes[indexed_value]:
+                    best_indexed_value_count = col_meta_data.indexes[k]
+                elif best_indexed_value_count < col_meta_data.indexes[k]:
                     best_indexed_value = indexed_value
+                    best_indexed_value_count = col_meta_data.indexes[k]
         return best_indexed_value
 
     def find_in_docs(self, docs, search_context):
