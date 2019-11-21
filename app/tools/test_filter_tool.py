@@ -113,5 +113,15 @@ class FilterToolTest(unittest.TestCase):
 
         self.assertFalse(search_filter.match({'id': 15, 'age': 50}))
 
+    def test_regex(self):
+        search_filter = FilterTool({'$filter': {'first_name': {'$reg': '^Jo.*'}}})
+
+        self.assertTrue(search_filter.match({'first_name': 'John', 'last_name': 'Smith'}))
+
+    def test_fail_regex(self):
+        search_filter = FilterTool({'$filter': {'first_name': {'$reg': '.*nh$'}}})
+
+        self.assertFalse(search_filter.match({'first_name': 'John', 'last_name': 'Smith'}))
+
     def suite():
         return unittest.TestLoader().loadTestsFromTestCase(FilterToolTest)

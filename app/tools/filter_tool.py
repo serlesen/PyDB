@@ -1,3 +1,5 @@
+import re
+
 class FilterTool(object):
 
     def __init__(self, search_filter):
@@ -20,13 +22,8 @@ class FilterTool(object):
                 if not self.match_in(doc[k], filter_list[k]):
                     return False
             elif isinstance(filter_list[k], dict):
-                inner_dict_key = list(filter_list[k].keys())[0]
-                if inner_dict_key == '$exists':
-                    if not self.match_exists(doc, k, filter_list[k][inner_dict_key]):
-                        return False
-                elif inner_dict_key in ['$gt', '$lt', '$gte', '$lte']:
-                    if not self.match_comparison(doc, k, filter_list[k][inner_dict_key], inner_dict_key):
-                        return False
+                if not self.match_inner_dict(doc, k, filter_list[k]):
+                    return False
             elif filter_list[k] == '$exists':
                 if not self.match_exists(doc, k, True):
                     return False
@@ -35,6 +32,25 @@ class FilterTool(object):
             elif doc[k] != filter_list[k]:
                 return False
         return True
+
+    def match_inner_dict(self, doc, field, inner_dict):
+        inner_dict_key = list(inner_dict.keys())[0]
+        if inner_dict_key == '$exists':
+            if not self.match_exists(doc, field, inner_dict[inner_dict_key]):
+                return False
+        elif inner_dict_key in ['$gt', '$lt', '$gte', '$lte']:
+            if not self.match_comparison(doc, field, inner_dict[inner_dict_key], inner_dict_key):
+                return False
+        elif inner_dict_key == '$reg':
+            if not self.match_regex(doc, field, inner_dict[inner_dict_key]):
+                return False
+        return True
+
+    def match_regex(self, doc, field, regex):
+        if re.match(regex, doc[field]):
+            result = re.match(regex, doc[field])
+            return True
+        return False
 
     def match_comparison(self, doc, field, val, comparison):
         if field not in doc:
