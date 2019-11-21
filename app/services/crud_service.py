@@ -1,11 +1,20 @@
+import uuid
+
 from app.services.file_reader import FileReader
+from app.services.search_service import SearchService
+from app.tools.search_context import SearchContext
 
 class CrudService(object):
 
     def __init__(self):
         self.file_reader = FileReader()
+        self.search_service = SearchService()
 
     def create(self, col_meta_data, doc):
+        if 'id' not in doc:
+            doc['id'] = uuid.uuid4()
+        else:
+            search_service.search(col_meta_data, SearchContext({'$filter': {'id': doc['id']}, '$size': 1}))
         return self.file_reader.append(col_meta_data, doc)
 
     def bulk_insert(self, col_meta_data, docs):

@@ -10,6 +10,10 @@ class FileReader(object):
         results = []
         for fname in col_meta_data.enumerate_data_fnames():
             pname = DatabaseContext.DATA_FOLDER + col_meta_data.collection + '/' + fname
+
+            if os.path.exists(pname) == False:
+                return results
+
             with open(pname, "rb") as file:
                 results.extend(pickle.load(file))
         return results

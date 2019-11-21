@@ -18,7 +18,8 @@ class CollectionsService(object):
         # to initialize the meta data of the collection
         CollectionMetaData(collection)
 
-        return {'status': 'done'}
+        # all the collections must have the id index
+        return self.indexes_service.build_index(CollectionMetaData(collection), 'id')
 
     def create_index(self, collection, field):
         return self.indexes_service.build_index(CollectionMetaData(collection), field)
