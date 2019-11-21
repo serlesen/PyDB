@@ -8,17 +8,7 @@ from app.tools.collection_meta_data import CollectionMetaData
 class CollectionsSimulator(object):
 
     def build_single_col(col_name):
-        DatabaseContext.MAX_DOC_PER_FILE = 3
-        DatabaseContext.DATA_FOLDER = 'data-test/'
-
-        if os.path.exists(DatabaseContext.DATA_FOLDER) == False:
-            os.makedirs(DatabaseContext.DATA_FOLDER)
-
-        if os.path.exists(DatabaseContext.DATA_FOLDER + col_name) == False:
-            os.makedirs(DatabaseContext.DATA_FOLDER + col_name)
-
-        # set up the collection and metadata
-        col_meta_data = CollectionMetaData(col_name)
+        col_meta_data = CollectionsSimulator.init_data_folder(col_name, 3)
 
         # set up the test data
         with open(DatabaseContext.DATA_FOLDER + col_meta_data.collection + '/' + col_meta_data.last_data_fname(), 'wb') as file:
@@ -36,17 +26,7 @@ class CollectionsSimulator(object):
             file.write(pickle.dumps(docs))
 
     def build_big_col(col_name):
-        DatabaseContext.MAX_DOC_PER_FILE = 100000
-        DatabaseContext.DATA_FOLDER = 'data-test/'
-
-        if os.path.exists(DatabaseContext.DATA_FOLDER) == False:
-            os.makedirs(DatabaseContext.DATA_FOLDER)
-
-        if os.path.exists(DatabaseContext.DATA_FOLDER + col_name) == False:
-            os.makedirs(DatabaseContext.DATA_FOLDER + col_name)
-
-        # set up the collection and metadata
-        big_col_meta_data = CollectionMetaData(col_name)
+        big_col_meta_data = CollectionsSimulator.init_data_folder(col_name, 100000)
 
         # set up the test data
         for i in range(5):
@@ -65,6 +45,18 @@ class CollectionsSimulator(object):
                 file.write(pickle.dumps(l))
                 if i != 4:
                     big_col_meta_data.next_data_fname()
+
+    def init_data_folder(col_name, col_size):
+        DatabaseContext.MAX_DOC_PER_FILE = col_size
+        DatabaseContext.DATA_FOLDER = 'data-test/'
+
+        if os.path.exists(DatabaseContext.DATA_FOLDER) == False:
+            os.makedirs(DatabaseContext.DATA_FOLDER)
+
+        if os.path.exists(DatabaseContext.DATA_FOLDER + col_name) == False:
+            os.makedirs(DatabaseContext.DATA_FOLDER + col_name)
+
+        return CollectionMetaData(col_name)
 
     def clean():
         shutil.rmtree(DatabaseContext.DATA_FOLDER)
