@@ -1,10 +1,13 @@
 import _pickle as pickle
 import os.path
+import time
 
 from app.tools.filter_tool import FilterTool
 from app.tools.database_context import DatabaseContext
 
 class FileReader(object):
+
+    LOCK_FILE = '{}.lock'
 
     def find_all(self, col_meta_data):
         results = []
@@ -55,11 +58,16 @@ class FileReader(object):
         else:
             docs = []
            
+        self.lock_file(pname)
+
         with open(pname, 'wb') as file:
             for doc in input_docs:
                 # FIXME inserts docs until max file is reached
                 docs.append(self.normalize(doc))
             file.write(pickle.dumps(docs))
+
+        self.unlock_file(pname)
+
         return "Done"
 
     def append(self, col_meta_data, doc):
@@ -73,10 +81,15 @@ class FileReader(object):
         else:
             docs = []
 
+        self.lock_file(pname)
+
         with open(pname, "wb") as file:
             normalized_doc = self.normalize(doc)
             docs.append(normalized_doc)
             file.write(pickle.dumps(docs))
+
+        self.unlock_file(pname)
+
         return normalized_doc
 
     def file_len(self, pname):
@@ -91,6 +104,9 @@ class FileReader(object):
             pname = DatabaseContext.DATA_FOLDER + col_meta_data.collection + '/' + fname
             results = self.find_one_in_file(pname, FilterTool({'$filter': {'id': id}, 'size': 1}))
             if results is not None:
+
+                self.lock_file(pname)
+
                 with open(pname, "rb+") as file:
                     docs = pickle.load(file)
                     file.seek(0)
@@ -105,11 +121,20 @@ class FileReader(object):
                                 docs.append(normalized_doc)
                     file.write(pickle.dumps(docs))
 
-                if input_doc is None and self.file_len(pname) == 0:
-                    col_meta_data.remove_last_data_file()
+                self.unlock_file(pname)
+
                 return updated
         return []
 
+    def lock_file(self, pname):
+        while os.path.exists(self.LOCK_FILE.format(pname)):
+            time.sleep(0.01)
+
+        with open(self.LOCK_FILE.format(pname), 'w') as file:
+            file.write('x')
+
+    def unlock_file(self, pname):
+        os.remove(self.LOCK_FILE.format(pname))
 
     def normalize(self, doc):
         normalized_doc = {}
