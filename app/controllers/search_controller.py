@@ -3,6 +3,7 @@ from app.controllers import app
 from app.controllers import search_service
 from app.tools.argument_parser import ArgumentParser
 from app.tools.collection_meta_data import CollectionMetaData
+from app.tools.results_mapper import ResultsMapper
 from app.tools.search_context import SearchContext
 
 @app.route('/<collection>/search', methods=['POST'])
@@ -14,4 +15,4 @@ def search(collection):
     result = search_service.search(CollectionMetaData(collection), SearchContext(request.json))
     if len(result) == 0:
         abort(404)
-    return result
+    return ResultsMapper.map(result)

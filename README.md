@@ -63,6 +63,19 @@ Example:
 1. {'name': {'$reg': 'Jo.*'}}
 Only the documents where the regex 'Jo.*' has a match on the field 'name' will be returned.
 
+## Mapper
+
+The results can be mapped to a desired structure. In the '$map' field, you have to specify each field you want to map
+(inner documents are reachable with dots notation) to a new field name (if the new field contains dots a new inner
+document will be created). Not specified fields will be ignored
+Example:
+1. Database document
+{'user': {'first_name': 'John', 'last_name': 'Smith'}}
+2. Mapper
+{'user.first_name': 'customer.name'}
+3. Result
+{'customer': {'name': 'John'}}
+
 ## Identification
 
 The field 'id' will be inserted with a UUID value to each new document if it's not present.

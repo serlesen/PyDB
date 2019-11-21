@@ -3,7 +3,7 @@ from app.tools.database_context import DatabaseContext
 
 class SearchContext(object):
 
-    def __init__(self, raw_auery):
+    def __init__(self, raw_query):
         query = {}
         for k in raw_query.keys():
             query[k.lower()] = raw_query[k]
