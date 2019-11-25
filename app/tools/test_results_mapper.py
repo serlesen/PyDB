@@ -36,5 +36,20 @@ class ResultsMapperTest(unittest.TestCase):
         
         self.assertEqual(results[0]['customer']['name'], 'John')
 
+    def test_field_as_itself(self):
+        search_context = SearchContext({'$map': {'first_name': '$itself'}})
+
+        results = ResultsMapper.map([{'first_name': 'John', 'last_name': 'Smith'}], search_context)
+
+        self.assertEqual(results[0]['first_name'], 'John')
+
+    def test_doc_as_itself(self):
+        search_context = SearchContext({'$map': {'user': '$itself'}})
+
+        results = ResultsMapper.map([{'user': {'first_name': 'John', 'last_name': 'Smith'}}], search_context)
+
+        self.assertEqual(results[0]['user']['first_name'], 'John')
+        self.assertEqual(results[0]['user']['last_name'], 'Smith')
+
     def suite():
         return unittest.TestLoader().loadTestsFromTestCase(ResultsMapperTest)

@@ -18,7 +18,9 @@ class ResultsMapper(object):
             else:
                 value = result[old_key]
 
-            if '.' in new_key:
+            if '$itself' == new_key:
+                doc[old_key] = value
+            elif '.' in new_key:
                 doc.update(ResultsMapper.build_doc(value, new_key))
             else:
                 doc[new_key] = value

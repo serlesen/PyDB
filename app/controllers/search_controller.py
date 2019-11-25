@@ -12,7 +12,10 @@ def search(collection):
         abort(405)
     if not ArgumentParser.validate(request.json):
         abort(400)
-    result = search_service.search(CollectionMetaData(collection), SearchContext(request.json))
+    search_context = SearchContext(request.json)
+    result = search_service.search(CollectionMetaData(collection), search_context)
     if len(result) == 0:
         abort(404)
+    if search_context.map is None:
+        return result
     return ResultsMapper.map(result)

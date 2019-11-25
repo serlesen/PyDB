@@ -76,6 +76,16 @@ Example:
 3. Result
 {'customer': {'name': 'John'}}
 
+The keyword '$itself' can be used for a field or an inner document if you want the field or inner document to be maintained
+as before.
+Example:
+1. Database document
+{'user': {'first_name': 'John', 'last_name': 'Smith'}}
+2. Mapper
+{'user': '$itself'}
+3. Result
+{'user': {'first_name': 'John', 'last_name': 'Smith'}}
+
 ## Identification
 
 The field 'id' will be inserted with a UUID value to each new document if it's not present.
