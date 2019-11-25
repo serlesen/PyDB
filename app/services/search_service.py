@@ -36,10 +36,14 @@ class SearchService(object):
         return best_indexed_value
 
     def find_in_docs(self, docs, search_context):
-            results = []
-            for doc in docs:
-                if search_context.filter.match(doc):
-                    results.append(doc)
-                    if len(results) == search_context.size:
-                        return results
-            return results
+        results = []
+        for doc in docs:
+            if search_context.filter.match(doc):
+                results.append(doc)
+                if search_context.sort == None and len(results) == search_context.size + search_context.skip:
+                    return results[search_context.skip:search_context.skip + search_context.size]
+        return self.sort_and_limit_results(results, search_context)
+
+    def sort_and_limit_results(self, results, search_context):
+        return results[search_context.skip:search_context.skip + search_context.size]
+        

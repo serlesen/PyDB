@@ -16,7 +16,7 @@ The inserted documents will have their JSON keys lowercased.
 
 To search a document, you must use a POST over the URL /<collection>/search with a JSON body with the following format:
 * $filter: with the filters to filter the desired documents
-* $size: with the size of the desiered response
+* $size: with the size of the desiered response (default size is 10, unbounded is -1)
 * $skip: if you want to skip a determined number of documents in the respons
 * $sort: with the information about the order the results must be returned
 * $map: if you want the response to be returned other than the raw inserted documents

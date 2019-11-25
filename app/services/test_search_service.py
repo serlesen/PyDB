@@ -40,6 +40,13 @@ class SearchServiceTest(unittest.TestCase):
         results = self.search_service.search(CollectionMetaData('col'), search_context)
         self.assertEqual(len(results), 1)
 
+    def test_find_doc_with_skip_size(self):
+        search_context = SearchContext({'$filter': {'first_name': {'$exists': True}}, '$skip': 1, '$size': 2})
+        results = self.search_service.search(CollectionMetaData('col'), search_context)
+        self.assertEqual(len(results), 2)
+        self.assertEqual(results[0]['id'], 2)
+        self.assertEqual(results[1]['id'], 3)
+
     @timeout_decorator.timeout(2.5)
     def test_search_over_250000_docs(self):
         results = self.search_service.search(CollectionMetaData('big-col'), SearchContext({'$filter': {'id': 449994}}))

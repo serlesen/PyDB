@@ -102,7 +102,7 @@ class FileReader(object):
     def update(self, col_meta_data, id, input_doc):
         for fname in col_meta_data.enumerate_data_fnames():
             pname = DatabaseContext.DATA_FOLDER + col_meta_data.collection + '/' + fname
-            results = self.find_one_in_file(pname, FilterTool({'$filter': {'id': id}, 'size': 1}))
+            results = self.find_one_in_file(pname, FilterTool({'$filter': {'id': id}}))
             if results is not None:
 
                 self.lock_file(pname)
