@@ -23,7 +23,7 @@ class ResultsMapperTest(unittest.TestCase):
         self.assertEqual(results[0]['name'], 'John')
 
     def test_map_output_inner_doc(self):
-        search_context = SearchContext({'$map': {'first_name': 'user.name'}})
+        search_context = SearchContext({'$map': {'$include': {'first_name': 'user.name'}}})
 
         results = ResultsMapper.map([{'first_name': 'John', 'last_name': 'Smith'}], search_context)
 
@@ -50,6 +50,24 @@ class ResultsMapperTest(unittest.TestCase):
 
         self.assertEqual(results[0]['user']['first_name'], 'John')
         self.assertEqual(results[0]['user']['last_name'], 'Smith')
+
+    def test_exclude_single_field(self):
+        search_context = SearchContext({'$map': {'$exclude': ['first_name']}})
+
+        results = ResultsMapper.map([{'first_name': 'John', 'last_name': 'Smith'}], search_context)
+
+        self.assertTrue('first_name' not in results[0])
+        self.assertTrue('last_name' in results[0])
+
+
+    def test_exclude_inner_field(self):
+        search_context = SearchContext({'$map': {'$exclude': ['user.first_name']}})
+
+        results = ResultsMapper.map([{'user': {'first_name': 'John', 'last_name': 'Smith'}}], search_context)
+
+        self.assertTrue('first_name' not in results[0]['user'])
+        self.assertTrue('last_name' in results[0]['user'])
+
 
     def suite():
         return unittest.TestLoader().loadTestsFromTestCase(ResultsMapperTest)

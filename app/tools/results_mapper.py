@@ -5,14 +5,33 @@ class ResultsMapper(object):
             return results
 
         mapped_results = []
-        for r in results:
-            mapped_results.append(ResultsMapper.map_single_result(r, search_context))
+        if '$exclude' in search_context.map:
+            exclusions = search_context.map['$exclude']
+            for r in results:
+                mapped_results.append(ResultsMapper.exclude_single_result(r, exclusions, ''))
+        else:
+            if '$include' in search_context.map:
+                mapping = search_context.map['$include']
+            else:
+                mapping = search_context.map
+            for r in results:
+                mapped_results.append(ResultsMapper.map_single_result(r, mapping))
         return mapped_results
 
-    def map_single_result(result, search_context):
+    def exclude_single_result(result, exclusions, prefix):
         doc = {}
-        for old_key in search_context.map.keys():
-            new_key = search_context.map[old_key]
+        for k in result.keys():
+            if prefix + k not in exclusions:
+                if isinstance(result[k], dict):
+                   doc[k] = ResultsMapper.exclude_single_result(result[k], exclusions, k + '.')
+                else:
+                    doc[k] = result[k]
+        return doc
+
+    def map_single_result(result, mapping):
+        doc = {}
+        for old_key in mapping.keys():
+            new_key = mapping[old_key]
             if '.' in old_key:
                 value = ResultsMapper.search_value(result, old_key)
             else:

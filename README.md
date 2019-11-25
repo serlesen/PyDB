@@ -86,6 +86,16 @@ Example:
 3. Result
 {'user': {'first_name': 'John', 'last_name': 'Smith'}}
 
+You can also only specify the excluded fields or inner documents of the mapping with the keyword '$exclude' followed by the list of fields (with
+dot notation) you want to exclude.
+Example:
+1. Database document
+{'user': {'first_name': 'John', 'last_name': 'Smith'}}
+2. Mapper
+{'$exclude': ['user.first_name']}
+3. Result
+{'user': {'last_name': 'Smith'}}
+
 ## Identification
 
 The field 'id' will be inserted with a UUID value to each new document if it's not present.
