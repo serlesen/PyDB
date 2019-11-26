@@ -10,6 +10,7 @@ from app.tools.search_context import SearchContext
 class IndexesService(object):
 
     INDEX_FILE_NAME = '{}.idx'
+    LOCK_FILE = '{}.lock'
 
     def __init__(self):
         self.file_reader = FileReader()
@@ -38,6 +39,24 @@ class IndexesService(object):
 
         return col_meta_data.add_index(field, len(resulting_docs))
 
+    def append_to_indexes(self, col_meta_data, doc, line):
+        for field in col_meta_data.indexes.keys():
+            pname = DatabaseContext.DATA_FOLDER + col_meta_data.collection + '/' + self.INDEX_FILE_NAME.format(field)
+
+            if field not in doc:
+                pass
+
+            self.lock_file(pname)
+
+            with open(pname, 'rb+') as file:
+                values = pickle.load(file)
+                file.seek(0)
+                file.truncate()
+                values[value] = line
+                file.write(pickle.dumps(values))
+
+            self.unlock_file(pname)
+
     def find_all(self, col_meta_data, field, filter_tool):
         pname = DatabaseContext.DATA_FOLDER + col_meta_data.collection + '/' + self.INDEX_FILE_NAME.format(field)
 
@@ -61,3 +80,13 @@ class IndexesService(object):
 
         os.remove(pname)
         return col_meta_data.remove_index(field)
+
+    def lock_file(self, pname):
+        while os.path.exists(self.LOCK_FILE.format(pname)):
+            time.sleep(0.01)
+
+        with open(self.LOCK_FILE.format(pname), 'w') as file:
+            file.write('x')
+
+    def unlock_file(self, pname):
+        os.remove(self.LOCK_FILE.format(pname))
