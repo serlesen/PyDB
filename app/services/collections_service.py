@@ -3,12 +3,27 @@ import shutil
 
 from app.tools.collection_meta_data import CollectionMetaData
 from app.tools.database_context import DatabaseContext
+from app.services.file_reader import FileReader
 from app.services.indexes_service import IndexesService
 
 class CollectionsService(object):
 
     def __init__(self):
         self.indexes_service = IndexesService()
+        self.file_reader = FileReader()
+
+    def get_status(self, collection):
+        col_meta_data = CollectionMetaData(collection)
+
+        count = (col_meta_data.counter - 1) * DatabaseContext.MAX_DOC_PER_FILE
+        count += self.file_reader.file_len(DatabaseContext.DATA_FOLDER + col_meta_data.collection + '/' + col_meta_data.last_data_fname())
+
+        indexes = []
+        for k in col_meta_data.indexes.keys():
+            indexes.append({'field': k, 'count': col_meta_data.indexes[k]})
+
+        return {'count' : count,
+                'indexes': indexes}
 
     def create(self, collection):
         if os.path.exists(DatabaseContext.DATA_FOLDER + collection):

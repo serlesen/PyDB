@@ -42,5 +42,10 @@ class CollectionsServiceTest(unittest.TestCase):
         result = self.collections_service.remove('new_col')
         self.assertEqual(result['status'], 'missing collection')
 
+    def test_get_status(self):
+        status = self.collections_service.get_status('col')
+        self.assertEqual(status['count'], 6)
+        self.assertTrue('indexes' in status)
+
     def suite():
         return unittest.TestLoader().loadTestsFromTestCase(CollectionsServiceTest)
