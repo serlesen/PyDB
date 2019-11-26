@@ -2,6 +2,7 @@ import _pickle as pickle
 import os.path
 import datetime
 
+from app.exceptions.app_exception import AppException
 from app.services.file_reader import FileReader
 from app.tools.database_context import DatabaseContext
 from app.tools.filter_tool import FilterTool
@@ -39,6 +40,15 @@ class IndexesService(object):
 
         return col_meta_data.add_index(field, len(resulting_docs))
 
+    def get_line(self, col_meta_data, doc):
+        pname = DatabaseContext.DATA_FOLDER + col_meta_data.collection + '/' + self.INDEX_FILE_NAME.format('id')
+
+        with open(pname, 'rb') as file:
+            if doc['id'] in values:
+                return values[doc['id']]
+
+        raise AppException('Unable to find document with id {}'.format(doc['id']), 400)
+        
     def append_to_indexes(self, col_meta_data, doc, line):
         for field in col_meta_data.indexes.keys():
             pname = DatabaseContext.DATA_FOLDER + col_meta_data.collection + '/' + self.INDEX_FILE_NAME.format(field)
@@ -53,6 +63,43 @@ class IndexesService(object):
                 file.seek(0)
                 file.truncate()
                 values[value] = line
+                file.write(pickle.dumps(values))
+
+            self.unlock_file(pname)
+
+    def update_indexes(self, col_meta_data, old_doc, new_doc):
+
+        line = self.get_line(col_meta_data, old_doc)
+
+        for field in col_meta_data.indexes.keys():
+            pname = DatabaseContext.DATA_FOLDER + col_meta_data.collection + '/' + self.INDEX_FILE_NAME.format(field)
+
+            if field not in old_doc and field not in new_doc:
+                pass
+
+            should_remove = True
+            if field not in old_doc:
+                should_remove = False
+
+            should_add = True
+            if field not in new_doc:
+                should_add = False
+
+            self.lock_file(pname)
+
+            with open(pname, 'rb+') as file:
+                values = pickle.load(file)
+                file.seek(0)
+                file.truncate()
+
+                if should_remove:
+                    values[old_doc[field]].remove(line)
+
+                if should_add:
+                    if new_doc[field] not in values:
+                        values[new_doc[field]] = []
+                    values[new_doc[field]].append(line)
+
                 file.write(pickle.dumps(values))
 
             self.unlock_file(pname)
