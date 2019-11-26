@@ -3,7 +3,7 @@ from flask import Flask, request, abort, make_response, jsonify
 from app.controllers import app
 from app.controllers import collections_service
 
-@app.route('/collections/<collection>', methods=['GET'])
+@app.route('/collections/<collection>/status', methods=['GET'])
 def collection_status(collection):
     return collections_service.get_status(collection)
 
