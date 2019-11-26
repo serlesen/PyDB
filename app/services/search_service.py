@@ -1,5 +1,7 @@
 import datetime
 
+from operator import itemgetter
+
 from app.services.file_reader import FileReader
 from app.services.indexes_service import IndexesService
 from app.tools.filter_tool import FilterTool
@@ -22,6 +24,9 @@ class SearchService(object):
         return self.find_in_docs(docs, search_context)
 
     def find_field_in_index(self, col_meta_data, search_context):
+        if search_context.filter is None:
+            return None
+
         best_indexed_value = None
         best_indexed_value_count = 0
         for indexed_value in search_context.filter_keys:
@@ -37,13 +42,20 @@ class SearchService(object):
 
     def find_in_docs(self, docs, search_context):
         results = []
-        for doc in docs:
-            if search_context.filter.match(doc):
-                results.append(doc)
-                if search_context.sort == None and len(results) == search_context.size + search_context.skip:
-                    return results[search_context.skip:search_context.skip + search_context.size]
+        if search_context.filter is not None:
+            for doc in docs:
+                if search_context.filter.match(doc):
+                    results.append(doc)
+                    if search_context.sort == None and len(results) == search_context.size + search_context.skip:
+                        return results[search_context.skip:search_context.skip + search_context.size]
+        else:
+            results = docs
         return self.sort_and_limit_results(results, search_context)
 
     def sort_and_limit_results(self, results, search_context):
+        if search_context.sort != None:
+            sort_attributes = search_context.sort.get_sort_attributes()
+            for s in reversed(sort_attributes):
+                results = sorted(results, key=itemgetter(s['key']), reverse=s['reverse'])
         return results[search_context.skip:search_context.skip + search_context.size]
         

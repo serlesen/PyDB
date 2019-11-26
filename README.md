@@ -96,6 +96,16 @@ Example:
 3. Result
 {'user': {'last_name': 'Smith'}}
 
+## Sorting
+
+The outputs can be sorted on multiple fields in two orders (ASC or DESC). The sorting will be applied in the order of the fields are selected.
+The sort operation will be done before the mapping.
+Example:
+1. Sort
+{'$sort': {'first_name': 'ASC', 'last_name': 'DESC'}}
+2. Description
+The results will be first sorted by the field 'first_name' in alphabetical order, then by the field 'last_name' in reverse alphabetical order.
+
 ## Identification
 
 The field 'id' will be inserted with a UUID value to each new document if it's not present.

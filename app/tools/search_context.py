@@ -1,5 +1,6 @@
 from app.tools.filter_tool import FilterTool
 from app.tools.database_context import DatabaseContext
+from app.tools.sort_tool import SortTool
 
 class SearchContext(object):
 
@@ -27,9 +28,9 @@ class SearchContext(object):
             self.skip = DatabaseContext.DEFAULT_RESULTS_SKIP
 
         if '$sort' in query:
-            self.sort = query['$sort']
+            self.sort = SortTool(query['$sort'])
         else:
-            self.sort = DatabaseContext.DEFAULT_RESULTS_SORT
+            self.sort = None
 
         if '$map' in query:
             self.map = query['$map']
