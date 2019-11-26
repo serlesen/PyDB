@@ -44,13 +44,14 @@ class IndexesService(object):
         with open(pname, 'rb') as file:
             match_value = filter_tool.search_filter['$filter'][field]
             results = []
+            values = pickle.load(file)
             if isinstance(match_value, dict) or isinstance(match_value, list):
-                values = pickle.load(file)
                 for k in values.keys():
                     if filter_tool.match({field, k}):
                         results.extend(values[k])
             else:
-                results.extend(pickle.load(file)[match_value])
+                if match_value in values:
+                    results.extend(values[match_value])
             return results
 
     def remove_index(self, col_meta_data, field):

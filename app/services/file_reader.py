@@ -23,9 +23,9 @@ class FileReader(object):
 
     def find_by_line(self, col_meta_data, lines):
         lines_it = iter(lines)
-        l = next(lines_it)
         results = []
         try:
+            l = next(lines_it)
             for i, fname in enumerate(col_meta_data.enumerate_data_fnames()):
                 if l > (i + 1) * DatabaseContext.MAX_DOC_PER_FILE:
                     continue

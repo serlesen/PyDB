@@ -1,5 +1,6 @@
 import os
 
+from app.exceptions.app_exception import AppException
 from app.tools.database_context import DatabaseContext
 
 #
@@ -12,6 +13,9 @@ class CollectionMetaData(object):
     DATA_FILE_NAME = 'data{}.bin'
 
     def __init__(self, collection):
+        if os.path.exists(DatabaseContext.DATA_FOLDER + collection) is False:
+            raise AppException('Collection {} doesn\'t exist'.format(collection), 400)
+
         self.collection = collection
         fname = DatabaseContext.DATA_FOLDER + self.collection + '/' + self.META_DATA_FILE_NAME 
         if os.path.exists(fname) is False:
