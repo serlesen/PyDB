@@ -4,6 +4,7 @@ import datetime
 
 from app.exceptions.app_exception import AppException
 from app.services.file_reader import FileReader
+from app.tools.collection_locker import CollectionLocker
 from app.tools.database_context import DatabaseContext
 from app.tools.filter_tool import FilterTool
 from app.tools.search_context import SearchContext
@@ -55,7 +56,7 @@ class IndexesService(object):
             if field not in doc:
                 pass
 
-            self.file_reader.lock_file(pname)
+            CollectionLocker.lock_file(pname)
 
             with open(pname, 'rb+') as file:
                 values = pickle.load(file)
@@ -64,7 +65,7 @@ class IndexesService(object):
                 values[value] = line
                 file.write(pickle.dumps(values))
 
-            self.file_reader.unlock_file(pname)
+            CollectionLocker.unlock_file(pname)
 
     def update_indexes(self, col_meta_data, old_doc, new_doc):
 
@@ -84,7 +85,7 @@ class IndexesService(object):
             if field not in new_doc:
                 should_add = False
 
-            self.file_reader.lock_file(pname)
+            CollectionLocker.lock_file(pname)
 
             with open(pname, 'rb+') as file:
                 values = pickle.load(file)
@@ -101,7 +102,7 @@ class IndexesService(object):
 
                 file.write(pickle.dumps(values))
 
-            self.file_reader.unlock_file(pname)
+            CollectionLocker.unlock_file(pname)
 
     def find_all(self, col_meta_data, field, filter_tool):
         pname = DatabaseContext.DATA_FOLDER + col_meta_data.collection + '/' + self.INDEX_FILE_NAME.format(field)

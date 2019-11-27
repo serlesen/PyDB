@@ -2,12 +2,11 @@ import _pickle as pickle
 import os.path
 import time
 
+from app.tools.collection_locker import CollectionLocker
 from app.tools.filter_tool import FilterTool
 from app.tools.database_context import DatabaseContext
 
 class FileReader(object):
-
-    LOCK_FILE = '{}.lock'
 
     def find_all(self, col_meta_data):
         results = []
@@ -58,7 +57,7 @@ class FileReader(object):
         else:
             docs = []
            
-        self.lock_file(pname)
+        CollectionLocker.lock_file(pname)
 
         with open(pname, 'wb') as file:
             for doc in input_docs:
@@ -66,7 +65,7 @@ class FileReader(object):
                 docs.append(self.normalize(doc))
             file.write(pickle.dumps(docs))
 
-        self.unlock_file(pname)
+        CollectionLocker.unlock_file(pname)
 
         return "Done"
 
@@ -81,14 +80,14 @@ class FileReader(object):
         else:
             docs = []
 
-        self.lock_file(pname)
+        CollectionLocker.lock_file(pname)
 
         with open(pname, "wb") as file:
             normalized_doc = self.normalize(doc)
             docs.append(normalized_doc)
             file.write(pickle.dumps(docs))
 
-        self.unlock_file(pname)
+        CollectionLocker.unlock_file(pname)
 
         return normalized_doc
 
@@ -105,7 +104,7 @@ class FileReader(object):
             results = self.find_one_in_file(pname, FilterTool({'$filter': {'id': id}}))
             if results is not None:
 
-                self.lock_file(pname)
+                CollectionLocker.lock_file(pname)
 
                 with open(pname, "rb+") as file:
                     docs = pickle.load(file)
@@ -121,20 +120,10 @@ class FileReader(object):
                                 docs.append(normalized_doc)
                     file.write(pickle.dumps(docs))
 
-                self.unlock_file(pname)
+                CollectionLocker.unlock_file(pname)
 
                 return updated
         return []
-
-    def lock_file(self, pname):
-        while os.path.exists(self.LOCK_FILE.format(pname)):
-            time.sleep(0.01)
-
-        with open(self.LOCK_FILE.format(pname), 'w') as file:
-            file.write('x')
-
-    def unlock_file(self, pname):
-        os.remove(self.LOCK_FILE.format(pname))
 
     def normalize(self, doc):
         normalized_doc = {}
