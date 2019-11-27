@@ -126,6 +126,15 @@ python3 pydb
 python3 -m unittest -v
 ```
 
+### TODO
+
+* Sort by nested documents
+* Clean deleted documents and indexes in separated threads
+* Search/Update/Add made in separated threads
+* Master/Slave replication
+* Master/Master replication
+* Sharding
+
 ### PostgreSQL comparison
 
 size of the table (without any index): 250000 elements
