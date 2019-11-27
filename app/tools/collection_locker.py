@@ -1,5 +1,20 @@
 import os
 
+from app.tools.database_context import DatabaseContext
+
+def col_locking(func):
+    def wrapper(*args, **kwargs):
+        # first arg is self, second arg is col_meta_data
+        col_meta_data = args[1]
+
+        pname = DatabaseContext.DATA_FOLDER + col_meta_data.collection + '/' + CollectionLocker.LOCK_FOLDER
+
+        while os.path.exists(pname):
+            time.sleep(DatabaseContext.LOCKING_CYCLE)
+
+        return func(*args, **kwargs)
+    return wrapper
+
 class CollectionLocker(object):
     
     LOCK_FILE = '{}.lock'
@@ -26,13 +41,6 @@ class CollectionLocker(object):
 
         with open(pname, 'w') as file:
             file.write('x')
-
-    @staticmethod
-    def check_col_locking(col_meta_data):
-        pname = DatabaseContext.DATA_FOLDER + col_meta_data.collection + '/' + CollectionLocker.LOCK_FOLDER
-
-        while os.path.exists(pname):
-            time.sleep(DatabaseContext.LOCKING_CYCLE)
 
     @staticmethod
     def unlock_col(col_meta_data):

@@ -2,12 +2,13 @@ import _pickle as pickle
 import os.path
 import time
 
-from app.tools.collection_locker import CollectionLocker
+from app.tools.collection_locker import CollectionLocker, col_locking
 from app.tools.filter_tool import FilterTool
 from app.tools.database_context import DatabaseContext
 
 class FileReader(object):
 
+    @col_locking
     def find_all(self, col_meta_data):
         results = []
         for fname in col_meta_data.enumerate_data_fnames():
@@ -20,6 +21,7 @@ class FileReader(object):
                 results.extend(pickle.load(file))
         return results
 
+    @col_locking
     def find_by_line(self, col_meta_data, lines):
         lines_it = iter(lines)
         results = []
@@ -46,6 +48,7 @@ class FileReader(object):
                     return doc
             return None
 
+    @col_locking
     def append_bulk(self, col_meta_data, input_docs):
         pname = DatabaseContext.DATA_FOLDER + col_meta_data.collection + '/' + col_meta_data.last_data_fname()
         if self.file_len(pname) >= DatabaseContext.MAX_DOC_PER_FILE:
@@ -69,6 +72,7 @@ class FileReader(object):
 
         return "Done"
 
+    @col_locking
     def append(self, col_meta_data, doc):
         pname = DatabaseContext.DATA_FOLDER + col_meta_data.collection + '/' + col_meta_data.last_data_fname()
         if self.file_len(pname) >= DatabaseContext.MAX_DOC_PER_FILE:
@@ -98,6 +102,7 @@ class FileReader(object):
             docs = pickle.load(file)
             return len(docs)
 
+    @col_locking
     def update(self, col_meta_data, id, input_doc):
         for fname in col_meta_data.enumerate_data_fnames():
             pname = DatabaseContext.DATA_FOLDER + col_meta_data.collection + '/' + fname

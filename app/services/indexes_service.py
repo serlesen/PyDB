@@ -4,7 +4,7 @@ import datetime
 
 from app.exceptions.app_exception import AppException
 from app.services.file_reader import FileReader
-from app.tools.collection_locker import CollectionLocker
+from app.tools.collection_locker import CollectionLocker, col_locking
 from app.tools.database_context import DatabaseContext
 from app.tools.filter_tool import FilterTool
 from app.tools.search_context import SearchContext
@@ -16,6 +16,7 @@ class IndexesService(object):
     def __init__(self):
         self.file_reader = FileReader()
 
+    @col_locking
     def build_index(self, col_meta_data, field):
         docs = self.file_reader.find_all(col_meta_data)
         filter_tool = FilterTool({'$filter': {field: {'$exists': True}}})
@@ -49,6 +50,7 @@ class IndexesService(object):
 
         raise AppException('Unable to find document with id {}'.format(doc['id']), 400)
         
+    @col_locking
     def append_to_indexes(self, col_meta_data, doc, line):
         for field in col_meta_data.indexes.keys():
             pname = DatabaseContext.DATA_FOLDER + col_meta_data.collection + '/' + self.INDEX_FILE_NAME.format(field)
@@ -67,6 +69,7 @@ class IndexesService(object):
 
             CollectionLocker.unlock_file(pname)
 
+    @col_locking
     def update_indexes(self, col_meta_data, old_doc, new_doc):
 
         line = self.get_line(col_meta_data, old_doc)
@@ -104,6 +107,7 @@ class IndexesService(object):
 
             CollectionLocker.unlock_file(pname)
 
+    @col_locking
     def find_all(self, col_meta_data, field, filter_tool):
         pname = DatabaseContext.DATA_FOLDER + col_meta_data.collection + '/' + self.INDEX_FILE_NAME.format(field)
 
@@ -120,6 +124,7 @@ class IndexesService(object):
                     results.extend(values[match_value])
             return results
 
+    @col_locking
     def remove_index(self, col_meta_data, field):
         pname = DatabaseContext.DATA_FOLDER + col_meta_data.collection + '/' + self.INDEX_FILE_NAME.format(field)
         if os.path.exists(pname) is False:

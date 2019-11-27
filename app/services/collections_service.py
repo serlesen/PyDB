@@ -1,10 +1,11 @@
 import os
 import shutil
 
-from app.tools.collection_meta_data import CollectionMetaData
-from app.tools.database_context import DatabaseContext
 from app.services.file_reader import FileReader
 from app.services.indexes_service import IndexesService
+from app.tools.collection_locker import col_locking
+from app.tools.collection_meta_data import CollectionMetaData
+from app.tools.database_context import DatabaseContext
 
 class CollectionsService(object):
 
@@ -22,6 +23,7 @@ class CollectionsService(object):
         return {'count' : self.count(col_meta_data),
                 'indexes': indexes}
 
+    @col_locking
     def count(self, col_meta_data):
         count = (col_meta_data.counter - 1) * DatabaseContext.MAX_DOC_PER_FILE
         count += self.file_reader.file_len(DatabaseContext.DATA_FOLDER + col_meta_data.collection + '/' + col_meta_data.last_data_fname())
