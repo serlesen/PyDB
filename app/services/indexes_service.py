@@ -107,6 +107,13 @@ class IndexesService(object):
 
             CollectionLocker.unlock_file(pname)
 
+    @staticmethod
+    def enumerate_index_fnames(col_meta_data):
+       fnames = []
+       for i in col_meta_data.indexes.keys():
+           fnames.append(self.INDEX_FILE_NAME.format(i))
+       return fnames
+
     @col_locking
     def find_all(self, col_meta_data, field, filter_tool):
         pname = DatabaseContext.DATA_FOLDER + col_meta_data.collection + '/' + self.INDEX_FILE_NAME.format(field)

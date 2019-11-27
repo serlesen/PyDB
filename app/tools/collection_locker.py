@@ -7,10 +7,7 @@ def col_locking(func):
         # first arg is self, second arg is col_meta_data
         col_meta_data = args[1]
 
-        pname = DatabaseContext.DATA_FOLDER + col_meta_data.collection + '/' + CollectionLocker.LOCK_FOLDER
-
-        while os.path.exists(pname):
-            time.sleep(DatabaseContext.LOCKING_CYCLE)
+        CollectionLocker.wait_for_lock(DatabaseContext.DATA_FOLDER + col_meta_data.collection + '/' + CollectionLocker.LOCK_FOLDER)
 
         return func(*args, **kwargs)
     return wrapper
@@ -34,10 +31,18 @@ class CollectionLocker(object):
 
     @staticmethod
     def lock_col(col_meta_data):
-        pname = DatabaseContext.DATA_FOLDER + col_meta_data.collection + '/' + CollectionLocker.LOCK_FOLDER
 
-        while os.path.exists(pname):
-            time.sleep(DatabaseContext.LOCKING_CYCLE)
+        # check data files are not locked
+        for f in col_meta_data.enumerate_data_fnames():
+            wait_for_lock(DatabaseContext.DATA_FOLDER + col_meta_data.collection + '/' + f)
+            
+        # check indexes files are not locked
+        for f in app.services.indexes_service.IndexesService.enumerate_index_fnames(col_meta_data):
+            wait_for_lock(DatabaseContext.DATA_FOLDER + col_meta_data.collection + '/' + f)
+        
+        # check collection is not locked
+        pname = DatabaseContext.DATA_FOLDER + col_meta_data.collection + '/' + CollectionLocker.LOCK_FOLDER
+        wait_for_lock(pname)
 
         with open(pname, 'w') as file:
             file.write('x')
@@ -45,3 +50,8 @@ class CollectionLocker(object):
     @staticmethod
     def unlock_col(col_meta_data):
         os.remove(DatabaseContext.DATA_FOLDER + col_meta_data.collection + '/' + CollectionLocker.LOCK_FOLDER)
+
+    def wait_for_lock(pname):
+        while os.path.exists(pname):
+            time.sleep(DatabaseContext.LOCKING_CYCLE)
+

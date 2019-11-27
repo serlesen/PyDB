@@ -1,8 +1,9 @@
 import unittest
 
 from app.services.database_service import DatabaseService
+from app.test.collections_simulator import CollectionsSimulator
 
-class DatabaseServiceTest(unitttest.TestCase):
+class DatabaseServiceTest(unittest.TestCase):
 
     @classmethod
     def setUpClass(cls):
