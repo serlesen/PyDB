@@ -46,12 +46,12 @@ class ResultsMapper(object):
         return doc
 
     def search_value(result, field):
-        inner_doc = result
+        nested_doc = result
         fields = field.split('.')
         for f in fields:
-            inner_doc = inner_doc[f]
+            nested_doc = nested_doc[f]
 
-        return inner_doc
+        return nested_doc
 
     def build_doc(value, field):
         doc = value
