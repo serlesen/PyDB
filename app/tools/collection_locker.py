@@ -1,5 +1,7 @@
 import os
+import time
 
+#from app.services.indexes_service import IndexesService
 from app.tools.database_context import DatabaseContext
 
 def col_locking(func):
@@ -19,8 +21,7 @@ class CollectionLocker(object):
     
     @staticmethod
     def lock_file(pname):
-        while os.path.exists(CollectionLocker.LOCK_FILE.format(pname)):
-            time.sleep(DatabaseContext.LOCKING_CYCLE)
+        CollectionLocker.wait_for_lock(pname)
 
         with open(CollectionLocker.LOCK_FILE.format(pname), 'w') as file:
             file.write('x')
@@ -34,15 +35,15 @@ class CollectionLocker(object):
 
         # check data files are not locked
         for f in col_meta_data.enumerate_data_fnames():
-            wait_for_lock(DatabaseContext.DATA_FOLDER + col_meta_data.collection + '/' + f)
+            CollectionLocker.wait_for_lock(DatabaseContext.DATA_FOLDER + col_meta_data.collection + '/' + f)
             
-        # check indexes files are not locked
-        for f in app.services.indexes_service.IndexesService.enumerate_index_fnames(col_meta_data):
-            wait_for_lock(DatabaseContext.DATA_FOLDER + col_meta_data.collection + '/' + f)
+#        # check indexes files are not locked
+#        for f in IndexesServic.enumerate_index_fnames(col_meta_data):
+#            CollectionLocker.wait_for_lock(DatabaseContext.DATA_FOLDER + col_meta_data.collection + '/' + f)
         
         # check collection is not locked
         pname = DatabaseContext.DATA_FOLDER + col_meta_data.collection + '/' + CollectionLocker.LOCK_FOLDER
-        wait_for_lock(pname)
+        CollectionLocker.wait_for_lock(pname)
 
         with open(pname, 'w') as file:
             file.write('x')
@@ -52,6 +53,6 @@ class CollectionLocker(object):
         os.remove(DatabaseContext.DATA_FOLDER + col_meta_data.collection + '/' + CollectionLocker.LOCK_FOLDER)
 
     def wait_for_lock(pname):
-        while os.path.exists(pname):
+        while os.path.exists(CollectionLocker.LOCK_FILE.format(pname)):
             time.sleep(DatabaseContext.LOCKING_CYCLE)
 

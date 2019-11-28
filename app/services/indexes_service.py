@@ -3,6 +3,7 @@ import os.path
 import datetime
 
 from app.exceptions.app_exception import AppException
+from app.injection.dependency_injections_service import DependencyInjectionsService
 from app.services.file_reader import FileReader
 from app.tools.collection_locker import CollectionLocker, col_locking
 from app.tools.database_context import DatabaseContext
@@ -14,7 +15,13 @@ class IndexesService(object):
     INDEX_FILE_NAME = '{}.idx'
 
     def __init__(self):
-        self.file_reader = FileReader()
+        self.file_reader = DependencyInjectionsService.get_instance().get_service(FileReader)
+
+    def enumerate_index_fnames(self, col_meta_data):
+       fnames = []
+       for i in col_meta_data.indexes.keys():
+           fnames.append(self.INDEX_FILE_NAME.format(i))
+       return fnames
 
     @col_locking
     def build_index(self, col_meta_data, field):
@@ -107,12 +114,6 @@ class IndexesService(object):
 
             CollectionLocker.unlock_file(pname)
 
-    @staticmethod
-    def enumerate_index_fnames(col_meta_data):
-       fnames = []
-       for i in col_meta_data.indexes.keys():
-           fnames.append(self.INDEX_FILE_NAME.format(i))
-       return fnames
 
     @col_locking
     def find_all(self, col_meta_data, field, filter_tool):

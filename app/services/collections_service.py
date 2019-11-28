@@ -1,6 +1,7 @@
 import os
 import shutil
 
+from app.injection.dependency_injections_service import DependencyInjectionsService
 from app.services.file_reader import FileReader
 from app.services.indexes_service import IndexesService
 from app.tools.collection_locker import col_locking
@@ -10,8 +11,8 @@ from app.tools.database_context import DatabaseContext
 class CollectionsService(object):
 
     def __init__(self):
-        self.indexes_service = IndexesService()
-        self.file_reader = FileReader()
+        self.indexes_service = DependencyInjectionsService.get_instance().get_service(IndexesService)
+        self.file_reader = DependencyInjectionsService.get_instance().get_service(FileReader)
 
     def get_status(self, collection):
         col_meta_data = CollectionMetaData(collection)

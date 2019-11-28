@@ -1,6 +1,5 @@
 import _pickle as pickle
 import os.path
-import time
 
 from app.tools.collection_locker import CollectionLocker, col_locking
 from app.tools.filter_tool import FilterTool

@@ -5,6 +5,7 @@ from app.services.test_database_service import DatabaseServiceTest
 from app.services.test_file_reader import FileReaderTest
 from app.services.test_indexes_service import IndexesServiceTest
 from app.services.test_search_service import SearchServiceTest
+from app.threads.test_cleaning_thread import CleaningThreadTest
 from app.tools.test_filter_tool import FilterToolTest
 from app.tools.test_collection_meta_data import CollectionMetaDataTest
 from app.tools.test_results_mapper import ResultsMapperTest
@@ -12,6 +13,7 @@ from app.tools.test_search_context import SearchContextTest
 
 def suite():
     return unittest.TestSuite([
+        CleaningThreadTest.suite(),
         CollectionMetaDataTest.suite(),
         CollectionsServiceTest.suite(),
         DatabaseServiceTest.suite(),

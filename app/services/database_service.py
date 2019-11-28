@@ -1,13 +1,14 @@
 import os
 
+from app.injection.dependency_injections_service import DependencyInjectionsService
+from app.services.collections_service import CollectionsService
 from app.tools.collection_meta_data import CollectionMetaData
 from app.tools.database_context import DatabaseContext
-from app.services.collections_service import CollectionsService
 
 class DatabaseService(object):
 
     def __init__(self):
-        self.collections_service = CollectionsService()
+        self.collections_service = DependencyInjectionsService.get_instance().get_service(CollectionsService)
 
     def get_status(self):
         cols = []

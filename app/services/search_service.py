@@ -2,6 +2,7 @@ import datetime
 
 from operator import itemgetter
 
+from app.injection.dependency_injections_service import DependencyInjectionsService
 from app.services.file_reader import FileReader
 from app.services.indexes_service import IndexesService
 from app.tools.filter_tool import FilterTool
@@ -9,8 +10,8 @@ from app.tools.filter_tool import FilterTool
 class SearchService(object):
 
     def __init__(self):
-        self.file_reader = FileReader()
-        self.indexes_service = IndexesService()
+        self.file_reader = DependencyInjectionsService.get_instance().get_service(FileReader)
+        self.indexes_service = DependencyInjectionsService.get_instance().get_service(IndexesService)
 
     def search(self, col_meta_data, search_context):
         indexed_value = self.find_field_in_index(col_meta_data, search_context)

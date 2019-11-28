@@ -131,6 +131,7 @@ python3 -m unittest -v
 * Sort by nested documents
 * Clean deleted documents and indexes in separated threads
 * Search/Update/Add made in separated threads
+* Users authentication/management
 * Master/Slave replication
 * Master/Master replication
 * Sharding

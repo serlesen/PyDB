@@ -1,5 +1,6 @@
 import uuid
 
+from app.injection.dependency_injections_service import DependencyInjectionsService
 from app.exceptions.app_exception import AppException
 from app.services.collections_service import CollectionsService
 from app.services.file_reader import FileReader
@@ -10,10 +11,10 @@ from app.tools.search_context import SearchContext
 class CrudService(object):
 
     def __init__(self):
-        self.collections_service = CollectionsService()
-        self.file_reader = FileReader()
-        self.indexes_service = IndexesService()
-        self.search_service = SearchService()
+        self.collections_service = DependencyInjectionsService.get_instance().get_service(CollectionsService)
+        self.file_reader = DependencyInjectionsService.get_instance().get_service(FileReader)
+        self.indexes_service = DependencyInjectionsService.get_instance().get_service(IndexesService)
+        self.search_service = DependencyInjectionsService.get_instance().get_service(SearchService)
 
     def create(self, col_meta_data, doc):
         if 'id' not in doc:
