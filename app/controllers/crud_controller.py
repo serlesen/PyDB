@@ -31,7 +31,7 @@ def update(collection, id):
 
 @app.route('/<collection>/<id>', methods=['DELETE'])
 def delete(collection, id):
-    result = crud_service.update(CollectionMetaData(collection), int(id), None)
+    result = crud_service.update(CollectionMetaData(collection), int(id), {})
     if len(result) != 1:
         raise AppException('Unable to find document {}'.format(id), 404)
     return result[0]

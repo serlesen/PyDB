@@ -114,15 +114,17 @@ class FileReader(object):
                     docs = pickle.load(file)
                     file.seek(0)
                     file.truncate()
+
                     updated = None
+                    updated_docs = []
                     for doc in docs:
-                        if updated is None:
-                            if doc["id"] == id:
-                                docs.remove(doc)
-                                normalized_doc = self.normalize(input_doc)
-                                updated = normalized_doc
-                                docs.append(normalized_doc)
-                    file.write(pickle.dumps(docs))
+                        if updated is None and doc["id"] == id:
+                            normalized_doc = self.normalize(input_doc)
+                            updated = normalized_doc
+                            updated_docs.append(normalized_doc)
+                        else:
+                            updated_docs.append(doc)
+                    file.write(pickle.dumps(updated_docs))
 
                 CollectionLocker.unlock_file(pname)
 

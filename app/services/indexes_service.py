@@ -26,16 +26,16 @@ class IndexesService(object):
 
     @col_locking
     def build_index(self, col_meta_data, field):
+        pname = DatabaseContext.DATA_FOLDER + col_meta_data.collection + '/' + self.INDEX_FILE_NAME.format(field)
+        if os.path.exists(pname):
+            return {'status': 'already existing'}
+
         docs = self.file_reader.find_all(col_meta_data)
         filter_tool = FilterTool({'$filter': {field: {'$exists': True}}})
         resulting_docs = []
         for d in docs:
             if filter_tool.match(d):
                 resulting_docs.append(d)
-
-        pname = DatabaseContext.DATA_FOLDER + col_meta_data.collection + '/' + self.INDEX_FILE_NAME.format(field)
-        if os.path.exists(pname):
-            return {'status': 'already existing'}
 
         values = {}
         for i, doc in enumerate(resulting_docs):
@@ -49,14 +49,15 @@ class IndexesService(object):
 
         return col_meta_data.add_index(field, len(resulting_docs))
 
-    def get_line(self, col_meta_data, doc):
+    def get_lines(self, col_meta_data, id):
         pname = DatabaseContext.DATA_FOLDER + col_meta_data.collection + '/' + self.INDEX_FILE_NAME.format('id')
 
         with open(pname, 'rb') as file:
-            if doc['id'] in values:
-                return values[doc['id']]
+            values = pickle.load(file)
+            if id in values:
+                return values[id]
 
-        raise AppException('Unable to find document with id {}'.format(doc['id']), 400)
+        raise AppException('Unable to find document with id {}'.format(id), 400)
         
     @col_locking
     def append_to_indexes(self, col_meta_data, doc, line):
@@ -80,7 +81,7 @@ class IndexesService(object):
     @col_locking
     def update_indexes(self, col_meta_data, old_doc, new_doc):
 
-        line = self.get_line(col_meta_data, old_doc)
+        lines = self.get_lines(col_meta_data, old_doc['id'])
 
         for field in col_meta_data.indexes.keys():
             pname = DatabaseContext.DATA_FOLDER + col_meta_data.collection + '/' + self.INDEX_FILE_NAME.format(field)
@@ -88,10 +89,12 @@ class IndexesService(object):
             if field not in old_doc and field not in new_doc:
                 pass
 
+            # remove from the index the value of the old document
             should_remove = True
             if field not in old_doc:
                 should_remove = False
 
+            # add to the index the value of the new document
             should_add = True
             if field not in new_doc:
                 should_add = False
@@ -104,12 +107,13 @@ class IndexesService(object):
                 file.truncate()
 
                 if should_remove:
-                    values[old_doc[field]].remove(line)
+                    for line in lines:
+                        values[old_doc[field]].remove(line)
 
                 if should_add:
                     if new_doc[field] not in values:
                         values[new_doc[field]] = []
-                    values[new_doc[field]].append(line)
+                    values[new_doc[field]].extend(lines)
 
                 file.write(pickle.dumps(values))
 

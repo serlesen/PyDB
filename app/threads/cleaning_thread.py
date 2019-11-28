@@ -13,18 +13,19 @@ class CleaningThread(Thread):
         item = CleaningStack.get_instance().pop()
 
         col_meta_data = CollectionMetaData(item['collection'])
-        line = item['line']
+        incoming_line = item['line']
 
-        pname = self.find_data_file(col_meta_data, line)
+        pname = self.find_data_file(col_meta_data, incoming_line)
 
         CollectionLocker.lock_col(col_meta_data)
  
+
         # Remove the document from the data files
         with open(pname, 'rb+') as file:
             docs = pickle.load(file)
             file.seek(0)
             file.truncate()
-            docs.pop(line)
+            docs.pop(incoming_line)
             file.write(pickle.dumps(docs))
  
         # Update the indexes line
@@ -40,9 +41,9 @@ class CleaningThread(Thread):
                 for k, lines in values.items():
                     updated_lines = []
                     for l in lines:
-                        if l > line:
+                        if l > incoming_line:
                             updated_lines.append(l - 1)
-                        elif l != line:
+                        elif l != incoming_line:
                             updated_lines.append(l)
                     if len(updated_lines) > 0:
                         updated_values[k] = updated_lines

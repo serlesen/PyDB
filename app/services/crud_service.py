@@ -32,10 +32,10 @@ class CrudService(object):
         return self.file_reader.append_bulk(col_meta_data, docs)
 
     def update(self, col_meta_data, id, doc):
-        previous_docs = search_service.search(col_meta_data, SearchContext({'$filter': {'id': doc['id']}, '$size': 1}))
+        previous_docs = self.search_service.search(col_meta_data, SearchContext({'$filter': {'id': id}, '$size': 1}))
         if len(previous_docs) != 1:
             raise AppException('Unable to update document with id {}'.format(id), 400)
-        self.indexes_service.update_indexes(previous_docs[0], doc)
+        self.indexes_service.update_indexes(col_meta_data, previous_docs[0], doc)
         return self.file_reader.update(col_meta_data, id, doc)
 
     def delete(self, col_meta_data, id):

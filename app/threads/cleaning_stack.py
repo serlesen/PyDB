@@ -15,3 +15,6 @@ class CleaningStack(object):
 
     def pop(self):
         return self.stack.pop(0)
+
+    def contains_data(self):
+        return len(self.stack) > 0
