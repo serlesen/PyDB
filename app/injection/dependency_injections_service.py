@@ -13,6 +13,6 @@ class DependencyInjectionsService(object):
     
     def get_service(self, service_name):
         if str(service_name) not in self.services:
-            self.services = {str(service_name) : service_name()}
+            self.services[str(service_name)] = service_name()
         return self.services[str(service_name)]
 
