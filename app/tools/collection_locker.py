@@ -1,7 +1,6 @@
 import os
 import time
 
-#from app.services.indexes_service import IndexesService
 from app.tools.database_context import DatabaseContext
 
 def col_locking(func):
@@ -37,9 +36,12 @@ class CollectionLocker(object):
         for f in col_meta_data.enumerate_data_fnames():
             CollectionLocker.wait_for_lock(DatabaseContext.DATA_FOLDER + col_meta_data.collection + '/' + f)
             
-#        # check indexes files are not locked
-#        for f in IndexesServic.enumerate_index_fnames(col_meta_data):
-#            CollectionLocker.wait_for_lock(DatabaseContext.DATA_FOLDER + col_meta_data.collection + '/' + f)
+        # to avoid circular dependency, import right before use it
+        from app.services.indexes_service import IndexesService
+
+        # check indexes files are not locked
+        for f in IndexesService.enumerate_index_fnames(col_meta_data):
+            CollectionLocker.wait_for_lock(DatabaseContext.DATA_FOLDER + col_meta_data.collection + '/' + f)
         
         # check collection is not locked
         pname = DatabaseContext.DATA_FOLDER + col_meta_data.collection + '/' + CollectionLocker.LOCK_FOLDER

@@ -17,10 +17,11 @@ class IndexesService(object):
     def __init__(self):
         self.file_reader = DependencyInjectionsService.get_instance().get_service(FileReader)
 
-    def enumerate_index_fnames(self, col_meta_data):
+    @staticmethod
+    def enumerate_index_fnames(col_meta_data):
        fnames = []
        for i in col_meta_data.indexes.keys():
-           fnames.append(self.INDEX_FILE_NAME.format(i))
+           fnames.append(IndexesService.INDEX_FILE_NAME.format(i))
        return fnames
 
     @col_locking
@@ -113,7 +114,6 @@ class IndexesService(object):
                 file.write(pickle.dumps(values))
 
             CollectionLocker.unlock_file(pname)
-
 
     @col_locking
     def find_all(self, col_meta_data, field, filter_tool):

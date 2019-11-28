@@ -9,9 +9,6 @@ from app.tools.database_context import DatabaseContext
 
 class CleaningThread(Thread):
 
-    def __init__(self):
-        self.indexes_service = IndexesService()
-
     def run(self):
         item = CleaningStack.get_instance().pop()
 
@@ -31,22 +28,26 @@ class CleaningThread(Thread):
             file.write(pickle.dumps(docs))
  
         # Update the indexes line
-#        for f in self.indexes_service.enumerate_index_fnames(col_meta_data):
-#            pname = DatabaseContext.DATA_FOLDER + col_meta_data.collection + '/' + f
-# 
-#            with open(pname, 'rb+') as file:
-#                values = pickle.load(file)
-#                file.seek(0)
-#                file.truncate()
-#                for v in values.keys():
-#                    if v > line:
-#                        d = values[v]
-#                        values.remove(v)
-#                        new_line = v - 1
-#                        values[new_line] = d
-#                    elif v == line:
-#                        values.remove(v)
-#                file.write(pickle.dumps(values))
+        for f in IndexesService.enumerate_index_fnames(col_meta_data):
+            pname = DatabaseContext.DATA_FOLDER + col_meta_data.collection + '/' + f
+ 
+            with open(pname, 'rb+') as file:
+                values = pickle.load(file)
+                file.seek(0)
+                file.truncate()
+
+                updated_values = {}
+                for k, lines in values.items():
+                    updated_lines = []
+                    for l in lines:
+                        if l > line:
+                            updated_lines.append(l - 1)
+                        elif l != line:
+                            updated_lines.append(l)
+                    if len(updated_lines) > 0:
+                        updated_values[k] = updated_lines
+
+                file.write(pickle.dumps(updated_values))
  
         CollectionLocker.unlock_col(col_meta_data)
 
