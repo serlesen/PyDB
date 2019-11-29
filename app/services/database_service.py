@@ -2,6 +2,7 @@ import os
 
 from app.injection.dependency_injections_service import DependencyInjectionsService
 from app.services.collections_service import CollectionsService
+from app.threads.cleaning_stack import CleaningStack
 from app.tools.collection_meta_data import CollectionMetaData
 from app.tools.database_context import DatabaseContext
 
@@ -16,7 +17,9 @@ class DatabaseService(object):
             col_meta_data = CollectionMetaData(f)
 
             cols.append({'collection': f, 'count': self.collections_service.count(col_meta_data), 'size (bytes)': self.collection_size(col_meta_data)})
-        return {'collections': cols}
+        return {'collections': cols,
+                'cleaning_operations': CleaningStack.get_instance().get_details()
+                }
 
     def collection_size(self, col_meta_data):
         total_size = 0

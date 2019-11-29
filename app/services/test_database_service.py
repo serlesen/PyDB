@@ -24,5 +24,8 @@ class DatabaseServiceTest(unittest.TestCase):
         self.assertEqual(len(status['collections']), 1)
         self.assertEqual(status['collections'][0]['collection'], 'col')
 
+        self.assertTrue('cleaning_operations' in status)
+        self.assertEqual(len(status['cleaning_operations']), 0)
+
     def suite():
         return unittest.TestLoader().loadTestsFromTestCase(DatabaseServiceTest)

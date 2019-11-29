@@ -22,7 +22,8 @@ class CollectionsService(object):
             indexes.append({'field': k, 'count': col_meta_data.indexes[k]})
 
         return {'count' : self.count(col_meta_data),
-                'indexes': indexes}
+                'indexes': indexes
+                }
 
     @col_locking
     def count(self, col_meta_data):
