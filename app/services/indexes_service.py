@@ -12,21 +12,12 @@ from app.tools.search_context import SearchContext
 
 class IndexesService(object):
 
-    INDEX_FILE_NAME = '{}.idx'
-
     def __init__(self):
         self.file_reader = DependencyInjectionsService.get_instance().get_service(FileReader)
 
-    @staticmethod
-    def enumerate_index_fnames(col_meta_data):
-       fnames = []
-       for i in col_meta_data.indexes.keys():
-           fnames.append(IndexesService.INDEX_FILE_NAME.format(i))
-       return fnames
-
     @col_locking
     def build_index(self, col_meta_data, field):
-        pname = DatabaseContext.DATA_FOLDER + col_meta_data.collection + '/' + self.INDEX_FILE_NAME.format(field)
+        pname = DatabaseContext.DATA_FOLDER + col_meta_data.collection + '/' + col_meta_data.get_index_fname(field)
         if os.path.exists(pname):
             return {'status': 'already existing'}
 
@@ -47,10 +38,10 @@ class IndexesService(object):
         with open(pname, 'wb') as file:
             file.write(pickle.dumps(values))
 
-        return col_meta_data.add_index(field, len(resulting_docs))
+        return col_meta_data.add_or_update_index(field, len(resulting_docs))
 
     def get_lines(self, col_meta_data, id):
-        pname = DatabaseContext.DATA_FOLDER + col_meta_data.collection + '/' + self.INDEX_FILE_NAME.format('id')
+        pname = DatabaseContext.DATA_FOLDER + col_meta_data.collection + '/' + col_meta_data.get_index_fname('id')
 
         with open(pname, 'rb') as file:
             values = pickle.load(file)
@@ -62,7 +53,7 @@ class IndexesService(object):
     @col_locking
     def append_to_indexes(self, col_meta_data, doc, line):
         for field in col_meta_data.indexes.keys():
-            pname = DatabaseContext.DATA_FOLDER + col_meta_data.collection + '/' + self.INDEX_FILE_NAME.format(field)
+            pname = DatabaseContext.DATA_FOLDER + col_meta_data.collection + '/' + col_meta_data.get_index_fname(field)
 
             if field not in doc:
                 pass
@@ -84,7 +75,7 @@ class IndexesService(object):
         lines = self.get_lines(col_meta_data, old_doc['id'])
 
         for field in col_meta_data.indexes.keys():
-            pname = DatabaseContext.DATA_FOLDER + col_meta_data.collection + '/' + self.INDEX_FILE_NAME.format(field)
+            pname = DatabaseContext.DATA_FOLDER + col_meta_data.collection + '/' + col_meta_data.get_index_fname(field)
 
             if field not in old_doc and field not in new_doc:
                 pass
@@ -121,7 +112,7 @@ class IndexesService(object):
 
     @col_locking
     def find_all(self, col_meta_data, field, filter_tool):
-        pname = DatabaseContext.DATA_FOLDER + col_meta_data.collection + '/' + self.INDEX_FILE_NAME.format(field)
+        pname = DatabaseContext.DATA_FOLDER + col_meta_data.collection + '/' + col_meta_data.get_index_fname(field)
 
         with open(pname, 'rb') as file:
             match_value = filter_tool.search_filter['$filter'][field]
@@ -138,7 +129,7 @@ class IndexesService(object):
 
     @col_locking
     def remove_index(self, col_meta_data, field):
-        pname = DatabaseContext.DATA_FOLDER + col_meta_data.collection + '/' + self.INDEX_FILE_NAME.format(field)
+        pname = DatabaseContext.DATA_FOLDER + col_meta_data.collection + '/' + col_meta_data.get_index_fname(field)
         if os.path.exists(pname) is False:
             return {'status': 'missing index'}
 

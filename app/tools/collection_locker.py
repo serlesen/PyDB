@@ -36,11 +36,8 @@ class CollectionLocker(object):
         for f in col_meta_data.enumerate_data_fnames():
             CollectionLocker.wait_for_lock(DatabaseContext.DATA_FOLDER + col_meta_data.collection + '/' + f)
             
-        # to avoid circular dependency, import right before use it
-        from app.services.indexes_service import IndexesService
-
         # check indexes files are not locked
-        for f in IndexesService.enumerate_index_fnames(col_meta_data):
+        for f in col_meta_data.enumerate_index_fnames():
             CollectionLocker.wait_for_lock(DatabaseContext.DATA_FOLDER + col_meta_data.collection + '/' + f)
         
         # check collection is not locked

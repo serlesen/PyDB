@@ -17,7 +17,7 @@ def create(collection):
 def get(collection, id):
     result = search_service.search(CollectionMetaData(collection), SearchContext({"$filter":{"id":int(id)}}))
     if len(result) != 1:
-        abort(404)
+        raise AppException('Unable to find document {}'.format(id), 404)
     return result[0]
 
 @app.route('/<collection>/<id>', methods=['PUT'])
@@ -25,13 +25,13 @@ def update(collection, id):
     if not request.json:
         abort(405)
     result = crud_service.update(CollectionMetaData(collection), int(id), request.json)
-    if len(result) != 1:
+    if result is None:
         raise AppException('Unable to find document {}'.format(id), 404)
-    return result[0]
+    return result
 
 @app.route('/<collection>/<id>', methods=['DELETE'])
 def delete(collection, id):
-    result = crud_service.update(CollectionMetaData(collection), int(id), {})
-    if len(result) != 1:
+    result = crud_service.delete(CollectionMetaData(collection), int(id))
+    if result is None:
         raise AppException('Unable to find document {}'.format(id), 404)
-    return result[0]
+    return result

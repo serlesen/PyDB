@@ -110,17 +110,17 @@ class FileReader(object):
 
                 CollectionLocker.lock_file(pname)
 
+                updated = None
                 with open(pname, "rb+") as file:
                     docs = pickle.load(file)
                     file.seek(0)
                     file.truncate()
 
-                    updated = None
                     updated_docs = []
-                    for doc in docs:
+                    for i, doc in enumerate(docs):
                         if updated is None and doc["id"] == id:
                             normalized_doc = self.normalize(input_doc)
-                            updated = normalized_doc
+                            updated = {'line': i, 'doc': normalized_doc}
                             updated_docs.append(normalized_doc)
                         else:
                             updated_docs.append(doc)
@@ -129,7 +129,7 @@ class FileReader(object):
                 CollectionLocker.unlock_file(pname)
 
                 return updated
-        return []
+        return None
 
     def normalize(self, doc):
         normalized_doc = {}

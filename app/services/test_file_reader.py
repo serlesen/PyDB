@@ -42,7 +42,7 @@ class FileReaderTest(unittest.TestCase):
 
     def test_remove_doc_in_file(self):
         result = self.file_reader.update(CollectionMetaData('col'), 6, {})
-        self.assertEqual(result, {})
+        self.assertEqual(result, {'line': 2, 'doc': {}})
 
         filter_tool = FilterTool({'$filter': {'id': 6}})
         result = self.file_reader.find_one_in_file('data-test/col/data2.bin', filter_tool)

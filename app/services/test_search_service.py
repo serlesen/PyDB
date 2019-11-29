@@ -21,7 +21,7 @@ class SearchServiceTest(unittest.TestCase):
         big_col_wi_meta_data = CollectionMetaData('big-col-with-index')
         indexes_service = IndexesService()
         indexes_service.build_index(big_col_wi_meta_data, 'id')
-        big_col_wi_meta_data.add_index('id', 5 * DatabaseContext.MAX_DOC_PER_FILE)
+        big_col_wi_meta_data.add_or_update_index('id', 5 * DatabaseContext.MAX_DOC_PER_FILE)
 
     @classmethod
     def tearDownClass(cls):

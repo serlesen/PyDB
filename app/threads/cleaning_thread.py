@@ -1,7 +1,7 @@
+from itertools import count
 from threading import Thread
 import _pickle as pickle
 
-from app.services.indexes_service import IndexesService
 from app.threads.cleaning_stack import CleaningStack
 from app.tools.collection_locker import CollectionLocker
 from app.tools.collection_meta_data import CollectionMetaData
@@ -15,22 +15,39 @@ class CleaningThread(Thread):
         col_meta_data = CollectionMetaData(item['collection'])
         incoming_line = item['line']
 
-        pname = self.find_data_file(col_meta_data, incoming_line)
-
         CollectionLocker.lock_col(col_meta_data)
- 
 
-        # Remove the document from the data files
-        with open(pname, 'rb+') as file:
-            docs = pickle.load(file)
-            file.seek(0)
-            file.truncate()
-            docs.pop(incoming_line)
-            file.write(pickle.dumps(docs))
+        self.swift_data_docs(col_meta_data, incoming_line)
  
-        # Update the indexes line
-        for f in IndexesService.enumerate_index_fnames(col_meta_data):
-            pname = DatabaseContext.DATA_FOLDER + col_meta_data.collection + '/' + f
+        self.update_indexes_file(col_meta_data, incoming_line)
+
+        CollectionLocker.unlock_col(col_meta_data)
+
+    def swift_data_docs(self, col_meta_data, incoming_line):
+        doc_to_move = None
+        fnames = col_meta_data.enumerate_data_fnames() 
+        for i, fname in zip(count(len(fnames) - 1, -1), reversed(fnames)):
+            if incoming_line > (i + 1) * DatabaseContext.MAX_DOC_PER_FILE:
+                continue
+            if incoming_line < i * DatabaseContext.MAX_DOC_PER_FILE:
+                line_to_pop = 0
+            elif incoming_line < (i + 1) * DatabaseContext.MAX_DOC_PER_FILE and incoming_line > i * DatabaseContext.MAX_DOC_PER_FILE:
+                line_to_pop = incoming_line
+            
+            pname = DatabaseContext.DATA_FOLDER + col_meta_data.collection + '/' + fname
+
+            with open(pname, 'rb+') as file:
+                docs = pickle.load(file)
+                file.seek(0)
+                file.truncate()
+                if doc_to_move is not None:
+                    docs.append(doc_to_move)
+                doc_to_move = docs.pop(line_to_pop)
+                file.write(pickle.dumps(docs))
+
+    def update_indexes_file(self, col_meta_data, incoming_line):
+        for field in col_meta_data.indexes.keys():
+            pname = DatabaseContext.DATA_FOLDER + col_meta_data.collection + '/' + col_meta_data.get_index_fname(field)
  
             with open(pname, 'rb+') as file:
                 values = pickle.load(file)
@@ -49,11 +66,5 @@ class CleaningThread(Thread):
                         updated_values[k] = updated_lines
 
                 file.write(pickle.dumps(updated_values))
- 
-        CollectionLocker.unlock_col(col_meta_data)
 
-    def find_data_file(self, col_meta_data, line):
-        for i, fname in enumerate(col_meta_data.enumerate_data_fnames()):
-            if line > (i + 1) * DatabaseContext.MAX_DOC_PER_FILE:
-                continue
-            return DatabaseContext.DATA_FOLDER + col_meta_data.collection + '/' + fname
+            col_meta_data.add_or_update_index(field, col_meta_data.indexes[field] - 1)

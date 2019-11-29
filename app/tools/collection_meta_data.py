@@ -5,12 +5,13 @@ from app.tools.database_context import DatabaseContext
 
 #
 # line 1: counter of the last data file
-# line 2: dict with the indexes -> key = field; value = file name of the index
+# line 2: dict with the indexes -> key = field; value = amount of indexed elements
 #
 class CollectionMetaData(object):
 
     META_DATA_FILE_NAME = 'meta_data.txt'
     DATA_FILE_NAME = 'data{}.bin'
+    INDEX_FILE_NAME = '{}.idx'
 
     def __init__(self, collection):
         if os.path.exists(DatabaseContext.DATA_FOLDER + collection) is False:
@@ -28,9 +29,7 @@ class CollectionMetaData(object):
             self.counter = int(file.readline())
             self.indexes = eval(file.readline())
 
-    def add_index(self, field, count):
-        if field in self.indexes:
-            return {'status': 'already existing'}
+    def add_or_update_index(self, field, count):
         self.indexes[field] = count
         self.update_meta_data(str(self.indexes), 2)
         return {'status': 'done'}
@@ -47,6 +46,15 @@ class CollectionMetaData(object):
         for i in range(self.counter):
             fnames.append(self.DATA_FILE_NAME.format(i + 1))
         return fnames
+
+    def enumerate_index_fnames(self):
+        fnames = []
+        for f in self.indexes.keys():
+            fnames.append(self.get_index_fname(f))
+        return fnames
+
+    def get_index_fname(self, field):
+        return self.INDEX_FILE_NAME.format(field)
 
     def last_data_fname(self):
         return self.DATA_FILE_NAME.format(self.counter)

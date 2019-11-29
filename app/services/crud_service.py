@@ -7,6 +7,7 @@ from app.services.file_reader import FileReader
 from app.services.indexes_service import IndexesService
 from app.services.search_service import SearchService
 from app.tools.search_context import SearchContext
+from app.threads.cleaning_stack import CleaningStack
 
 class CrudService(object):
 
@@ -36,7 +37,9 @@ class CrudService(object):
         if len(previous_docs) != 1:
             raise AppException('Unable to update document with id {}'.format(id), 400)
         self.indexes_service.update_indexes(col_meta_data, previous_docs[0], doc)
-        return self.file_reader.update(col_meta_data, id, doc)
+        return self.file_reader.update(col_meta_data, id, doc)['doc']
 
     def delete(self, col_meta_data, id):
-        return self.file_reader.update(col_meta_data, id, {})
+        deleted_doc = self.file_reader.update(col_meta_data, id, {})
+        CleaningStack.get_instance().push(col_meta_data, deleted_doc['doc'], deleted_doc['line'])
+        return deleted_doc['doc']
