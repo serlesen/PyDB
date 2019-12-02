@@ -19,7 +19,7 @@ class CrudService(object):
 
     def create(self, col_meta_data, doc):
         if 'id' not in doc:
-            doc['id'] = uuid.uuid4()
+            doc['id'] = str(uuid.uuid4())
         else:
             existing_docs = search_service.search(col_meta_data, SearchContext({'$filter': {'id': doc['id']}, '$size': 1}))
             if len(existing_docs) > 0:

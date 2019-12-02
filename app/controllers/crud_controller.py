@@ -4,6 +4,7 @@ from app.controllers import app
 from app.controllers import crud_service
 from app.controllers import search_service
 from app.exceptions.app_exception import AppException
+from app.threads.searching_stack import SearchingStack
 from app.tools.collection_meta_data import CollectionMetaData
 from app.tools.search_context import SearchContext
 
@@ -15,7 +16,9 @@ def create(collection):
 
 @app.route('/<collection>/<id>')
 def get(collection, id):
-    result = search_service.search(CollectionMetaData(collection), SearchContext({"$filter":{"id":int(id)}}))
+    search_id = SearchingStack.get_instance().push_search(collection, {"$filter":{"id":int(id)}})
+    result = SearchingStack.get_instance().pop_results(search_id)
+    #result = search_service.search(CollectionMetaData(collection), SearchContext({"$filter":{"id":int(id)}}))
     if len(result) != 1:
         raise AppException('Unable to find document {}'.format(id), 404)
     return result[0]
