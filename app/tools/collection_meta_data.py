@@ -41,10 +41,11 @@ class CollectionMetaData(object):
         self.update_meta_data(str(self.indexes), 2)
         return {'status': 'done'}
 
-    def enumerate_data_fnames(self):
+    def enumerate_data_fnames(self, thread_id):
         fnames = []
         for i in range(self.counter):
-            fnames.append(self.DATA_FILE_NAME.format(i + 1))
+            if thread_id == None or (i % DatabaseContext.MAX_THREADS) == thread_id:
+                fnames.append(self.DATA_FILE_NAME.format(i + 1))
         return fnames
 
     def enumerate_index_fnames(self):

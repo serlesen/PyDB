@@ -5,3 +5,4 @@ class DatabaseContext(object):
     LOCKING_CYCLE = 0.01
     THREADS_CYCLE = 0.1
     MAX_DOC_PER_FILE = 100000
+    MAX_THREADS = 24

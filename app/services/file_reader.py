@@ -8,9 +8,9 @@ from app.tools.database_context import DatabaseContext
 class FileReader(object):
 
     @col_locking
-    def find_all(self, col_meta_data):
+    def find_all(self, col_meta_data, thread_id):
         results = []
-        for fname in col_meta_data.enumerate_data_fnames():
+        for fname in col_meta_data.enumerate_data_fnames(thread_id):
             pname = DatabaseContext.DATA_FOLDER + col_meta_data.collection + '/' + fname
 
             if os.path.exists(pname) == False:
@@ -21,13 +21,13 @@ class FileReader(object):
         return results
 
     @col_locking
-    def find_by_line(self, col_meta_data, lines):
+    def find_by_line(self, col_meta_data, lines, thread_id):
         lines_it = iter(lines)
         results = []
         try:
             l = next(lines_it)
-            for i, fname in enumerate(col_meta_data.enumerate_data_fnames()):
-                if l > (i + 1) * DatabaseContext.MAX_DOC_PER_FILE:
+            for i, fname in enumerate(col_meta_data.enumerate_data_fnames(None)):
+                if l > (i + 1) * DatabaseContext.MAX_DOC_PER_FILE and (thread_id == None or (i % DatabaseContext.MAX_THREADS) == thread_id):
                     continue
                 pname = DatabaseContext.DATA_FOLDER + col_meta_data.collection + '/' + fname
                 with open(pname, "rb") as file:
@@ -103,7 +103,7 @@ class FileReader(object):
 
     @col_locking
     def update(self, col_meta_data, id, input_doc):
-        for fname in col_meta_data.enumerate_data_fnames():
+        for fname in col_meta_data.enumerate_data_fnames(None):
             pname = DatabaseContext.DATA_FOLDER + col_meta_data.collection + '/' + fname
             results = self.find_one_in_file(pname, FilterTool({'$filter': {'id': id}}))
             if results is not None:

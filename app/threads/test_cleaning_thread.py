@@ -36,12 +36,12 @@ class CleaningThreadTest(unittest.TestCase):
     def test_clean_deleted_items(self):
         col_meta_data = CollectionMetaData('col')
 
-        count = len(self.file_reader.find_all(col_meta_data))
+        count = len(self.file_reader.find_all(col_meta_data, None))
 
         self.file_reader.update(col_meta_data, 2, {})
         CleaningStack.get_instance().push(col_meta_data, {}, 1)
 
-        docs = self.file_reader.find_all(col_meta_data)
+        docs = self.file_reader.find_all(col_meta_data, None)
         lines = self.indexes_service.find_all(col_meta_data, 'id', FilterTool({'$filter': {'id': 2}}))
 
         self.assertEqual(len(CleaningStack.get_instance().stack), 1)
@@ -51,7 +51,7 @@ class CleaningThreadTest(unittest.TestCase):
 
         self.cleaning_thread.run()
         
-        docs = self.file_reader.find_all(col_meta_data)
+        docs = self.file_reader.find_all(col_meta_data, None)
         lines = self.indexes_service.find_all(col_meta_data, 'id', FilterTool({'$filter': {'id': 2}}))
 
         self.assertEqual(len(CleaningStack.get_instance().stack), 0)

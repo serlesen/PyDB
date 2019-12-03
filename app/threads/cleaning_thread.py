@@ -25,7 +25,7 @@ class CleaningThread(Thread):
 
     def swift_data_docs(self, col_meta_data, incoming_line):
         doc_to_move = None
-        fnames = col_meta_data.enumerate_data_fnames() 
+        fnames = col_meta_data.enumerate_data_fnames(None) 
         for i, fname in zip(count(len(fnames) - 1, -1), reversed(fnames)):
             if incoming_line > (i + 1) * DatabaseContext.MAX_DOC_PER_FILE:
                 continue

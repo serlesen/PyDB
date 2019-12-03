@@ -21,7 +21,7 @@ class IndexesService(object):
         if os.path.exists(pname):
             return {'status': 'already existing'}
 
-        docs = self.file_reader.find_all(col_meta_data)
+        docs = self.file_reader.find_all(col_meta_data, None)
         filter_tool = FilterTool({'$filter': {field: {'$exists': True}}})
         resulting_docs = []
         for d in docs:

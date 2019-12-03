@@ -10,12 +10,15 @@ from app.tools.database_context import DatabaseContext
 class ThreadsManager(Thread):
 
     def run(self):
+        available_threads = DatabaseContext.MAX_THREADS
+
         while True:
 
             if CleaningStack.get_instance().contains_data():
                 CleaningThread().start()
 
             if SearchingStack.get_instance().contains_data():
-                SearchingThread().start()
+                for i in range(available_threads):
+                    SearchingThread(i).start()
 
             time.sleep(DatabaseContext.THREADS_CYCLE)

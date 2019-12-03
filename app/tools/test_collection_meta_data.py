@@ -26,7 +26,7 @@ class CollectionMetaDataTest(unittest.TestCase):
 
     def test_enumerate_file_names(self):
         meta_data = CollectionMetaData('col')
-        self.assertListEqual(meta_data.enumerate_data_fnames(), ['data1.bin', 'data2.bin'])
+        self.assertListEqual(meta_data.enumerate_data_fnames(None), ['data1.bin', 'data2.bin'])
 
     def test_add_remove_index(self):
         meta_data = CollectionMetaData('col')

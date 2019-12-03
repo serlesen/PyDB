@@ -8,13 +8,16 @@ from app.tools.search_context import SearchContext
 
 class SearchingThread(Thread):
 
-    def __init__(self):
+    def __init__(self, thread_id):
         Thread.__init__(self)
         self.search_service = DependencyInjectionsService.get_instance().get_service(SearchService)
+        self.thread_id
 
     def run(self):
-       item = SearchingStack.get_instance().pop_search()
+       item = SearchingStack.get_instance().pop_search(self.thread_id)
+       if item == None:
+           return
 
-       results = self.search_service.search(CollectionMetaData(item['collection']), SearchContext(item['search_query']))
+       results = self.search_service.search(CollectionMetaData(item['collection']), SearchContext(item['search_query']), self.thread_id)
 
-       SearchingStack.get_instance().push_results(results, item['id'])
+       SearchingStack.get_instance().push_results(results, item['id'], self.thread_id)

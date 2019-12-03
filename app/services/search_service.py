@@ -13,20 +13,20 @@ class SearchService(object):
         self.file_reader = DependencyInjectionsService.get_instance().get_service(FileReader)
         self.indexes_service = DependencyInjectionsService.get_instance().get_service(IndexesService)
 
-    def search(self, col_meta_data, search_context):
+    def search(self, col_meta_data, search_context, thread_id):
         indexed_value = self.find_field_in_index(col_meta_data, search_context)
+        docs = []
         if indexed_value != None:
             k = list(indexed_value.keys())[0]
 
             # filter by main index
             lines = self.indexes_service.find_all(col_meta_data, k, FilterTool({'$filter': indexed_value}))
-            docs = self.file_reader.find_by_line(col_meta_data, lines)
+            docs = self.file_reader.find_by_line(col_meta_data, lines, thread_id)
+        else:
+            docs = self.file_reader.find_all(col_meta_data, thread_id)
 
-            # filter by other argument in search_context
-            return self.find_in_docs(docs, search_context)
-
-        docs = self.file_reader.find_all(col_meta_data)
-        return self.find_in_docs(docs, search_context)
+        r = self.find_in_docs(docs, search_context)
+        return r
 
     def find_field_in_index(self, col_meta_data, search_context):
         if search_context.filter is None:

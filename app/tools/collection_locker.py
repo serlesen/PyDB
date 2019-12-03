@@ -33,7 +33,7 @@ class CollectionLocker(object):
     def lock_col(col_meta_data):
 
         # check data files are not locked
-        for f in col_meta_data.enumerate_data_fnames():
+        for f in col_meta_data.enumerate_data_fnames(None):
             CollectionLocker.wait_for_lock(DatabaseContext.DATA_FOLDER + col_meta_data.collection + '/' + f)
             
         # check indexes files are not locked
