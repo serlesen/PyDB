@@ -1,5 +1,8 @@
 import re
 
+#
+# Class which handle the logic to filter a document
+#
 class FilterTool(object):
 
     def __init__(self, search_filter):

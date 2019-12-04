@@ -7,6 +7,9 @@ from app.threads.searching_stack import SearchingStack
 from app.tools.collection_meta_data import CollectionMetaData
 from app.tools.database_context import DatabaseContext
 
+#
+# Class to return a status of the database
+#
 class DatabaseService(object):
 
     def __init__(self):

@@ -9,6 +9,10 @@ from app.services.search_service import SearchService
 from app.tools.search_context import SearchContext
 from app.threads.cleaning_stack import CleaningStack
 
+#
+# Class to create, update and delete a single document.
+# A bulk insert method is created but for debug purpose only
+#
 class CrudService(object):
 
     def __init__(self):

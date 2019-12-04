@@ -1,3 +1,7 @@
+#
+# Parser to validate the input argument.
+# Deprecated
+#
 class ArgumentParser(object):
 
     keywords = ['$filter', '$size', '$map', '$skip', '$sort', '$map']

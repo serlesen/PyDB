@@ -10,6 +10,9 @@ from app.tools.database_context import DatabaseContext
 from app.tools.filter_tool import FilterTool
 from app.tools.search_context import SearchContext
 
+#
+# Class to create, remove and update the indexes. It also searches into the indexes content
+#
 class IndexesService(object):
 
     def __init__(self):

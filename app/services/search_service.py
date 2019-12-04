@@ -7,6 +7,10 @@ from app.services.file_reader import FileReader
 from app.services.indexes_service import IndexesService
 from app.tools.filter_tool import FilterTool
 
+#
+# Class to search over given documents to apply a search_context.
+# This class also sort and limit the results to be returned.
+#
 class SearchService(object):
 
     def __init__(self):

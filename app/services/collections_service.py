@@ -8,6 +8,9 @@ from app.tools.collection_locker import col_locking
 from app.tools.collection_meta_data import CollectionMetaData
 from app.tools.database_context import DatabaseContext
 
+#
+# Class to create and remove a collection. It also returns some meta data about a collections as the count
+#
 class CollectionsService(object):
 
     def __init__(self):

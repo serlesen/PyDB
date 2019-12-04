@@ -4,6 +4,7 @@ from app.exceptions.app_exception import AppException
 from app.tools.database_context import DatabaseContext
 
 #
+# Class which contains all the meta information about a collection (count, name of the indexes, counter of the data files)
 # line 1: counter of the last data file
 # line 2: dict with the indexes -> key = field; value = amount of indexed elements
 #

@@ -5,6 +5,10 @@ from app.tools.collection_locker import CollectionLocker, col_locking
 from app.tools.filter_tool import FilterTool
 from app.tools.database_context import DatabaseContext
 
+#
+# Class to read (without conditions or only some given lines), append and update a data file.
+# A bulk append method is created, but only for debug purpose.
+#
 class FileReader(object):
 
     @col_locking

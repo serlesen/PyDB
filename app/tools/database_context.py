@@ -1,3 +1,6 @@
+#
+# Class which contains constants for the database behavior.
+#
 class DatabaseContext(object):
     DATA_FOLDER = 'data/'
     DEFAULT_RESULTS_SIZE = 10

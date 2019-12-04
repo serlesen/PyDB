@@ -13,6 +13,10 @@ def col_locking(func):
         return func(*args, **kwargs)
     return wrapper
 
+#
+# Class to handle the lock on collections and single files.
+# Only the decorator is outside the class (to ease the way to call it)
+#
 class CollectionLocker(object):
     
     LOCK_FILE = '{}.lock'
