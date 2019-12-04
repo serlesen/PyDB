@@ -18,7 +18,6 @@ def create(collection):
 def get(collection, id):
     search_id = SearchingStack.get_instance().push_search(collection, {"$filter":{"id":int(id)}})
     result = SearchingStack.get_instance().pop_results(search_id)
-    #result = search_service.search(CollectionMetaData(collection), SearchContext({"$filter":{"id":int(id)}}))
     if len(result) != 1:
         raise AppException('Unable to find document {}'.format(id), 404)
     return result[0]

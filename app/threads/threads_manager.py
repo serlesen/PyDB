@@ -17,8 +17,9 @@ class ThreadsManager(Thread):
             if CleaningStack.get_instance().contains_data():
                 CleaningThread().start()
 
-            if SearchingStack.get_instance().contains_data():
-                for i in range(available_threads):
-                    SearchingThread(i).start()
+            threads_by_search = SearchingStack.get_instance().threads_needed()
+            if threads_by_search is not None:
+                for t in threads_by_search['threads']:
+                    SearchingThread(threads_by_search['search_id'], t).start()
 
             time.sleep(DatabaseContext.THREADS_CYCLE)

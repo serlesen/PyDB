@@ -25,8 +25,7 @@ class SearchService(object):
         else:
             docs = self.file_reader.find_all(col_meta_data, thread_id)
 
-        r = self.find_in_docs(docs, search_context)
-        return r
+        return self.find_in_docs(docs, search_context)
 
     def find_field_in_index(self, col_meta_data, search_context):
         if search_context.filter is None:

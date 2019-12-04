@@ -27,17 +27,21 @@ class FileReader(object):
         try:
             l = next(lines_it)
             for i, fname in enumerate(col_meta_data.enumerate_data_fnames(None)):
-                if l > (i + 1) * DatabaseContext.MAX_DOC_PER_FILE and (thread_id == None or (i % DatabaseContext.MAX_THREADS) == thread_id):
+                if l > (i + 1) * DatabaseContext.MAX_DOC_PER_FILE:
                     continue
-                pname = DatabaseContext.DATA_FOLDER + col_meta_data.collection + '/' + fname
-                with open(pname, "rb") as file:
-                    current_docs = pickle.load(file)
-                    while l < (i + 1) * DatabaseContext.MAX_DOC_PER_FILE:
-                        current_line = l - i * DatabaseContext.MAX_DOC_PER_FILE
-                        results.append(current_docs[current_line])
-                        l = next(lines_it)
+                if thread_id == None or ((i + 1) % DatabaseContext.MAX_THREADS) == thread_id:
+                    pname = DatabaseContext.DATA_FOLDER + col_meta_data.collection + '/' + fname
+                    with open(pname, "rb") as file:
+                        current_docs = pickle.load(file)
+                        while l < (i + 1) * DatabaseContext.MAX_DOC_PER_FILE:
+                            current_line = l - i * DatabaseContext.MAX_DOC_PER_FILE
+                            results.append(current_docs[current_line])
+                            l = next(lines_it)
+                else:
+                    l = next(lines_it)
         except StopIteration:    
-            return results
+            pass
+        return results
 
     def find_one_in_file(self, pname, filter_tool):
         with open(pname, "rb") as file:

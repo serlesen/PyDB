@@ -44,7 +44,7 @@ class CollectionMetaData(object):
     def enumerate_data_fnames(self, thread_id):
         fnames = []
         for i in range(self.counter):
-            if thread_id == None or (i % DatabaseContext.MAX_THREADS) == thread_id:
+            if thread_id == None or ((i + 1) % DatabaseContext.MAX_THREADS) == thread_id:
                 fnames.append(self.DATA_FILE_NAME.format(i + 1))
         return fnames
 

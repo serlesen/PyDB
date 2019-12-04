@@ -81,13 +81,13 @@ class SearchServiceTest(unittest.TestCase):
 
     @timeout_decorator.timeout(0.5)
     def test_search_over_250000_docs_separated_threads(self):
-        results = self.search_service.search(CollectionMetaData('big-col'), SearchContext({'$filter': {'id': 449994}}), 4)
+        results = self.search_service.search(CollectionMetaData('big-col'), SearchContext({'$filter': {'id': 449994}}), 5)
         self.assertEqual(len(results), 1)
         self.assertEqual(results[0]['id'], 449994)
 
     @timeout_decorator.timeout(1)
     def test_search_over_250000_docs_with_index_separated_threads(self):
-        results = self.search_service.search(CollectionMetaData('big-col-with-index'), SearchContext({'$filter': {'id': 449994}}), 4)
+        results = self.search_service.search(CollectionMetaData('big-col-with-index'), SearchContext({'$filter': {'id': 449994}}), 5)
         self.assertEqual(len(results), 1)
         self.assertEqual(results[0]['id'], 449994)
 

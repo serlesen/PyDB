@@ -1,6 +1,7 @@
 import time
 import uuid
 
+from app.tools.collection_meta_data import CollectionMetaData
 from app.tools.database_context import DatabaseContext
 
 class SearchingStack(object):
@@ -17,30 +18,23 @@ class SearchingStack(object):
             SearchingStack.instance = SearchingStack()
         return SearchingStack.instance
 
-    def push_search(self, collection, search_query, threads):
+    def push_search(self, collection, search_query):
         search_id = str(uuid.uuid4())
-        self.queries[search_id] = {'threads': threads, 'collection': collection, 'search_query': search_query}
-        self.pending_results[search_id] = threads
+        self.pending_results[search_id] = list(range(1, CollectionMetaData(collection).counter + 1))
         self.results[search_id] = []
+        self.queries[search_id] = {'collection': collection, 'search_query': search_query, 'started': False}
         return search_id
 
     def push_results(self, results, search_id, thread_id):
-
         pending = self.pending_results[search_id]
         pending.remove(thread_id)
         if len(pending) == 0:
             del self.pending_results[search_id]
 
-        self.results[search_id].extends(results)
+        self.results[search_id].extend(results)
 
-    def pop_search(self, thread_id):
-        for k, v in self.queries.items():
-            if thread_id in v['threads']:
-                v['threads'].remove(thread_id)
-                return q
-                
-        # FIXME maybe throw an exception
-        return None
+    def pop_search(self, search_id):
+        return self.queries[search_id]
 
     def pop_results(self, search_id):
         while search_id in self.pending_results:
@@ -50,5 +44,9 @@ class SearchingStack(object):
     def get_details(self):
         return self.queries
 
-    def contains_data(self):
-        return len(self.queries) > 0
+    def threads_needed(self):
+        for k, v in self.queries.items():
+            if v['started'] is False:
+                v['started'] = True
+                return {'search_id': k, 'threads': self.pending_results[k]}
+        return None
