@@ -20,6 +20,6 @@ class SearchingThread(Thread):
        if item == None:
            return
 
-       results = self.search_service.search(CollectionMetaData(item['collection']), SearchContext(item['search_query']), self.thread_id)
+       results = self.search_service.search_by_thread(CollectionMetaData(item['collection']), SearchContext(item['search_query']), self.thread_id)
 
        SearchingStack.get_instance().push_results(results, self.search_id, self.thread_id)

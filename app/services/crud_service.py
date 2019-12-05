@@ -25,19 +25,19 @@ class CrudService(object):
         if 'id' not in doc:
             doc['id'] = str(uuid.uuid4())
         else:
-            existing_docs = search_service.search(col_meta_data, SearchContext({'$filter': {'id': doc['id']}, '$size': 1}))
+            existing_docs = self.search_service.search(col_meta_data.collection, {'$filter': {'id': doc['id']}, '$size': 1})
             if len(existing_docs) > 0:
                 raise AppException('Document with same ID already in the database', 409)
         updated = self.file_reader.append(col_meta_data, doc)
         appended_line = self.collections_service.count(col_meta_data) - 1
-        self.indexes_service.append_to_index(col_meta_data, doc, appended_line)
+        self.indexes_service.append_to_indexes(col_meta_data, doc, appended_line)
         return updated
 
     def bulk_insert(self, col_meta_data, docs):
         return self.file_reader.append_bulk(col_meta_data, docs)
 
     def update(self, col_meta_data, id, doc):
-        previous_docs = self.search_service.search(col_meta_data, SearchContext({'$filter': {'id': id}, '$size': 1}))
+        previous_docs = self.search_service.search(col_meta_data.collection, {'$filter': {'id': id}, '$size': 1})
         if len(previous_docs) != 1:
             raise AppException('Unable to update document with id {}'.format(id), 400)
         self.indexes_service.update_indexes(col_meta_data, previous_docs[0], doc)

@@ -12,7 +12,7 @@ class ThreadsManager(Thread):
     def run(self):
         available_threads = DatabaseContext.MAX_THREADS
 
-        while True:
+        while DatabaseContext.THREADS_MANAGER_CYCLING:
 
             if CleaningStack.get_instance().contains_data():
                 CleaningThread().start()

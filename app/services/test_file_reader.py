@@ -22,6 +22,34 @@ class FileReaderTest(unittest.TestCase):
     def tearDownClass(cls):
         CollectionsSimulator.clean()
 
+    def test_find_by_line_first_file_actual_thread(self):
+        docs = self.file_reader.find_by_line(CollectionMetaData('col'), [1], 1)
+        self.assertEqual(len(docs), 1)
+        self.assertEqual(docs[0]['id'], 2)
+
+    def test_find_by_line_first_file_next_thread(self):
+        docs = self.file_reader.find_by_line(CollectionMetaData('col'), [1], 2)
+        self.assertEqual(len(docs), 0)
+
+    def test_find_by_line_second_file_previous_thread(self):
+        docs = self.file_reader.find_by_line(CollectionMetaData('col'), [4], 1)
+        self.assertEqual(len(docs), 0)
+
+    def test_find_by_line_second_file_actual_thread(self):
+        docs = self.file_reader.find_by_line(CollectionMetaData('col'), [4], 2)
+        self.assertEqual(len(docs), 1)
+        self.assertEqual(docs[0]['id'], 5)
+
+    def test_find_by_multiple_lines_but_found_first_one(self):
+        docs = self.file_reader.find_by_line(CollectionMetaData('col'), [1, 4], 1)
+        self.assertEqual(len(docs), 1)
+        self.assertEqual(docs[0]['id'], 2)
+
+    def test_find_by_multiple_lines_but_found_second_one(self):
+        docs = self.file_reader.find_by_line(CollectionMetaData('col'), [1, 4], 2)
+        self.assertEqual(len(docs), 1)
+        self.assertEqual(docs[0]['id'], 5)
+
     def test_find_one_doc_in_file(self):
         filter_tool = FilterTool({'$filter': {'id': 3}})
         result = self.file_reader.find_one_in_file('data-test/col/data1.bin', filter_tool)
@@ -63,7 +91,6 @@ class FileReaderTest(unittest.TestCase):
         self.file_reader.update(CollectionMetaData('col'), 2, {'id': 2, 'first_name': 'John', 'last_name': 'Smith'})
         results = self.file_reader.find_one_in_file('data-test/col/data1.bin', filter_tool)
         self.assertIsNone(results)
-
 
     def suite():
         return unittest.TestLoader().loadTestsFromTestCase(FileReaderTest)

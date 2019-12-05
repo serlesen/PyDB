@@ -15,8 +15,8 @@ def create_collection(collection):
 
 @app.route('/collections/<collection>/index/<field>', methods=['POST'])
 def create_index(collection, field):
-	col_meta_data = CollectionMetaData(collection)
-	docs = file_reader.find_all(col_meta_data, None)
+    col_meta_data = CollectionMetaData(collection)
+    docs = file_reader.find_all(col_meta_data, None)
     return indexes_service.build_index(col_meta_data, docs, field)
 
 @app.route('/collections/<collection>', methods=['DELETE'])

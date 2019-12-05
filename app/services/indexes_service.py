@@ -61,7 +61,10 @@ class IndexesService(object):
                 values = pickle.load(file)
                 file.seek(0)
                 file.truncate()
-                values[value] = line
+                v = doc[field]
+                if v not in values:
+                    values[v] = []
+                values[v].append(line)
                 file.write(pickle.dumps(values))
 
             CollectionLocker.unlock_file(pname)

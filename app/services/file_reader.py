@@ -31,21 +31,26 @@ class FileReader(object):
         try:
             l = next(lines_it)
             for i, fname in enumerate(col_meta_data.enumerate_data_fnames(None)):
-                if l > (i + 1) * DatabaseContext.MAX_DOC_PER_FILE:
+                if self.is_line_in_current_file(l, i) == False:
                     continue
-                if thread_id == None or ((i + 1) % DatabaseContext.MAX_THREADS) == thread_id:
-                    pname = DatabaseContext.DATA_FOLDER + col_meta_data.collection + '/' + fname
-                    with open(pname, "rb") as file:
-                        current_docs = pickle.load(file)
-                        while l < (i + 1) * DatabaseContext.MAX_DOC_PER_FILE:
-                            current_line = l - i * DatabaseContext.MAX_DOC_PER_FILE
-                            results.append(current_docs[current_line])
-                            l = next(lines_it)
-                else:
-                    l = next(lines_it)
+                while self.is_line_in_current_file(l, i):
+                    if thread_id == None or ((i + 1) % DatabaseContext.MAX_THREADS) == thread_id:
+                        # the desired line is in the current data file for the desired thread
+                        pname = DatabaseContext.DATA_FOLDER + col_meta_data.collection + '/' + fname
+                        with open(pname, "rb") as file:
+                            current_docs = pickle.load(file)
+                            while self.is_line_in_current_file(l, i):
+                                current_line = l - i * DatabaseContext.MAX_DOC_PER_FILE
+                                results.append(current_docs[current_line])
+                                l = next(lines_it)
+                    else:
+                        l = next(lines_it)
         except StopIteration:    
             pass
         return results
+
+    def is_line_in_current_file(self, line, index_file):
+        return line >= index_file * DatabaseContext.MAX_DOC_PER_FILE and line < (index_file + 1) * DatabaseContext.MAX_DOC_PER_FILE
 
     def find_one_in_file(self, pname, filter_tool):
         with open(pname, "rb") as file:
