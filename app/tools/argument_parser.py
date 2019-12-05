@@ -8,6 +8,6 @@ class ArgumentParser(object):
 
     def validate(input):
         for k in input.keys():
-            if k not in self.keywords:
+            if k not in ArgumentParser.keywords:
                 return False
         return True

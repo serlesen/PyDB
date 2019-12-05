@@ -5,4 +5,4 @@ from app.controllers import database_service
 
 @app.route('/status', methods=['GET'])
 def database_status():
-    return database_service.get_status()
+    return jsonify(database_service.get_status())

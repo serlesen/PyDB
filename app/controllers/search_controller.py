@@ -5,6 +5,7 @@ from app.controllers import search_service
 from app.exceptions.app_exception import AppException
 from app.tools.argument_parser import ArgumentParser
 from app.tools.results_mapper import ResultsMapper
+from app.tools.search_context import SearchContext
 
 @app.route('/<collection>/search', methods=['POST'])
 def search(collection):
@@ -15,6 +16,6 @@ def search(collection):
     result = search_service.search(collection, request.json)
     if len(result) == 0:
         abort(404)
-    if search_context.map is None:
-        return result
-    return ResultsMapper.map(result)
+    if SearchContext(request.json).map is None:
+        return jsonify(result)
+    return jsonify(ResultsMapper.map(result))

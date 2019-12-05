@@ -11,14 +11,14 @@ from app.tools.search_context import SearchContext
 def create(collection):
     if not request.json:
         abort(405)
-    return crud_service.create(CollectionMetaData(collection), request.json), 201
+    return jsonify(crud_service.create(CollectionMetaData(collection), request.json)), 201
 
 @app.route('/<collection>/<id>')
 def get(collection, id):
     result = search_service.search(collection, {"$filter":{"id": int(id)}})
     if len(result) != 1:
         raise AppException('Unable to find document {}'.format(id), 404)
-    return result[0]
+    return jsonify(result[0])
 
 @app.route('/<collection>/<id>', methods=['PUT'])
 def update(collection, id):
@@ -27,11 +27,11 @@ def update(collection, id):
     result = crud_service.update(CollectionMetaData(collection), int(id), request.json)
     if result is None:
         raise AppException('Unable to find document {}'.format(id), 404)
-    return result
+    return jsonify(result)
 
 @app.route('/<collection>/<id>', methods=['DELETE'])
 def delete(collection, id):
     result = crud_service.delete(CollectionMetaData(collection), int(id))
     if result is None:
         raise AppException('Unable to find document {}'.format(id), 404)
-    return result
+    return jsonify(result)

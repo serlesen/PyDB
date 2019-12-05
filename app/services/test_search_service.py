@@ -70,25 +70,25 @@ class SearchServiceTest(unittest.TestCase):
         self.assertEqual(results[5]['first_name'], 'Sergio')
 
     @timeout_decorator.timeout(2.5)
-    def test_search_over_250000_docs(self):
+    def test_search_over_500000_docs(self):
         results = self.search_service.search_by_thread(CollectionMetaData('big-col'), SearchContext({'$filter': {'id': 449994}}), None)
         self.assertEqual(len(results), 1)
         self.assertEqual(results[0]['id'], 449994)
 
     @timeout_decorator.timeout(1)
-    def test_search_over_250000_docs_with_index(self):
+    def test_search_over_500000_docs_with_index(self):
         results = self.search_service.search_by_thread(CollectionMetaData('big-col-with-index'), SearchContext({'$filter': {'id': 449994}}), None)
         self.assertEqual(len(results), 1)
         self.assertEqual(results[0]['id'], 449994)
 
     @timeout_decorator.timeout(0.5)
-    def test_search_over_250000_docs_separated_threads(self):
+    def test_search_over_500000_docs_separated_threads(self):
         results = self.search_service.search_by_thread(CollectionMetaData('big-col'), SearchContext({'$filter': {'id': 449994}}), 5)
         self.assertEqual(len(results), 1)
         self.assertEqual(results[0]['id'], 449994)
 
     @timeout_decorator.timeout(1)
-    def test_search_over_250000_docs_with_index_separated_threads(self):
+    def test_search_over_500000_docs_with_index_separated_threads(self):
         results = self.search_service.search_by_thread(CollectionMetaData('big-col-with-index'), SearchContext({'$filter': {'id': 449994}}), 5)
         self.assertEqual(len(results), 1)
         self.assertEqual(results[0]['id'], 449994)

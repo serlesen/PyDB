@@ -1,7 +1,9 @@
 import unittest
 
+from app.controllers.test_search_controller import SearchControllerTest
 from app.controllers.test_collections_controller import CollectionsControllerTest
 from app.controllers.test_crud_controller import CrudControllerTest
+from app.controllers.test_database_controller import DatabaseControllerTest
 from app.services.test_collections_service import CollectionsServiceTest
 from app.services.test_database_service import DatabaseServiceTest
 from app.services.test_file_reader import FileReaderTest
@@ -20,12 +22,14 @@ def suite():
         CollectionsControllerTest.suite(),
         CollectionsServiceTest.suite(),
         CrudControllerTest.suite(),
+        DatabaseControllerTest.suite(),
         DatabaseServiceTest.suite(),
         FileReaderTest.suite(),
         FilterToolTest.suite(),
         IndexesServiceTest.suite(),
         ResultsMapperTest.suite(),
         SearchContextTest.suite(),
+        SearchControllerTest.suite(),
         SearchServiceTest.suite()
         ])
 
