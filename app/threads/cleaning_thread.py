@@ -67,4 +67,4 @@ class CleaningThread(Thread):
 
                 file.write(pickle.dumps(updated_values))
 
-            col_meta_data.add_or_update_index(field, col_meta_data.indexes[field] - 1)
+            col_meta_data.add_or_update_index_count(field, col_meta_data.indexes[field] - 1)

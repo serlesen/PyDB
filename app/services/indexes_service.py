@@ -3,8 +3,6 @@ import os.path
 import datetime
 
 from app.exceptions.app_exception import AppException
-from app.injection.dependency_injections_service import DependencyInjectionsService
-from app.services.file_reader import FileReader
 from app.tools.collection_locker import CollectionLocker, col_locking
 from app.tools.database_context import DatabaseContext
 from app.tools.filter_tool import FilterTool
@@ -15,16 +13,12 @@ from app.tools.search_context import SearchContext
 #
 class IndexesService(object):
 
-    def __init__(self):
-        self.file_reader = DependencyInjectionsService.get_instance().get_service(FileReader)
-
     @col_locking
-    def build_index(self, col_meta_data, field):
+    def build_index(self, col_meta_data, docs, field):
         pname = DatabaseContext.DATA_FOLDER + col_meta_data.collection + '/' + col_meta_data.get_index_fname(field)
         if os.path.exists(pname):
             return {'status': 'already existing'}
 
-        docs = self.file_reader.find_all(col_meta_data, None)
         filter_tool = FilterTool({'$filter': {field: {'$exists': True}}})
         resulting_docs = []
         for d in docs:
@@ -41,7 +35,7 @@ class IndexesService(object):
         with open(pname, 'wb') as file:
             file.write(pickle.dumps(values))
 
-        return col_meta_data.add_or_update_index(field, len(resulting_docs))
+        return col_meta_data.add_or_update_index_count(field, len(resulting_docs))
 
     def get_lines(self, col_meta_data, id):
         pname = DatabaseContext.DATA_FOLDER + col_meta_data.collection + '/' + col_meta_data.get_index_fname('id')
@@ -137,5 +131,5 @@ class IndexesService(object):
             return {'status': 'missing index'}
 
         os.remove(pname)
-        return col_meta_data.remove_index(field)
+        return col_meta_data.remove_index_count(field)
 

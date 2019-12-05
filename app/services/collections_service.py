@@ -43,10 +43,7 @@ class CollectionsService(object):
         CollectionMetaData(collection)
 
         # all the collections must have the id index
-        return self.indexes_service.build_index(CollectionMetaData(collection), 'id')
-
-    def create_index(self, collection, field):
-        return self.indexes_service.build_index(CollectionMetaData(collection), field)
+        return self.indexes_service.build_index(CollectionMetaData(collection), [], 'id')
 
     def remove(self, collection):
         if os.path.exists(DatabaseContext.DATA_FOLDER + collection):
@@ -54,5 +51,3 @@ class CollectionsService(object):
             return {'status': 'done'}
         return {'status': 'missing collection'}
 
-    def remove_index(self, collection, field):
-        return self.indexes_service.remove_index(CollectionMetaData(collection), field)

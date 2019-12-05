@@ -30,12 +30,12 @@ class CollectionMetaData(object):
             self.counter = int(file.readline())
             self.indexes = eval(file.readline())
 
-    def add_or_update_index(self, field, count):
+    def add_or_update_index_count(self, field, count):
         self.indexes[field] = count
         self.update_meta_data(str(self.indexes), 2)
         return {'status': 'done'}
             
-    def remove_index(self, field):
+    def remove_index_count(self, field):
         if field not in self.indexes:
             return {'status': 'missing index'}
         del self.indexes[field]

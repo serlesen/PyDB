@@ -19,8 +19,9 @@ class CleaningThreadTest(unittest.TestCase):
 
         col_meta_data = CollectionMetaData('col')
         indexes_service = IndexesService()
-        indexes_service.build_index(col_meta_data, 'id')
-        col_meta_data.add_or_update_index('id', 5 * DatabaseContext.MAX_DOC_PER_FILE)
+        file_reader = FileReader()
+        docs = file_reader.find_all(col_meta_data, None)
+        indexes_service.build_index(col_meta_data, docs, 'id')
 
     def setUp(self):
         # instanciate the service to test

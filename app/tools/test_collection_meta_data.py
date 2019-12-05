@@ -31,11 +31,11 @@ class CollectionMetaDataTest(unittest.TestCase):
     def test_add_remove_index(self):
         meta_data = CollectionMetaData('col')
 
-        result = meta_data.add_or_update_index('id', 10)
+        result = meta_data.add_or_update_index_count('id', 10)
         self.assertEqual(result['status'], 'done')
         self.assertEqual(meta_data.indexes['id'], 10)
 
-        meta_data.remove_index('id')
+        meta_data.remove_index_count('id')
         self.assertEqual(result['status'], 'done')
         self.assertTrue('id' not in meta_data.indexes)
 
