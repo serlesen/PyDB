@@ -37,7 +37,7 @@ class SearchControllerTest(unittest.TestCase):
         CollectionsSimulator.clean()
         DatabaseContext.THREADS_MANAGER_CYCLING = False
 
-    @timeout_decorator.timeout(2.5)
+    @timeout_decorator.timeout(3)
     def test_search_over_500000_docs(self):
         response = self.app.post('/col/search', data=json.dumps({'$filter': {'id': 449994}}), content_type='application/json')
         self.assertEqual(response.status_code, 200)
@@ -46,7 +46,7 @@ class SearchControllerTest(unittest.TestCase):
         self.assertEqual(len(response_data), 1)
         self.assertEqual(response_data[0]['id'], 449994)
 
-    @timeout_decorator.timeout(2.5)
+    @timeout_decorator.timeout(3)
     def test_not_found_search_over_500000_docs(self):
         response = self.app.post('/col/search', data=json.dumps({'$filter': {'id': 949994}}), content_type='application/json')
         self.assertEqual(response.status_code, 404)

@@ -3,8 +3,8 @@ from threading import Thread
 
 from app.threads.cleaning_stack import CleaningStack
 from app.threads.cleaning_thread import CleaningThread
-from app.threads.searching_stack import SearchingStack
-from app.threads.searching_thread import SearchingThread
+from app.threads.query_stack import QueryStack
+from app.threads.query_thread import QueryThread
 from app.tools.database_context import DatabaseContext
 
 class ThreadsManager(Thread):
@@ -17,9 +17,9 @@ class ThreadsManager(Thread):
             if CleaningStack.get_instance().contains_data():
                 CleaningThread().start()
 
-            threads_by_search = SearchingStack.get_instance().threads_needed()
-            if threads_by_search is not None:
-                for t in threads_by_search['threads']:
-                    SearchingThread(threads_by_search['search_id'], t).start()
+            threads_by_query = QueryStack.get_instance().threads_needed()
+            if threads_by_query is not None:
+                for t in threads_by_query['threads']:
+                    QueryThread(threads_by_query['query_id'], t).start()
 
             time.sleep(DatabaseContext.THREADS_CYCLE)

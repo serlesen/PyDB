@@ -34,7 +34,7 @@ class DatabaseControllerTest(unittest.TestCase):
         self.assertEqual(len(response_data['collections']), 1)
         self.assertEqual(response_data['collections'][0]['collection'], 'col')
         self.assertTrue('cleaning_operations' in response_data)
-        self.assertTrue('searching_operations' in response_data)
+        self.assertTrue('query_operations' in response_data)
 
     def suite():
         return unittest.TestLoader().loadTestsFromTestCase(DatabaseControllerTest)

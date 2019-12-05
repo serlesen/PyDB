@@ -6,6 +6,7 @@ from app.services.crud_service import CrudService
 from app.services.database_service import DatabaseService
 from app.services.file_reader import FileReader
 from app.services.indexes_service import IndexesService
+from app.services.query_manager import QueryManager
 from app.services.search_service import SearchService
 from app.threads.threads_manager import ThreadsManager
 
@@ -16,6 +17,7 @@ crud_service = DependencyInjectionsService.get_instance().get_service(CrudServic
 database_service = DependencyInjectionsService.get_instance().get_service(DatabaseService)
 file_reader = DependencyInjectionsService.get_instance().get_service(FileReader)
 indexes_service = DependencyInjectionsService.get_instance().get_service(IndexesService)
+query_manager = DependencyInjectionsService.get_instance().get_service(QueryManager)
 search_service = DependencyInjectionsService.get_instance().get_service(SearchService)
 
 ThreadsManager().start()

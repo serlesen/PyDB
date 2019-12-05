@@ -3,7 +3,7 @@ import os
 from app.injection.dependency_injections_service import DependencyInjectionsService
 from app.services.collections_service import CollectionsService
 from app.threads.cleaning_stack import CleaningStack
-from app.threads.searching_stack import SearchingStack
+from app.threads.query_stack import QueryStack
 from app.tools.collection_meta_data import CollectionMetaData
 from app.tools.database_context import DatabaseContext
 
@@ -23,7 +23,7 @@ class DatabaseService(object):
             cols.append({'collection': f, 'count': self.collections_service.count(col_meta_data), 'size (bytes)': self.collection_size(col_meta_data)})
         return {'collections': cols,
                 'cleaning_operations': CleaningStack.get_instance().get_details(),
-                'searching_operations': SearchingStack.get_instance().get_details()
+                'query_operations': QueryStack.get_instance().get_details()
                 }
 
     def collection_size(self, col_meta_data):

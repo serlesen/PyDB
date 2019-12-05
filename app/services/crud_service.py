@@ -5,7 +5,7 @@ from app.exceptions.app_exception import AppException
 from app.services.collections_service import CollectionsService
 from app.services.file_reader import FileReader
 from app.services.indexes_service import IndexesService
-from app.services.search_service import SearchService
+from app.services.query_manager import QueryManager
 from app.tools.search_context import SearchContext
 from app.threads.cleaning_stack import CleaningStack
 
@@ -19,13 +19,13 @@ class CrudService(object):
         self.collections_service = DependencyInjectionsService.get_instance().get_service(CollectionsService)
         self.file_reader = DependencyInjectionsService.get_instance().get_service(FileReader)
         self.indexes_service = DependencyInjectionsService.get_instance().get_service(IndexesService)
-        self.search_service = DependencyInjectionsService.get_instance().get_service(SearchService)
+        self.query_manager = DependencyInjectionsService.get_instance().get_service(QueryManager)
 
     def create(self, col_meta_data, doc):
         if 'id' not in doc:
             doc['id'] = str(uuid.uuid4())
         else:
-            existing_docs = self.search_service.search(col_meta_data.collection, {'$filter': {'id': doc['id']}, '$size': 1})
+            existing_docs = self.query_manager.search(col_meta_data.collection, {'$filter': {'id': doc['id']}, '$size': 1})
             if len(existing_docs) > 0:
                 raise AppException('Document with same ID already in the database', 409)
         updated = self.file_reader.append(col_meta_data, doc)
@@ -37,7 +37,7 @@ class CrudService(object):
         return self.file_reader.append_bulk(col_meta_data, docs)
 
     def update(self, col_meta_data, id, doc):
-        previous_docs = self.search_service.search(col_meta_data.collection, {'$filter': {'id': id}, '$size': 1})
+        previous_docs = self.query_manager.search(col_meta_data.collection, {'$filter': {'id': id}, '$size': 1})
         if len(previous_docs) != 1:
             raise AppException('Unable to update document with id {}'.format(id), 400)
         self.indexes_service.update_indexes(col_meta_data, previous_docs[0], doc)

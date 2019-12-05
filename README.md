@@ -129,7 +129,6 @@ python3 -m unittest -v
 ### TODO
 
 * Sort by nested documents
-* Update/Add made in separated threads
 * Add cache instead of opening the indexes and data files everytime
 * Users authentication/management
 * Master/Slave replication

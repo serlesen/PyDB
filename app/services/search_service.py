@@ -5,7 +5,7 @@ from operator import itemgetter
 from app.injection.dependency_injections_service import DependencyInjectionsService
 from app.services.file_reader import FileReader
 from app.services.indexes_service import IndexesService
-from app.threads.searching_stack import SearchingStack
+from app.threads.query_stack import QueryStack
 from app.tools.filter_tool import FilterTool
 
 #
@@ -17,10 +17,6 @@ class SearchService(object):
     def __init__(self):
         self.file_reader = DependencyInjectionsService.get_instance().get_service(FileReader)
         self.indexes_service = DependencyInjectionsService.get_instance().get_service(IndexesService)
-
-    def search(self, collection, search_query):
-        search_id = SearchingStack.get_instance().push_search(collection, search_query)
-        return SearchingStack.get_instance().pop_results(search_id)
 
     def search_by_thread(self, col_meta_data, search_context, thread_id):
         indexed_value = self.find_field_in_index(col_meta_data, search_context)
