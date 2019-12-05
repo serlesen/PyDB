@@ -46,5 +46,10 @@ class SearchControllerTest(unittest.TestCase):
         self.assertEqual(len(response_data), 1)
         self.assertEqual(response_data[0]['id'], 449994)
 
+    @timeout_decorator.timeout(2.5)
+    def test_not_found_search_over_500000_docs(self):
+        response = self.app.post('/col/search', data=json.dumps({'$filter': {'id': 949994}}), content_type='application/json')
+        self.assertEqual(response.status_code, 404)
+
     def suite():
         return unittest.TestLoader().loadTestsFromTestCase(SearchControllerTest)
