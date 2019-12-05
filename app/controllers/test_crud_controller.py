@@ -7,11 +7,16 @@ from app.services.file_reader import FileReader
 from app.test.collections_simulator import CollectionsSimulator
 from app.tools.collection_meta_data import CollectionMetaData
 from app.tools.database_context import DatabaseContext
+from app.threads.threads_manager import ThreadsManager
 
 class CrudControllerTest(unittest.TestCase):
 
     @classmethod
     def setUpClass(cls):
+        if DatabaseContext.THREADS_MANAGER_CYCLING == False:
+            DatabaseContext.THREADS_MANAGER_CYCLING = True
+            ThreadsManager().start()
+
         CollectionsSimulator.build_single_col('col')
 
         col_meta_data = CollectionMetaData('col')

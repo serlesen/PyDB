@@ -1,5 +1,6 @@
 import unittest
 
+from app.controllers.test_collections_controller import CollectionsControllerTest
 from app.controllers.test_crud_controller import CrudControllerTest
 from app.services.test_collections_service import CollectionsServiceTest
 from app.services.test_database_service import DatabaseServiceTest
@@ -16,6 +17,7 @@ def suite():
     return unittest.TestSuite([
         CleaningThreadTest.suite(),
         CollectionMetaDataTest.suite(),
+        CollectionsControllerTest.suite(),
         CollectionsServiceTest.suite(),
         CrudControllerTest.suite(),
         DatabaseServiceTest.suite(),

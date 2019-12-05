@@ -16,7 +16,7 @@ class CollectionMetaData(object):
 
     def __init__(self, collection):
         if os.path.exists(DatabaseContext.DATA_FOLDER + collection) is False:
-            raise AppException('Collection {} doesn\'t exist'.format(collection), 400)
+            raise AppException('Collection {} doesn\'t exist'.format(collection), 404)
 
         self.collection = collection
         fname = DatabaseContext.DATA_FOLDER + self.collection + '/' + self.META_DATA_FILE_NAME 

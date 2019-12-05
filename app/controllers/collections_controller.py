@@ -2,6 +2,8 @@ from flask import Flask, request, abort, make_response, jsonify
 
 from app.controllers import app
 from app.controllers import collections_service
+from app.controllers import file_reader
+from app.controllers import indexes_service
 
 from app.tools.collection_meta_data import CollectionMetaData
 
