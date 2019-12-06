@@ -2,7 +2,7 @@ import _pickle as pickle
 
 from sys import getsizeof
 
-from app.tools.collection_locker import CollectionLocker
+from app.tools.collection_locker import file_locking, CollectionLocker
 from app.tools.database_context import DatabaseContext
 
 class FilesReader(object):
@@ -37,15 +37,12 @@ class FilesReader(object):
 
         return self.files[pname]
 
-    # use decorator for locking file instead
+    @file_locking
     def write_file_content(self, pname, docs):
-        CollectionLocker.lock_file(pname)
         with open(pname, "wb") as file:
             file.write(pickle.dumps(docs))
 
         self.invalidate_file_content(pname)
-
-        CollectionLocker.unlock_file(pname)
 
     def invalidate_file_content(self, pname):
         if pname in self.files:

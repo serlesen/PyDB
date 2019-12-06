@@ -56,25 +56,20 @@ class IndexesService(object):
             if field not in doc:
                 pass
 
-            CollectionLocker.lock_file(pname)
+            values = FilesReader.get_instance().get_file_content(pname)
 
-            with open(pname, 'rb+') as file:
-                values = pickle.load(file)
-                file.seek(0)
-                file.truncate()
-                v = doc[field]
-                if v not in values:
-                    values[v] = []
-                values[v].append(line)
-                file.write(pickle.dumps(values))
-            FilesReader.get_instance().invalidate_file_content(pname)
+            v = doc[field]
+            if v not in values:
+                values[v] = []
+            values[v].append(line)
 
-            CollectionLocker.unlock_file(pname)
+            FilesReader.get_instance().write_file_content(pname, values)
 
     @col_locking
     def update_indexes(self, col_meta_data, old_doc, new_doc):
 
-        lines = self.get_lines(col_meta_data, old_doc['id'])
+        # copy the list as it will be modified later
+        lines = list(self.get_lines(col_meta_data, old_doc['id']))
 
         for field in col_meta_data.indexes.keys():
             pname = DatabaseContext.DATA_FOLDER + col_meta_data.collection + '/' + col_meta_data.get_index_fname(field)
@@ -92,26 +87,18 @@ class IndexesService(object):
             if field not in new_doc:
                 should_add = False
 
-            CollectionLocker.lock_file(pname)
+            values = FilesReader.get_instance().get_file_content(pname)
+            
+            if should_remove:
+                for line in lines:
+                    values[old_doc[field]].remove(line)
+            
+            if should_add:
+                if new_doc[field] not in values:
+                    values[new_doc[field]] = []
+                values[new_doc[field]].extend(lines)
 
-            with open(pname, 'rb+') as file:
-                values = pickle.load(file)
-                file.seek(0)
-                file.truncate()
-
-                if should_remove:
-                    for line in lines:
-                        values[old_doc[field]].remove(line)
-
-                if should_add:
-                    if new_doc[field] not in values:
-                        values[new_doc[field]] = []
-                    values[new_doc[field]].extend(lines)
-
-                file.write(pickle.dumps(values))
-            FilesReader.get_instance().invalidate_file_content(pname)
-
-            CollectionLocker.unlock_file(pname)
+            FilesReader.get_instance().write_file_content(pname, values)
 
     @col_locking
     def find_all(self, col_meta_data, field, filter_tool):

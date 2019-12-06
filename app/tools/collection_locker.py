@@ -13,6 +13,21 @@ def col_locking(func):
         return func(*args, **kwargs)
     return wrapper
 
+def file_locking(func):
+    def wrapper(*args, **kwargs):
+        # first arg is self, second arg is pname
+        pname = args[1]
+
+        CollectionLocker.wait_for_lock(pname)
+
+        with open(CollectionLocker.LOCK_FILE.format(pname), 'w') as file:
+            file.write('x')
+
+        result = func(*args, **kwargs)
+
+        os.remove(CollectionLocker.LOCK_FILE.format(pname))
+    return wrapper
+
 #
 # Class to handle the lock on collections and single files.
 # Only the decorator is outside the class (to ease the way to call it)
@@ -21,17 +36,6 @@ class CollectionLocker(object):
     
     LOCK_FILE = '{}.lock'
     LOCK_FOLDER = 'col.lock'
-    
-    @staticmethod
-    def lock_file(pname):
-        CollectionLocker.wait_for_lock(pname)
-
-        with open(CollectionLocker.LOCK_FILE.format(pname), 'w') as file:
-            file.write('x')
-
-    @staticmethod
-    def unlock_file(pname):
-        os.remove(CollectionLocker.LOCK_FILE.format(pname))
 
     @staticmethod
     def lock_col(col_meta_data):
