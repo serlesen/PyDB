@@ -129,7 +129,7 @@ python3 -m unittest -v
 ### TODO
 
 * Sort by nested documents
-* Add cache instead of opening the indexes and data files everytime
+* At queries status, add source request to detect deadlocks
 * Users authentication/management
 * Master/Slave replication
 * Master/Master replication

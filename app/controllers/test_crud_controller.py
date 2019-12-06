@@ -3,7 +3,7 @@ import unittest
 
 from app.controllers import app
 from app.services.indexes_service import IndexesService
-from app.services.file_reader import FileReader
+from app.services.data_service import DataService
 from app.test.collections_simulator import CollectionsSimulator
 from app.tools.collection_meta_data import CollectionMetaData
 from app.tools.database_context import DatabaseContext
@@ -22,8 +22,8 @@ class CrudControllerTest(unittest.TestCase):
         col_meta_data = CollectionMetaData('col')
 
         indexes_service = IndexesService()
-        file_reader = FileReader()
-        docs = file_reader.find_all(col_meta_data, None)
+        data_service = DataService()
+        docs = data_service.find_all(col_meta_data, None)
         indexes_service.build_index(col_meta_data, docs, 'id')
 	
     def setUp(self):

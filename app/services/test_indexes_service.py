@@ -2,7 +2,7 @@ import unittest
 import os
 import _pickle as pickle
 
-from app.services.file_reader import FileReader
+from app.services.data_service import DataService
 from app.services.indexes_service import IndexesService
 from app.test.collections_simulator import CollectionsSimulator
 from app.tools.collection_meta_data import CollectionMetaData
@@ -21,12 +21,12 @@ class IndexesServiceTest(unittest.TestCase):
 
     def setUp(self):
         self.indexes_service = IndexesService()
-        self.file_reader = FileReader()
+        self.data_service = DataService()
 
     def test_create_index(self):
         col_meta_data = CollectionMetaData('col')
 
-        docs = self.file_reader.find_all(col_meta_data, None)
+        docs = self.data_service.find_all(col_meta_data, None)
         result = self.indexes_service.build_index(col_meta_data, docs, 'id')
 
         self.assertEqual(result['status'], 'done')
@@ -41,7 +41,7 @@ class IndexesServiceTest(unittest.TestCase):
     def test_update_indexes(self):
         col_meta_data = CollectionMetaData('col')
 
-        docs = self.file_reader.find_all(col_meta_data, None)
+        docs = self.data_service.find_all(col_meta_data, None)
         self.indexes_service.build_index(col_meta_data, docs, 'id')
 
         lines = self.indexes_service.find_all(col_meta_data, 'id', FilterTool({'$filter': {'id': 2}}))

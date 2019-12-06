@@ -2,6 +2,7 @@ import os
 import shutil
 import _pickle as pickle
 
+from app.services.files_reader import FilesReader
 from app.tools.database_context import DatabaseContext
 from app.tools.collection_meta_data import CollectionMetaData
 
@@ -60,3 +61,4 @@ class CollectionsSimulator(object):
 
     def clean():
         shutil.rmtree(DatabaseContext.DATA_FOLDER)
+        FilesReader.get_instance().reset()

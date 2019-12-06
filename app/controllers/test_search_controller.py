@@ -4,7 +4,7 @@ import unittest
 
 from app.controllers import app
 from app.services.indexes_service import IndexesService
-from app.services.file_reader import FileReader
+from app.services.data_service import DataService
 from app.test.collections_simulator import CollectionsSimulator
 from app.tools.collection_meta_data import CollectionMetaData
 from app.tools.database_context import DatabaseContext
@@ -23,8 +23,8 @@ class SearchControllerTest(unittest.TestCase):
         col_meta_data = CollectionMetaData('col')
 
         indexes_service = IndexesService()
-        file_reader = FileReader()
-        docs = file_reader.find_all(col_meta_data, None)
+        data_service = DataService()
+        docs = data_service.find_all(col_meta_data, None)
         indexes_service.build_index(col_meta_data, docs, 'id')
     
     def setUp(self):
@@ -37,7 +37,7 @@ class SearchControllerTest(unittest.TestCase):
         CollectionsSimulator.clean()
         DatabaseContext.THREADS_MANAGER_CYCLING = False
 
-    @timeout_decorator.timeout(3)
+    @timeout_decorator.timeout(4)
     def test_search_over_500000_docs(self):
         response = self.app.post('/col/search', data=json.dumps({'$filter': {'id': 449994}}), content_type='application/json')
         self.assertEqual(response.status_code, 200)
@@ -46,7 +46,7 @@ class SearchControllerTest(unittest.TestCase):
         self.assertEqual(len(response_data), 1)
         self.assertEqual(response_data[0]['id'], 449994)
 
-    @timeout_decorator.timeout(3)
+    @timeout_decorator.timeout(4)
     def test_not_found_search_over_500000_docs(self):
         response = self.app.post('/col/search', data=json.dumps({'$filter': {'id': 949994}}), content_type='application/json')
         self.assertEqual(response.status_code, 404)

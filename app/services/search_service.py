@@ -3,7 +3,7 @@ import datetime
 from operator import itemgetter
 
 from app.injection.dependency_injections_service import DependencyInjectionsService
-from app.services.file_reader import FileReader
+from app.services.data_service import DataService
 from app.services.indexes_service import IndexesService
 from app.threads.query_stack import QueryStack
 from app.tools.filter_tool import FilterTool
@@ -15,7 +15,7 @@ from app.tools.filter_tool import FilterTool
 class SearchService(object):
 
     def __init__(self):
-        self.file_reader = DependencyInjectionsService.get_instance().get_service(FileReader)
+        self.data_service = DependencyInjectionsService.get_instance().get_service(DataService)
         self.indexes_service = DependencyInjectionsService.get_instance().get_service(IndexesService)
 
     def search_by_thread(self, col_meta_data, search_context, thread_id):
@@ -26,9 +26,9 @@ class SearchService(object):
 
             # filter by main index
             lines = self.indexes_service.find_all(col_meta_data, k, FilterTool({'$filter': indexed_value}))
-            docs = self.file_reader.find_by_line(col_meta_data, lines, thread_id)
+            docs = self.data_service.find_by_line(col_meta_data, lines, thread_id)
         else:
-            docs = self.file_reader.find_all(col_meta_data, thread_id)
+            docs = self.data_service.find_all(col_meta_data, thread_id)
 
         return self.find_in_docs(docs, search_context)
 

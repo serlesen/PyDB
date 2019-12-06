@@ -2,6 +2,7 @@
 # Class which contains constants for the database behavior.
 #
 class DatabaseContext(object):
+    CACHE_FILE_SIZE = 100 # in Mb
     DATA_FOLDER = 'data/'
     DEFAULT_RESULTS_SIZE = 10
     DEFAULT_RESULTS_SKIP = 0

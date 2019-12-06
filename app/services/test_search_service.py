@@ -3,7 +3,7 @@ import unittest
 import os
 import _pickle as pickle
 
-from app.services.file_reader import FileReader
+from app.services.data_service import DataService
 from app.services.indexes_service import IndexesService
 from app.services.search_service import SearchService
 from app.test.collections_simulator import CollectionsSimulator
@@ -21,8 +21,8 @@ class SearchServiceTest(unittest.TestCase):
 
         big_col_wi_meta_data = CollectionMetaData('big-col-with-index')
         indexes_service = IndexesService()
-        file_reader = FileReader()
-        docs = file_reader.find_all(big_col_wi_meta_data, None)
+        data_service = DataService()
+        docs = data_service.find_all(big_col_wi_meta_data, None)
         indexes_service.build_index(big_col_wi_meta_data, docs, 'id')
 
     @classmethod

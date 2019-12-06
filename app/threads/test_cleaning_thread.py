@@ -1,7 +1,7 @@
 import unittest
 
 from app.services.indexes_service import IndexesService
-from app.services.file_reader import FileReader
+from app.services.data_service import DataService
 from app.services.search_service import SearchService
 from app.test.collections_simulator import CollectionsSimulator
 from app.threads.cleaning_stack import CleaningStack
@@ -19,14 +19,14 @@ class CleaningThreadTest(unittest.TestCase):
 
         col_meta_data = CollectionMetaData('col')
         indexes_service = IndexesService()
-        file_reader = FileReader()
-        docs = file_reader.find_all(col_meta_data, None)
+        data_service = DataService()
+        docs = data_service.find_all(col_meta_data, None)
         indexes_service.build_index(col_meta_data, docs, 'id')
 
     def setUp(self):
         # instanciate the service to test
         self.cleaning_thread = CleaningThread()
-        self.file_reader = FileReader()
+        self.data_service = DataService()
         self.search_service = SearchService()
         self.indexes_service = IndexesService()
 
@@ -37,12 +37,12 @@ class CleaningThreadTest(unittest.TestCase):
     def test_clean_deleted_items(self):
         col_meta_data = CollectionMetaData('col')
 
-        count = len(self.file_reader.find_all(col_meta_data, None))
+        count = len(self.data_service.find_all(col_meta_data, None))
 
-        self.file_reader.update(col_meta_data, 2, {})
+        self.data_service.update(col_meta_data, 2, {})
         CleaningStack.get_instance().push(col_meta_data, {}, 1)
 
-        docs = self.file_reader.find_all(col_meta_data, None)
+        docs = self.data_service.find_all(col_meta_data, None)
         lines = self.indexes_service.find_all(col_meta_data, 'id', FilterTool({'$filter': {'id': 2}}))
 
         self.assertEqual(len(CleaningStack.get_instance().stack), 1)
@@ -52,7 +52,7 @@ class CleaningThreadTest(unittest.TestCase):
 
         self.cleaning_thread.run()
         
-        docs = self.file_reader.find_all(col_meta_data, None)
+        docs = self.data_service.find_all(col_meta_data, None)
         lines = self.indexes_service.find_all(col_meta_data, 'id', FilterTool({'$filter': {'id': 2}}))
 
         self.assertEqual(len(CleaningStack.get_instance().stack), 0)

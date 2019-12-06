@@ -2,7 +2,7 @@ from flask import Flask, request, abort, make_response, jsonify
 
 from app.controllers import app
 from app.controllers import collections_service
-from app.controllers import file_reader
+from app.controllers import data_service
 from app.controllers import indexes_service
 
 from app.tools.collection_meta_data import CollectionMetaData
@@ -18,7 +18,7 @@ def create_collection(collection):
 @app.route('/collections/<collection>/index/<field>', methods=['POST'])
 def create_index(collection, field):
     col_meta_data = CollectionMetaData(collection)
-    docs = file_reader.find_all(col_meta_data, None)
+    docs = data_service.find_all(col_meta_data, None)
     return indexes_service.build_index(col_meta_data, docs, field)
 
 @app.route('/collections/<collection>', methods=['DELETE'])

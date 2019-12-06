@@ -70,6 +70,9 @@ class QueryStack(object):
     def pop_results(self, query_id):
         while query_id in self.pending_results:
             time.sleep(DatabaseContext.THREADS_CYCLE)
+
+        del self.queries[query_id]
+
         if query_id in self.errors:
             raise self.errors.pop(query_id)
         return self.results.pop(query_id)

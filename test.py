@@ -6,7 +6,7 @@ from app.controllers.test_crud_controller import CrudControllerTest
 from app.controllers.test_database_controller import DatabaseControllerTest
 from app.services.test_collections_service import CollectionsServiceTest
 from app.services.test_database_service import DatabaseServiceTest
-from app.services.test_file_reader import FileReaderTest
+from app.services.test_data_service import DataServiceTest
 from app.services.test_indexes_service import IndexesServiceTest
 from app.services.test_search_service import SearchServiceTest
 from app.threads.test_cleaning_thread import CleaningThreadTest
@@ -24,7 +24,7 @@ def suite():
         CrudControllerTest.suite(),
         DatabaseControllerTest.suite(),
         DatabaseServiceTest.suite(),
-        FileReaderTest.suite(),
+        DataServiceTest.suite(),
         FilterToolTest.suite(),
         IndexesServiceTest.suite(),
         ResultsMapperTest.suite(),

@@ -3,6 +3,7 @@ import os.path
 import datetime
 
 from app.exceptions.app_exception import AppException
+from app.services.files_reader import FilesReader
 from app.tools.collection_locker import CollectionLocker, col_locking
 from app.tools.database_context import DatabaseContext
 from app.tools.filter_tool import FilterTool
@@ -34,16 +35,16 @@ class IndexesService(object):
 
         with open(pname, 'wb') as file:
             file.write(pickle.dumps(values))
+        FilesReader.get_instance().invalidate_file_content(pname)
 
         return col_meta_data.add_or_update_index_count(field, len(resulting_docs))
 
     def get_lines(self, col_meta_data, id):
         pname = DatabaseContext.DATA_FOLDER + col_meta_data.collection + '/' + col_meta_data.get_index_fname('id')
 
-        with open(pname, 'rb') as file:
-            values = pickle.load(file)
-            if id in values:
-                return values[id]
+        values = FilesReader.get_instance().get_file_content(pname)
+        if id in values:
+            return values[id]
 
         raise AppException('Unable to find document with id {}'.format(id), 400)
         
@@ -66,6 +67,7 @@ class IndexesService(object):
                     values[v] = []
                 values[v].append(line)
                 file.write(pickle.dumps(values))
+            FilesReader.get_instance().invalidate_file_content(pname)
 
             CollectionLocker.unlock_file(pname)
 
@@ -107,6 +109,7 @@ class IndexesService(object):
                     values[new_doc[field]].extend(lines)
 
                 file.write(pickle.dumps(values))
+            FilesReader.get_instance().invalidate_file_content(pname)
 
             CollectionLocker.unlock_file(pname)
 
@@ -114,18 +117,17 @@ class IndexesService(object):
     def find_all(self, col_meta_data, field, filter_tool):
         pname = DatabaseContext.DATA_FOLDER + col_meta_data.collection + '/' + col_meta_data.get_index_fname(field)
 
-        with open(pname, 'rb') as file:
-            match_value = filter_tool.search_filter['$filter'][field]
-            results = []
-            values = pickle.load(file)
-            if isinstance(match_value, dict) or isinstance(match_value, list):
-                for k in values.keys():
-                    if filter_tool.match({field, k}):
-                        results.extend(values[k])
-            else:
-                if match_value in values:
-                    results.extend(values[match_value])
-            return results
+        match_value = filter_tool.search_filter['$filter'][field]
+        results = []
+        values = FilesReader.get_instance().get_file_content(pname)
+        if isinstance(match_value, dict) or isinstance(match_value, list):
+            for k in values.keys():
+                if filter_tool.match({field, k}):
+                    results.extend(values[k])
+        else:
+            if match_value in values:
+                results.extend(values[match_value])
+        return results
 
     @col_locking
     def remove_index(self, col_meta_data, field):

@@ -2,7 +2,7 @@ import os
 import shutil
 
 from app.injection.dependency_injections_service import DependencyInjectionsService
-from app.services.file_reader import FileReader
+from app.services.data_service import DataService
 from app.services.indexes_service import IndexesService
 from app.tools.collection_locker import col_locking
 from app.tools.collection_meta_data import CollectionMetaData
@@ -15,7 +15,7 @@ class CollectionsService(object):
 
     def __init__(self):
         self.indexes_service = DependencyInjectionsService.get_instance().get_service(IndexesService)
-        self.file_reader = DependencyInjectionsService.get_instance().get_service(FileReader)
+        self.data_service = DependencyInjectionsService.get_instance().get_service(DataService)
 
     def get_status(self, collection):
         col_meta_data = CollectionMetaData(collection)
@@ -31,7 +31,7 @@ class CollectionsService(object):
     @col_locking
     def count(self, col_meta_data):
         count = (col_meta_data.counter - 1) * DatabaseContext.MAX_DOC_PER_FILE
-        count += self.file_reader.file_len(DatabaseContext.DATA_FOLDER + col_meta_data.collection + '/' + col_meta_data.last_data_fname())
+        count += self.data_service.file_len(DatabaseContext.DATA_FOLDER + col_meta_data.collection + '/' + col_meta_data.last_data_fname())
         return count
 
     def create(self, collection):

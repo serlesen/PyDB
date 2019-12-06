@@ -2,6 +2,7 @@ from itertools import count
 from threading import Thread
 import _pickle as pickle
 
+from app.services.files_reader import FilesReader
 from app.threads.cleaning_stack import CleaningStack
 from app.tools.collection_locker import CollectionLocker
 from app.tools.collection_meta_data import CollectionMetaData
@@ -44,6 +45,7 @@ class CleaningThread(Thread):
                     docs.append(doc_to_move)
                 doc_to_move = docs.pop(line_to_pop)
                 file.write(pickle.dumps(docs))
+            FilesReader.get_instance().invalidate_file_content(pname)
 
     def update_indexes_file(self, col_meta_data, incoming_line):
         for field in col_meta_data.indexes.keys():
@@ -66,5 +68,6 @@ class CleaningThread(Thread):
                         updated_values[k] = updated_lines
 
                 file.write(pickle.dumps(updated_values))
+            FilesReader.get_instance().invalidate_file_content(pname)
 
             col_meta_data.add_or_update_index_count(field, col_meta_data.indexes[field] - 1)
