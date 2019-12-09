@@ -1,9 +1,11 @@
 import _pickle as pickle
 
+from datetime import datetime
 from sys import getsizeof
 
 from app.tools.collection_locker import file_locking, CollectionLocker
 from app.tools.database_context import DatabaseContext
+
 
 class FilesReader(object):
 
@@ -11,7 +13,7 @@ class FilesReader(object):
 
     def __init__(self):
         self.files = {}
-        self.available_space = DatabaseContext.CACHE_FILE_SIZE
+        self.available_space = DatabaseContext.CACHE_FILE_SIZE * 1048576
 
     def get_instance():
         if FilesReader.instance is None:
@@ -23,19 +25,23 @@ class FilesReader(object):
 
     def get_file_content(self, pname):
         if pname in self.files:
-            return self.files[pname]
+            self.files[pname]['last_used'] = datetime.now()
+            return self.files[pname]['values']
 
         with open(pname, 'rb') as file:
             values = pickle.load(file)
 
-        self.files[pname] = values
+        size = getsizeof(values)
+        #print('consuming {} more bytes'.format(size))
+        self.files[pname] = {'values': values, 'last_used': datetime.now(), 'size': size}
 
-        self.available_space -= getsizeof(values)
+        self.available_space -= size
+        #print('{} bytes remaining'.format(self.available_space))
 
         if self.available_space < 0:
             self.remove_oldest_file_content()
 
-        return self.files[pname]
+        return values
 
     @file_locking
     def write_file_content(self, pname, docs):
@@ -49,4 +55,12 @@ class FilesReader(object):
             del self.files[pname]
 
     def remove_oldest_file_content(self):
-        pass
+        oldest_key = None
+        for k in self.files.keys():
+            if oldest_key is None:
+                oldest_key = k
+            elif self.files[oldest_key]['last_used'] > self.files[k]['last_used']:
+                oldest_key = k
+
+        self.available_space += self.files[oldest_key]['size']
+        del self.files[oldest_key]

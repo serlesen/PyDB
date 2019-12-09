@@ -7,6 +7,7 @@ from app.controllers.test_database_controller import DatabaseControllerTest
 from app.services.test_collections_service import CollectionsServiceTest
 from app.services.test_database_service import DatabaseServiceTest
 from app.services.test_data_service import DataServiceTest
+from app.services.test_files_reader import FilesReaderTest
 from app.services.test_indexes_service import IndexesServiceTest
 from app.services.test_search_service import SearchServiceTest
 from app.threads.test_cleaning_thread import CleaningThreadTest
@@ -25,6 +26,7 @@ def suite():
         DatabaseControllerTest.suite(),
         DatabaseServiceTest.suite(),
         DataServiceTest.suite(),
+        FilesReaderTest.suite(),
         FilterToolTest.suite(),
         IndexesServiceTest.suite(),
         ResultsMapperTest.suite(),
