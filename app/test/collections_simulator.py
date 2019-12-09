@@ -6,6 +6,7 @@ from app.services.files_reader import FilesReader
 from app.tools.database_context import DatabaseContext
 from app.tools.collection_meta_data import CollectionMetaData
 
+
 class CollectionsSimulator(object):
 
     def build_single_col(col_name):
@@ -32,18 +33,18 @@ class CollectionsSimulator(object):
         # set up the test data
         for i in range(5):
             with open(DatabaseContext.DATA_FOLDER + big_col_meta_data.collection + '/' + big_col_meta_data.last_data_fname(), 'wb') as file:
-                l = []
+                docs = []
                 for j in range(DatabaseContext.MAX_DOC_PER_FILE):
-                    l.append({"id":((i*DatabaseContext.MAX_DOC_PER_FILE)+j),
-                         "first_name":"al",
-                         "last_name":"jym",
-                         "age":15,
-                         "address":"somewhere",
-                         "job":"something",
-                         "salary":15352,
-                         "email":"my.email@google.com"
+                    docs.append({"id": ((i*DatabaseContext.MAX_DOC_PER_FILE)+j),
+                         "first_name": "al",
+                         "last_name": "jym",
+                         "age": 15,
+                         "address": "somewhere",
+                         "job": "something",
+                         "salary": 15352,
+                         "email": "my.email@google.com"
                         })
-                file.write(pickle.dumps(l))
+                file.write(pickle.dumps(docs))
                 if i != 4:
                     big_col_meta_data.next_data_fname()
 
