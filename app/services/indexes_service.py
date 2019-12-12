@@ -1,6 +1,5 @@
 import _pickle as pickle
 import os.path
-import datetime
 
 from app.exceptions.app_exception import AppException
 from app.services.files_reader import FilesReader

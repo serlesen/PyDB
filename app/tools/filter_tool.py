@@ -22,42 +22,45 @@ class FilterTool(object):
             if k == '$filter':
                 return self.match_filter(doc, filter_list[k])
             elif '.' in k:
-                if not self.match_nested_doc(doc, k, filter_list):
+                if not self.match_inner_doc(doc, k, filter_list):
                     return False
             elif isinstance(filter_list[k], list):
                 if not self.match_in(doc[k], filter_list[k]):
                     return False
             elif isinstance(filter_list[k], dict):
-                if not self.match_nested_dict(doc, k, filter_list[k]):
+                if not self.match_inner_dict(doc, k, filter_list[k]):
                     return False
             elif k not in doc:
                 return False
+            elif isinstance(doc[k], list):
+                if not self.match_in_list(doc[k], filter_list[k]):
+                    return False
             elif doc[k] != filter_list[k]:
                 return False
         return True
 
-    def match_nested_doc(self, doc, field_def, filter_list):
+    def match_inner_doc(self, doc, field_def, filter_list):
         fields = field_def.split('.')
-        nested_doc = doc
+        inner_doc = doc
         last_key = fields[0]
         for f in fields:
-            if f in nested_doc:
-                nested_doc = nested_doc[f]
+            if f in inner_doc:
+                inner_doc = inner_doc[f]
                 last_key = f
             else:
                 return False
-        return self.match_filter({last_key :nested_doc}, {last_key : filter_list[field_def]})
+        return self.match_filter({last_key :inner_doc}, {last_key : filter_list[field_def]})
 
-    def match_nested_dict(self, doc, field, nested_dict):
-        nested_dict_key = list(nested_dict.keys())[0]
-        if nested_dict_key == '$exists':
-            if not self.match_exists(doc, field, nested_dict[nested_dict_key]):
+    def match_inner_dict(self, doc, field, inner_dict):
+        inner_dict_key = list(inner_dict.keys())[0]
+        if inner_dict_key == '$exists':
+            if not self.match_exists(doc, field, inner_dict[inner_dict_key]):
                 return False
-        elif nested_dict_key in ['$gt', '$lt', '$gte', '$lte']:
-            if not self.match_comparison(doc, field, nested_dict[nested_dict_key], nested_dict_key):
+        elif inner_dict_key in ['$gt', '$lt', '$gte', '$lte']:
+            if not self.match_comparison(doc, field, inner_dict[inner_dict_key], inner_dict_key):
                 return False
-        elif nested_dict_key == '$reg':
-            if not self.match_regex(doc, field, nested_dict[nested_dict_key]):
+        elif inner_dict_key == '$reg':
+            if not self.match_regex(doc, field, inner_dict[inner_dict_key]):
                 return False
         return True
 
@@ -87,6 +90,9 @@ class FilterTool(object):
 
     def match_in(self, val, filter_list):
         return val in filter_list
+
+    def match_in_list(self, doc_list, filter_val):
+        return filter_val in doc_list
 
     def match_or(self, doc, filter_list):
         for q in filter_list:

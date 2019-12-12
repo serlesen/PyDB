@@ -1,9 +1,11 @@
 import unittest
 
-from app.controllers.test_search_controller import SearchControllerTest
+from app.controllers.test_auth_controller import AuthControllerTest
 from app.controllers.test_collections_controller import CollectionsControllerTest
 from app.controllers.test_crud_controller import CrudControllerTest
 from app.controllers.test_database_controller import DatabaseControllerTest
+from app.controllers.test_search_controller import SearchControllerTest
+from app.services.test_auth_service import AuthServiceTest
 from app.services.test_collections_service import CollectionsServiceTest
 from app.services.test_database_service import DatabaseServiceTest
 from app.services.test_data_service import DataServiceTest
@@ -18,6 +20,8 @@ from app.tools.test_search_context import SearchContextTest
 
 def suite():
     return unittest.TestSuite([
+        AuthControllerTest.suite(),
+        AuthServiceTest.suite(),
         CleaningThreadTest.suite(),
         CollectionMetaDataTest.suite(),
         CollectionsControllerTest.suite(),

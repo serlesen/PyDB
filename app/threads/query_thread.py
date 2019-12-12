@@ -1,4 +1,3 @@
-import datetime
 from threading import Thread
 
 from app.injection.dependency_injections_service import DependencyInjectionsService

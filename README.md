@@ -128,9 +128,12 @@ python3 -m unittest -v
 
 ### TODO
 
-* Sort by nested documents
+* handle nested documents at filters
+* filter by $not
+* Sort by inner documents
+* Sort nested documents
 * At queries status, add source request to detect deadlocks
-* Users authentication/management
+* Add users roles/permissions
 * Master/Slave replication
 * Master/Master replication
 * Sharding

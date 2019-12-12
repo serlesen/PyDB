@@ -9,6 +9,14 @@ from app.tools.collection_meta_data import CollectionMetaData
 
 class CollectionsSimulator(object):
 
+    def build_users_col():
+        col_meta_data = CollectionsSimulator.init_data_folder('users', 100000)
+
+        with open(DatabaseContext.DATA_FOLDER + col_meta_data.collection + '/' + col_meta_data.last_data_fname(), 'wb') as file:
+            docs = []
+            docs.append({'id': 1, 'login': 'admin', 'password': '$2b$13$qG6c01Xy9rd07vJ1lZsxE.ouYvdhbFVAn/miQBhnOXq5bk..4WhCC', 'tokens': ['eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpYXQiOjE1NzU5OTEwNDUsInN1YiI6MX0._jTMkfDl2RKzY_r6nUDVwFG8xlEuZPFFr7zvqWXJmcM']})
+            file.write(pickle.dumps(docs))
+
     def build_single_col(col_name):
         col_meta_data = CollectionsSimulator.init_data_folder(col_name, 3)
 

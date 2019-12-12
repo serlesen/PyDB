@@ -3,8 +3,8 @@ import unittest
 
 from app.controllers import app
 from app.test.collections_simulator import CollectionsSimulator
-from app.tools.database_context import DatabaseContext
 from app.threads.threads_manager import ThreadsManager
+from app.tools.database_context import DatabaseContext
 
 class CollectionsControllerTest(unittest.TestCase):
 

@@ -5,7 +5,9 @@ from app.controllers import collections_service
 from app.controllers import data_service
 from app.controllers import indexes_service
 
+from app.tools.argument_parser import ArgumentParser
 from app.tools.collection_meta_data import CollectionMetaData
+
 
 @app.route('/collections/<collection>/status', methods=['GET'])
 def collection_status(collection):
@@ -13,6 +15,8 @@ def collection_status(collection):
 
 @app.route('/collections/<collection>', methods=['POST'])
 def create_collection(collection):
+    if not ArgumentParser.validate_collection_name(collection):
+        raise AppException('Cannot create collection {} as it is a reserved collection'.format(collection), 400)
     return collections_service.create(collection)
 
 @app.route('/collections/<collection>/index/<field>', methods=['POST'])

@@ -25,18 +25,16 @@ class FilesReader(object):
 
     def get_file_content(self, pname):
         if pname in self.files:
-            self.files[pname]['last_used'] = datetime.now()
+            self.files[pname]['last_used'] = datetime.utcnow()
             return self.files[pname]['values']
 
         with open(pname, 'rb') as file:
             values = pickle.load(file)
 
         size = getsizeof(values)
-        #print('consuming {} more bytes'.format(size))
-        self.files[pname] = {'values': values, 'last_used': datetime.now(), 'size': size}
+        self.files[pname] = {'values': values, 'last_used': datetime.utcnow(), 'size': size}
 
         self.available_space -= size
-        #print('{} bytes remaining'.format(self.available_space))
 
         if self.available_space < 0:
             self.remove_oldest_file_content()
