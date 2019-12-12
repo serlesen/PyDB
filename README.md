@@ -63,6 +63,13 @@ Example:
 1. {'name': {'$reg': 'Jo.*'}}
 Only the documents where the regex 'Jo.*' has a match on the field 'name' will be returned.
 
+A field or a filter can be negate with the keyword '$not'.
+Example:
+1. {'$filter': {'first_name': {'$not': 'John'}}}
+Won't return the documents where the field 'first_name' is 'John'
+2. {'$filter': {'$not': {'first_name': 'John'}}}
+Has the same result as the previous, but this way we negate the comparison 'first_name' == 'John'. Which can also be a more complexe filter
+
 ## Mapper
 
 The results can be mapped to a desired structure. In the '$map' field, you have to specify each field you want to map
@@ -129,7 +136,6 @@ python3 -m unittest -v
 ### TODO
 
 * handle nested documents at filters
-* filter by $not
 * Sort by inner documents
 * Sort nested documents
 * At queries status, add source request to detect deadlocks

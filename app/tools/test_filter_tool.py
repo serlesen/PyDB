@@ -133,5 +133,17 @@ class FilterToolTest(unittest.TestCase):
 
         self.assertTrue(search_filter.match({'first_name': 'John', 'last_name': 'Doe', 'children': ['Junior', 'Mick']}))
 
+    def test_negate(self):
+        search_filter = FilterTool({'$filter': {'first_name': {'$not': 'John'}}})
+
+        self.assertFalse(search_filter.match({'last_name': 'Doe', 'first_name': 'John'}))
+        self.assertTrue(search_filter.match({'last_name': 'Doe', 'first_name': 'Joe'}))
+
+    def test_negate_expression(self):
+        search_filter = FilterTool({'$filter': {'$not': {'first_name': 'John'}}})
+
+        self.assertFalse(search_filter.match({'last_name': 'Doe', 'first_name': 'John'}))
+        self.assertTrue(search_filter.match({'last_name': 'Doe', 'first_name': 'Joe'}))
+
     def suite():
         return unittest.TestLoader().loadTestsFromTestCase(FilterToolTest)

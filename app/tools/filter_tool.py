@@ -21,6 +21,8 @@ class FilterTool(object):
         for k in filter_list.keys():
             if k == '$filter':
                 return self.match_filter(doc, filter_list[k])
+            elif k == '$not':
+                return not self.match_filter(doc, filter_list[k])
             elif '.' in k:
                 if not self.match_inner_doc(doc, k, filter_list):
                     return False
@@ -62,6 +64,8 @@ class FilterTool(object):
         elif inner_dict_key == '$reg':
             if not self.match_regex(doc, field, inner_dict[inner_dict_key]):
                 return False
+        elif inner_dict_key == '$not':
+            return doc[field] != inner_dict[inner_dict_key]
         return True
 
     def match_regex(self, doc, field, regex):
