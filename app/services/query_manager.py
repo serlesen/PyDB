@@ -1,4 +1,6 @@
+from app.exceptions.app_exception import AppException
 from app.threads.query_stack import QueryStack
+
 
 class QueryManager(object):
 
@@ -8,7 +10,10 @@ class QueryManager(object):
 
     def get_one(self, collection, doc_id):
         query_id = QueryStack.get_instance().push_search(collection, {"$filter":{"id": doc_id}})
-        return QueryStack.get_instance().pop_results(query_id)
+        results = QueryStack.get_instance().pop_results(query_id)
+        if len(results) != 1:
+            raise AppException('Unable to find document {}'.format(doc_id), 404)
+        return results[0]
 
     def create(self, collection, doc):
         query_id = QueryStack.get_instance().push_create(collection, doc)

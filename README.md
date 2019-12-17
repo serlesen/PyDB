@@ -135,12 +135,10 @@ python3 -m unittest -v
 
 ### TODO
 
-* allow to update a part of a document with PATCH
 * handle nested documents at filters
 * Sort by inner documents
 * Sort nested documents
 * At queries status, add source request to detect deadlocks
-* Add users roles/permissions
 * Master/Slave replication
 * Master/Master replication
 * Sharding

@@ -18,9 +18,7 @@ def create(collection):
 @has_permission(Permissions.READ)
 def get(collection, id):
     result = query_manager.get_one(collection, int(id))
-    if len(result) != 1:
-        raise AppException('Unable to find document {}'.format(id), 404)
-    return jsonify(result[0])
+    return jsonify(result)
 
 @app.route('/<collection>/<id>', methods=['PUT'])
 @has_permission(Permissions.WRITE)
@@ -31,6 +29,23 @@ def update(collection, id):
     if result is None:
         raise AppException('Unable to find document {}'.format(id), 404)
     return jsonify(result)
+
+@app.route('/<collection>/<id>', methods=['PATCH'])
+@has_permission(Permissions.WRITE)
+def patch(collection, id):
+    if not request.json:
+        abort(405)
+    result = query_manager.get_one(collection, int(id))
+
+    patch = request.json
+    for k in patch.keys():
+        result[k] = patch[k]
+
+    updated_result = query_manager.update(collection, result, int(id))
+    if updated_result is None:
+        raise AppException('Unable to find document {}'.format(id), 404)
+
+    return jsonify(updated_result)
 
 @app.route('/<collection>/<id>', methods=['DELETE'])
 @has_permission(Permissions.WRITE)

@@ -46,15 +46,38 @@ class CrudControllerTest(unittest.TestCase):
         self.assertEqual(json.loads(response.data)['id'], 1000)
 
     def test_update_document(self):
+        response = self.app.get('/col/2', headers={'Authorization': 'Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpYXQiOjE1NzY1NjM4NDksInN1YiI6M30.azF-SBFKkX3Gdx34M0a6ZJP6ZXT7WYbBLOCLDUkfnRE'})
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(len(json.loads(response.data).keys()), 3)
+
         response = self.app.put('/col/2', data=json.dumps({'id': 2, 'first_name': 'Isaac'}), content_type='application/json', headers={'Authorization': 'Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpYXQiOjE1NzY1NjM4NDksInN1YiI6M30.azF-SBFKkX3Gdx34M0a6ZJP6ZXT7WYbBLOCLDUkfnRE'})
         self.assertEqual(response.status_code, 200)
         self.assertEqual(json.loads(response.data)['id'], 2)
         self.assertEqual(json.loads(response.data)['first_name'], 'Isaac')
+        self.assertEqual(len(json.loads(response.data).keys()), 2)
 
         response = self.app.get('/col/2', headers={'Authorization': 'Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpYXQiOjE1NzY1NjM4NDksInN1YiI6M30.azF-SBFKkX3Gdx34M0a6ZJP6ZXT7WYbBLOCLDUkfnRE'})
         self.assertEqual(response.status_code, 200)
         self.assertEqual(json.loads(response.data)['id'], 2)
         self.assertEqual(json.loads(response.data)['first_name'], 'Isaac')
+        self.assertEqual(len(json.loads(response.data).keys()), 2)
+
+    def test_patch_document(self):
+        response = self.app.get('/col/3', headers={'Authorization': 'Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpYXQiOjE1NzY1NjM4NDksInN1YiI6M30.azF-SBFKkX3Gdx34M0a6ZJP6ZXT7WYbBLOCLDUkfnRE'})
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(len(json.loads(response.data).keys()), 3)
+
+        response = self.app.patch('/col/3', data=json.dumps({'id': 3, 'first_name': 'Albert'}), content_type='application/json', headers={'Authorization': 'Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpYXQiOjE1NzY1NjM4NDksInN1YiI6M30.azF-SBFKkX3Gdx34M0a6ZJP6ZXT7WYbBLOCLDUkfnRE'})
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(json.loads(response.data)['id'], 3)
+        self.assertEqual(json.loads(response.data)['first_name'], 'Albert')
+        self.assertEqual(len(json.loads(response.data).keys()), 3)
+
+        response = self.app.get('/col/3', headers={'Authorization': 'Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpYXQiOjE1NzY1NjM4NDksInN1YiI6M30.azF-SBFKkX3Gdx34M0a6ZJP6ZXT7WYbBLOCLDUkfnRE'})
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(json.loads(response.data)['id'], 3)
+        self.assertEqual(json.loads(response.data)['first_name'], 'Albert')
+        self.assertEqual(len(json.loads(response.data).keys()), 3)
 
     def test_delete_document(self):
         response = self.app.delete('/col/4', headers={'Authorization': 'Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpYXQiOjE1NzY1NjM4NDksInN1YiI6M30.azF-SBFKkX3Gdx34M0a6ZJP6ZXT7WYbBLOCLDUkfnRE'})
