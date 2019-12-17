@@ -2,12 +2,16 @@ from flask import Flask, request, abort, make_response, jsonify
 
 from app.controllers import app
 from app.controllers import query_manager
+
+from app.auth.decorators import has_permission
+from app.auth.permissions import Permissions
 from app.exceptions.app_exception import AppException
 from app.tools.argument_parser import ArgumentParser
 from app.tools.results_mapper import ResultsMapper
 from app.tools.search_context import SearchContext
 
 @app.route('/<collection>/search', methods=['POST'])
+@has_permission(Permissions.READ)
 def search(collection):
     if not request.json:
         abort(405)

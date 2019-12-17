@@ -19,13 +19,6 @@ class AuthControllerTest(unittest.TestCase):
 
         CollectionsSimulator.build_users_col()
 
-        col_meta_data = CollectionMetaData('users')
-        indexes_service = IndexesService()
-        data_service = DataService()
-        docs = data_service.find_all(col_meta_data, None)
-        indexes_service.build_index(col_meta_data, docs, 'id')
-        indexes_service.build_index(col_meta_data, docs, 'login')
-
     def setUp(self):
         app.config["TESTING"] = True
         app.config["DEBUG"] = True
@@ -55,14 +48,14 @@ class AuthControllerTest(unittest.TestCase):
         response = self.app.post('/auth/login', data=json.dumps({'login': 'admin', 'password': 'admin'}), content_type='application/json')
         token = json.loads(response.data)['token']
 
-        response = self.app.post('/auth/user', data=json.dumps({'login': 'user', 'password': 'user'}), headers={'Authorization': 'Bearer {}'.format(token)}, content_type='application/json')
+        response = self.app.post('/auth/user', data=json.dumps({'login': 'new-user', 'password': 'new-user'}), headers={'Authorization': 'Bearer {}'.format(token)}, content_type='application/json')
         self.assertEqual(response.status_code, 200)
 
-        response = self.app.post('/auth/login', data=json.dumps({'login': 'user', 'password': 'user'}), content_type='application/json')
+        response = self.app.post('/auth/login', data=json.dumps({'login': 'new-user', 'password': 'new-user'}), content_type='application/json')
         self.assertEqual(response.status_code, 200)
 
         login_info = json.loads(response.data)
-        self.assertEqual(login_info['login'], 'user')
+        self.assertEqual(login_info['login'], 'new-user')
         self.assertTrue('token' in login_info)
 
     def test_get_user(self):

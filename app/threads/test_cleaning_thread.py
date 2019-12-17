@@ -15,13 +15,7 @@ class CleaningThreadTest(unittest.TestCase):
 
     @classmethod
     def setUpClass(cls):
-        CollectionsSimulator.build_single_col('col')
-
-        col_meta_data = CollectionMetaData('col')
-        indexes_service = IndexesService()
-        data_service = DataService()
-        docs = data_service.find_all(col_meta_data, None)
-        indexes_service.build_index(col_meta_data, docs, 'id')
+        CollectionsSimulator.build_single_col('col', ['id'])
 
     def setUp(self):
         # instanciate the service to test

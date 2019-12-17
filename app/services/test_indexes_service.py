@@ -13,7 +13,7 @@ class IndexesServiceTest(unittest.TestCase):
 
     @classmethod
     def setUpClass(cls):
-        CollectionsSimulator.build_single_col('col')
+        CollectionsSimulator.build_single_col('col', None)
 
     @classmethod
     def tearDownClass(cls):

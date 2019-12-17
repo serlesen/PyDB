@@ -1,5 +1,7 @@
 import unittest
 
+from app.auth.test_permissions import PermissionsTest
+from app.auth.test_roles import RolesTest
 from app.controllers.test_auth_controller import AuthControllerTest
 from app.controllers.test_collections_controller import CollectionsControllerTest
 from app.controllers.test_crud_controller import CrudControllerTest
@@ -33,7 +35,9 @@ def suite():
         FilesReaderTest.suite(),
         FilterToolTest.suite(),
         IndexesServiceTest.suite(),
+        PermissionsTest.suite(),
         ResultsMapperTest.suite(),
+        RolesTest.suite(),
         SearchContextTest.suite(),
         SearchControllerTest.suite(),
         SearchServiceTest.suite()

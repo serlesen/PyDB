@@ -10,7 +10,7 @@ class CollectionsServiceTest(unittest.TestCase):
 
     @classmethod
     def setUpClass(cls):
-        CollectionsSimulator.build_single_col('col')
+        CollectionsSimulator.build_single_col('col', None)
 
     def setUp(self):
         # instanciate the service to test

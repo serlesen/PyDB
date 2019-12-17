@@ -9,7 +9,7 @@ class FilesReaderTest(unittest.TestCase):
 
     @classmethod
     def setUpClass(cls):
-        CollectionsSimulator.build_big_col('col')
+        CollectionsSimulator.build_big_col('col', None)
 
     @classmethod
     def tearDownClass(cls):

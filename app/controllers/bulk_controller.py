@@ -1,12 +1,15 @@
 import random, string
 
 from flask import Flask, request, abort, make_response, jsonify
+from app.auth.decorators import has_permission
+from app.auth.permissions import Permissions
 from app.controllers import app
 from app.controllers import crud_service
 from app.tools.collection_meta_data import CollectionMetaData
 from app.tools.database_context import DatabaseContext
 
 @app.route('/<collection>/bulk')
+@has_permission(Permissions.WRITE)
 def bulk(collection):
     for i in range(5):
         l = []

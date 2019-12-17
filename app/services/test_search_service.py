@@ -15,15 +15,9 @@ class SearchServiceTest(unittest.TestCase):
 
     @classmethod
     def setUpClass(cls):
-        CollectionsSimulator.build_single_col('col')
-        CollectionsSimulator.build_big_col('big-col')
-        CollectionsSimulator.build_big_col('big-col-with-index')
-
-        big_col_wi_meta_data = CollectionMetaData('big-col-with-index')
-        indexes_service = IndexesService()
-        data_service = DataService()
-        docs = data_service.find_all(big_col_wi_meta_data, None)
-        indexes_service.build_index(big_col_wi_meta_data, docs, 'id')
+        CollectionsSimulator.build_single_col('col', None)
+        CollectionsSimulator.build_big_col('big-col', None)
+        CollectionsSimulator.build_big_col('big-col-with-index', ['id'])
 
     @classmethod
     def tearDownClass(cls):

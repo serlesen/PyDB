@@ -2,8 +2,6 @@ import unittest
 
 from app.exceptions.app_exception import AppException
 from app.services.auth_service import AuthService
-from app.services.data_service import DataService
-from app.services.indexes_service import IndexesService
 from app.test.collections_simulator import CollectionsSimulator
 from app.threads.threads_manager import ThreadsManager
 from app.tools.collection_meta_data import CollectionMetaData
@@ -19,13 +17,6 @@ class AuthServiceTest(unittest.TestCase):
             ThreadsManager().start()
 
         CollectionsSimulator.build_users_col()
-
-        col_meta_data = CollectionMetaData('users')
-        indexes_service = IndexesService()
-        data_service = DataService()
-        docs = data_service.find_all(col_meta_data, None)
-        indexes_service.build_index(col_meta_data, docs, 'id')
-        indexes_service.build_index(col_meta_data, docs, 'login')
 
     def setUp(self):
         self.auth_service = AuthService()

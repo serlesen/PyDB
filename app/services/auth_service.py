@@ -78,6 +78,7 @@ class AuthService(object):
         return user
 
     def create_user(self, new_user):
+        # FIXME check if login already exists
         user = {'login': new_user['login'],
                 'password': self.bcrypt.generate_password_hash(new_user['password'], DatabaseContext.BCRYPT_LOG_ROUNDS).decode(),
                 'tokens': []

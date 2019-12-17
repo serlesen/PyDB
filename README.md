@@ -135,6 +135,7 @@ python3 -m unittest -v
 
 ### TODO
 
+* allow to update a part of a document with PATCH
 * handle nested documents at filters
 * Sort by inner documents
 * Sort nested documents

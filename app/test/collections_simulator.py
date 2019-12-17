@@ -2,6 +2,8 @@ import os
 import shutil
 import _pickle as pickle
 
+from app.services.data_service import DataService
+from app.services.indexes_service import IndexesService
 from app.services.files_reader import FilesReader
 from app.tools.database_context import DatabaseContext
 from app.tools.collection_meta_data import CollectionMetaData
@@ -14,10 +16,15 @@ class CollectionsSimulator(object):
 
         with open(DatabaseContext.DATA_FOLDER + col_meta_data.collection + '/' + col_meta_data.last_data_fname(), 'wb') as file:
             docs = []
-            docs.append({'id': 1, 'login': 'admin', 'password': '$2b$13$qG6c01Xy9rd07vJ1lZsxE.ouYvdhbFVAn/miQBhnOXq5bk..4WhCC', 'tokens': ['eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpYXQiOjE1NzU5OTEwNDUsInN1YiI6MX0._jTMkfDl2RKzY_r6nUDVwFG8xlEuZPFFr7zvqWXJmcM']})
+            docs.append({'id': 1, 'login': 'admin', 'password': '$2b$13$qG6c01Xy9rd07vJ1lZsxE.ouYvdhbFVAn/miQBhnOXq5bk..4WhCC', 'role': 'admin', 'permissions': {}, 'tokens': ['eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpYXQiOjE1NzU5OTEwNDUsInN1YiI6MX0._jTMkfDl2RKzY_r6nUDVwFG8xlEuZPFFr7zvqWXJmcM']})
+            docs.append({'id': 2, 'login': 'editor', 'password': '$2b$13$0WXjchCmXzA.LSDJ.VFY3e3236N8OYuhzxgxK/CGLKZlvObIKnVXK', 'role': 'editor', 'permissions': {}, 'tokens': ['eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpYXQiOjE1NzY1NjM3OTcsInN1YiI6Mn0.ZFvT2iTVJS66kCVjIuT97JfLW55Vf6R5HtSk0fNK4NE']})
+            docs.append({'id': 3, 'login': 'user', 'password': '$2b$13$..pzR.sYdfI0i4qwSgHBfuXetDpOLru4iGo4ia1qxj4RahEalTnXS', 'role': 'user', 'permissions': {'col': 'w'}, 'tokens': ['eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpYXQiOjE1NzY1NjM4NDksInN1YiI6M30.azF-SBFKkX3Gdx34M0a6ZJP6ZXT7WYbBLOCLDUkfnRE']})
             file.write(pickle.dumps(docs))
 
-    def build_single_col(col_name):
+        for field in ['id', 'login']:
+            CollectionsSimulator.build_indexes(col_meta_data, field)
+
+    def build_single_col(col_name, indexes):
         col_meta_data = CollectionsSimulator.init_data_folder(col_name, 3)
 
         # set up the test data
@@ -35,7 +42,11 @@ class CollectionsSimulator(object):
             docs.append({'id': 6, 'first_name': 'Biff', 'last_name': 'Tannen'})
             file.write(pickle.dumps(docs))
 
-    def build_big_col(col_name):
+        if indexes is not None:
+            for field in indexes:
+                CollectionsSimulator.build_indexes(col_meta_data, field)
+
+    def build_big_col(col_name, indexes):
         big_col_meta_data = CollectionsSimulator.init_data_folder(col_name, 100000)
 
         # set up the test data
@@ -55,6 +66,16 @@ class CollectionsSimulator(object):
                 file.write(pickle.dumps(docs))
                 if i != 4:
                     big_col_meta_data.next_data_fname()
+
+        if indexes is not None:
+            for field in indexes:
+                CollectionsSimulator.build_indexes(big_col_meta_data, field)
+
+    def build_indexes(col_meta_data, field):
+        indexes_service = IndexesService()
+        data_service = DataService()
+        docs = data_service.find_all(col_meta_data, None)
+        indexes_service.build_index(col_meta_data, docs, field)
 
     def init_data_folder(col_name, col_size):
         DatabaseContext.MAX_DOC_PER_FILE = col_size

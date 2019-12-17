@@ -17,14 +17,8 @@ class CrudControllerTest(unittest.TestCase):
             DatabaseContext.THREADS_MANAGER_CYCLING = True
             ThreadsManager().start()
 
-        CollectionsSimulator.build_single_col('col')
-
-        col_meta_data = CollectionMetaData('col')
-
-        indexes_service = IndexesService()
-        data_service = DataService()
-        docs = data_service.find_all(col_meta_data, None)
-        indexes_service.build_index(col_meta_data, docs, 'id')
+        CollectionsSimulator.build_users_col()
+        CollectionsSimulator.build_single_col('col', ['id'])
 	
     def setUp(self):
         app.config["TESTING"] = True
@@ -37,36 +31,36 @@ class CrudControllerTest(unittest.TestCase):
         DatabaseContext.THREADS_MANAGER_CYCLING = False
 
     def test_get_document(self):
-        response = self.app.get('/col/3')
+        response = self.app.get('/col/3', headers={'Authorization': 'Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpYXQiOjE1NzY1NjM4NDksInN1YiI6M30.azF-SBFKkX3Gdx34M0a6ZJP6ZXT7WYbBLOCLDUkfnRE'})
         self.assertEqual(response.status_code, 200)
         self.assertEqual(json.loads(response.data)['id'], 3)
 
     def test_create_document(self):
-        response = self.app.post('/col', data=json.dumps({'id': 1000, 'Name': 'Isaac'}), content_type='application/json')
+        response = self.app.post('/col', data=json.dumps({'id': 1000, 'Name': 'Isaac'}), content_type='application/json', headers={'Authorization': 'Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpYXQiOjE1NzY1NjM4NDksInN1YiI6M30.azF-SBFKkX3Gdx34M0a6ZJP6ZXT7WYbBLOCLDUkfnRE'})
         self.assertEqual(response.status_code, 201)
         self.assertEqual(json.loads(response.data)['id'], 1000)
         self.assertEqual(json.loads(response.data)['name'], 'Isaac')
 
-        response = self.app.get('/col/1000')
+        response = self.app.get('/col/1000', headers={'Authorization': 'Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpYXQiOjE1NzY1NjM4NDksInN1YiI6M30.azF-SBFKkX3Gdx34M0a6ZJP6ZXT7WYbBLOCLDUkfnRE'})
         self.assertEqual(response.status_code, 200)
         self.assertEqual(json.loads(response.data)['id'], 1000)
 
     def test_update_document(self):
-        response = self.app.put('/col/2', data=json.dumps({'id': 2, 'first_name': 'Isaac'}), content_type='application/json')
+        response = self.app.put('/col/2', data=json.dumps({'id': 2, 'first_name': 'Isaac'}), content_type='application/json', headers={'Authorization': 'Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpYXQiOjE1NzY1NjM4NDksInN1YiI6M30.azF-SBFKkX3Gdx34M0a6ZJP6ZXT7WYbBLOCLDUkfnRE'})
         self.assertEqual(response.status_code, 200)
         self.assertEqual(json.loads(response.data)['id'], 2)
         self.assertEqual(json.loads(response.data)['first_name'], 'Isaac')
 
-        response = self.app.get('/col/2')
+        response = self.app.get('/col/2', headers={'Authorization': 'Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpYXQiOjE1NzY1NjM4NDksInN1YiI6M30.azF-SBFKkX3Gdx34M0a6ZJP6ZXT7WYbBLOCLDUkfnRE'})
         self.assertEqual(response.status_code, 200)
         self.assertEqual(json.loads(response.data)['id'], 2)
         self.assertEqual(json.loads(response.data)['first_name'], 'Isaac')
 
     def test_delete_document(self):
-        response = self.app.delete('/col/4')
+        response = self.app.delete('/col/4', headers={'Authorization': 'Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpYXQiOjE1NzY1NjM4NDksInN1YiI6M30.azF-SBFKkX3Gdx34M0a6ZJP6ZXT7WYbBLOCLDUkfnRE'})
         self.assertEqual(response.status_code, 200)
 
-        response = self.app.get('/col/4')
+        response = self.app.get('/col/4', headers={'Authorization': 'Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpYXQiOjE1NzY1NjM4NDksInN1YiI6M30.azF-SBFKkX3Gdx34M0a6ZJP6ZXT7WYbBLOCLDUkfnRE'})
         self.assertEqual(response.status_code, 404)
 
     def suite():
