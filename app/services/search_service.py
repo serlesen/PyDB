@@ -25,6 +25,7 @@ class SearchService(object):
 
             # filter by main index
             lines = self.indexes_service.find_all(col_meta_data, k, FilterTool({'$filter': indexed_value}))
+
             docs = self.data_service.find_by_line(col_meta_data, lines, thread_id)
         else:
             docs = self.data_service.find_all(col_meta_data, thread_id)

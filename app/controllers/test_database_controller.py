@@ -27,7 +27,7 @@ class DatabaseControllerTest(unittest.TestCase):
         DatabaseContext.THREADS_MANAGER_CYCLING = False
 
     def test_get_database_status(self):
-        response = self.app.get('/status', headers={'Authorization': 'Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpYXQiOjE1NzY1NjM3OTcsInN1YiI6Mn0.ZFvT2iTVJS66kCVjIuT97JfLW55Vf6R5HtSk0fNK4NE'})
+        response = self.app.get('/status', headers={'Authorization': 'Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpYXQiOjE1NzY1OTIwNTcsInN1YiI6M30.KdhWBZg9yzN7CI80242mnsBKV3js_e-bhgICR8yb82o'})
         self.assertEqual(response.status_code, 200)
 
         response_data = json.loads(response.data)

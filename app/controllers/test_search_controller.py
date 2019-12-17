@@ -18,8 +18,8 @@ class SearchControllerTest(unittest.TestCase):
             DatabaseContext.THREADS_MANAGER_CYCLING = True
             ThreadsManager().start()
 
-        CollectionsSimulator.build_users_col()
         CollectionsSimulator.build_big_col('col', ['id'])
+        CollectionsSimulator.build_users_col()
     
     def setUp(self):
         app.config["TESTING"] = True
@@ -33,7 +33,7 @@ class SearchControllerTest(unittest.TestCase):
 
     @timeout_decorator.timeout(4)
     def test_search_over_500000_docs(self):
-        response = self.app.post('/col/search', data=json.dumps({'$filter': {'id': 449994}}), content_type='application/json', headers={'Authorization': 'Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpYXQiOjE1NzY1NjM4NDksInN1YiI6M30.azF-SBFKkX3Gdx34M0a6ZJP6ZXT7WYbBLOCLDUkfnRE'})
+        response = self.app.post('/col/search', data=json.dumps({'$filter': {'id': 449994}}), content_type='application/json', headers={'Authorization': 'Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpYXQiOjE1NzY1OTIwNTcsInN1YiI6NH0.DdyUZYKPqpFtkfwCIZgI-H4da0Ux4H4yxvlCbHxOIyE'})
         self.assertEqual(response.status_code, 200)
 
         response_data = json.loads(response.data)
@@ -42,7 +42,7 @@ class SearchControllerTest(unittest.TestCase):
 
     @timeout_decorator.timeout(4)
     def test_not_found_search_over_500000_docs(self):
-        response = self.app.post('/col/search', data=json.dumps({'$filter': {'id': 949994}}), content_type='application/json', headers={'Authorization': 'Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpYXQiOjE1NzY1NjM4NDksInN1YiI6M30.azF-SBFKkX3Gdx34M0a6ZJP6ZXT7WYbBLOCLDUkfnRE'})
+        response = self.app.post('/col/search', data=json.dumps({'$filter': {'id': 949994}}), content_type='application/json', headers={'Authorization': 'Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpYXQiOjE1NzY1OTIwNTcsInN1YiI6NH0.DdyUZYKPqpFtkfwCIZgI-H4da0Ux4H4yxvlCbHxOIyE'})
         self.assertEqual(response.status_code, 404)
 
     def suite():

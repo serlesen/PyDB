@@ -21,5 +21,10 @@ class RolesTest(unittest.TestCase):
     def test_not_validated_user_role(self):
         self.assertTrue(Roles.validate(Roles.USER, Roles.USER))
 
+    def test_replicator(self):
+        self.assertFalse(Roles.validate(Roles.REPLICATOR, Roles.ADMIN))
+        self.assertTrue(Roles.validate(Roles.REPLICATOR, Roles.REPLICATOR))
+
+
     def suite():
         return unittest.TestLoader().loadTestsFromTestCase(RolesTest)
