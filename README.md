@@ -121,6 +121,18 @@ The field 'id' will be inserted with a UUID value to each new document if it's n
 
 Only the index over the field 'id' will be automatically created.
 
+## Authorization
+
+The /auth/login endpoint will return a token which must be send back to each HTTP request in the Authorization Bearer header.
+
+## CRUD
+
+Here are the commands to create, read, update and delete a document (create and update are managed as upsert):
+* POST /<collection> : the body will be inserted in the collection. If the body already contains an id, it will update the existing document with that id, otherwise it will create a document with that id.
+* PUT /<collection>/<id> : the body will replace the document with the id of the URL path in the colleciton
+* PATCH /<collection>/<id> : the body will be inserted in the collection document with the id of the URL path in the collection
+* DELETE /<collection>/<id> : the collection document with the id of the URL will be deleted
+
 ## How to Run
 
 ```

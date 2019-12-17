@@ -22,11 +22,8 @@ class QueryStack(object):
     def push_search(self, collection, search_query):
         return self.push_action(collection, search_query, None, None, 'search')
 
-    def push_create(self, collection, doc):
-        return self.push_action(collection, None, doc, None, 'create')
-
-    def push_update(self, collection, doc, doc_id):
-        return self.push_action(collection, None, doc, doc_id, 'update')
+    def push_upsert(self, collection, doc, doc_id):
+        return self.push_action(collection, None, doc, doc_id, 'upsert')
 
     def push_delete(self, collection, doc_id):
         return self.push_action(collection, None, None, doc_id, 'delete')
@@ -41,9 +38,7 @@ class QueryStack(object):
     def build_threads_need(self, collection, action):
         if action == 'search':
             return list(range(1, CollectionMetaData(collection).counter + 1))
-        if action == 'create':
-            return [1]
-        if action == 'update':
+        if action == 'upsert':
             return [1]
         if action == 'delete':
             return [1]

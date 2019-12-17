@@ -12,15 +12,11 @@ class QueryManager(object):
         query_id = QueryStack.get_instance().push_search(collection, {"$filter":{"id": doc_id}})
         results = QueryStack.get_instance().pop_results(query_id)
         if len(results) != 1:
-            raise AppException('Unable to find document {}'.format(doc_id), 404)
+            return None
         return results[0]
 
-    def create(self, collection, doc):
-        query_id = QueryStack.get_instance().push_create(collection, doc)
-        return QueryStack.get_instance().pop_results(query_id)
-
-    def update(self, collection, doc, doc_id):
-        query_id = QueryStack.get_instance().push_update(collection, doc, doc_id)
+    def upsert(self, collection, doc, doc_id):
+        query_id = QueryStack.get_instance().push_upsert(collection, doc, doc_id)
         return QueryStack.get_instance().pop_results(query_id)
 
     def delete(self, collection, doc_id):
