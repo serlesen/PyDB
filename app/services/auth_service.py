@@ -36,7 +36,7 @@ class AuthService(object):
         user['tokens'].append(token)
 
         col_meta_data = CollectionMetaData('users')
-        self.crud_service.upsert(col_meta_data, user['id'], user)
+        self.crud_service.upsert(col_meta_data, user)
 
         return {'login': user['login'], 'token': token}
 
@@ -61,7 +61,7 @@ class AuthService(object):
         user = results[0]
 
         user['tokens'].remove(token)
-        self.crud_service.upsert(CollectionMetaData('users'), user['id'], user)
+        self.crud_service.upsert(CollectionMetaData('users'), user)
 
         return user
 
@@ -74,7 +74,7 @@ class AuthService(object):
         user = results[0]
 
         user['tokens'].clear()
-        self.crud_service.upsert(CollectionMetaData('users'), user['id'], user)
+        self.crud_service.upsert(CollectionMetaData('users'), user)
 
         return user
 
@@ -85,6 +85,6 @@ class AuthService(object):
                 'password': self.bcrypt.generate_password_hash(new_user['password'], DatabaseContext.BCRYPT_LOG_ROUNDS).decode(),
                 'tokens': []
                 }
-        result = self.crud_service.upsert(CollectionMetaData('users'), user['id'], user)
+        result = self.crud_service.upsert(CollectionMetaData('users'), user)
         return result
 

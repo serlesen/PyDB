@@ -17,7 +17,7 @@ def create(collection):
     doc = request.json
     if 'id' not in doc:
         doc['id'] = str(uuid.uuid4())
-    return jsonify(query_manager.upsert(collection, doc, doc['id'])), 201
+    return jsonify(query_manager.upsert(collection, doc)), 201
 
 @app.route('/<collection>/<id>')
 @has_permission(Permissions.READ)
@@ -32,7 +32,9 @@ def get(collection, id):
 def update(collection, id):
     if not request.json:
         abort(405)
-    return jsonify(query_manager.upsert(collection, request.json, int(id)))
+    doc = request.json
+    doc['id'] = int(id)
+    return jsonify(query_manager.upsert(collection, doc))
 
 @app.route('/<collection>/<id>', methods=['PATCH'])
 @has_permission(Permissions.WRITE)
@@ -47,7 +49,7 @@ def patch(collection, id):
     for k in patch.keys():
         result[k] = patch[k]
 
-    return jsonify(query_manager.upsert(collection, result, int(id)))
+    return jsonify(query_manager.upsert(collection, result))
 
 @app.route('/<collection>/<id>', methods=['DELETE'])
 @has_permission(Permissions.WRITE)

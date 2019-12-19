@@ -21,8 +21,8 @@ class CrudService(object):
         self.indexes_service = DependencyInjectionsService.get_instance().get_service(IndexesService)
         self.query_manager = DependencyInjectionsService.get_instance().get_service(QueryManager)
 
-    def upsert(self, col_meta_data, id, doc):
-        previous_doc = self.query_manager.get_one(col_meta_data.collection, id)
+    def upsert(self, col_meta_data, doc):
+        previous_doc = self.query_manager.get_one(col_meta_data.collection, doc['id'])
         if previous_doc is None:
             updated = self.data_service.append(col_meta_data, doc)
             appended_line = self.collections_service.count(col_meta_data) - 1
@@ -30,7 +30,7 @@ class CrudService(object):
             return updated
         else:
             self.indexes_service.update_indexes(col_meta_data, previous_doc, doc)
-            return self.data_service.update(col_meta_data, id, doc)['doc']
+            return self.data_service.update(col_meta_data, doc['id'], doc)['doc']
 
     def bulk_insert(self, col_meta_data, docs):
         return self.data_service.append_bulk(col_meta_data, docs)

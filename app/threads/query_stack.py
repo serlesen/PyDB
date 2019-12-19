@@ -22,8 +22,8 @@ class QueryStack(object):
     def push_search(self, collection, search_query):
         return self.push_action(collection, search_query, None, None, 'search')
 
-    def push_upsert(self, collection, doc, doc_id):
-        return self.push_action(collection, None, doc, doc_id, 'upsert')
+    def push_upsert(self, collection, doc):
+        return self.push_action(collection, None, doc, None, 'upsert')
 
     def push_delete(self, collection, doc_id):
         return self.push_action(collection, None, None, doc_id, 'delete')

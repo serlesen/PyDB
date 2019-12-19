@@ -30,4 +30,5 @@ from app.controllers import collections_controller
 from app.controllers import crud_controller
 from app.controllers import database_controller
 from app.controllers import errors_controller
+from app.controllers import replication_controller
 from app.controllers import search_controller

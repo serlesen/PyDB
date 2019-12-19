@@ -13,3 +13,4 @@ class DatabaseContext(object):
     MAX_DOC_PER_FILE = 100000
     MAX_THREADS = 24
     PASSWORDS_SECRET_KEY = 'heLL0'
+    SLAVES = []

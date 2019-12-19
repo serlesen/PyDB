@@ -17,19 +17,20 @@ class QueryThread(Thread):
         self.thread_id = thread_id
 
     def run(self):
-        item = QueryStack.get_instance().pop_action(self.query_id)
-        if item == None:
-            return
-
         try:
+            item = QueryStack.get_instance().pop_action(self.query_id)
+            if item == None:
+                return
+
             if item['action'] == 'search':
                 results = self.search_service.search_by_thread(CollectionMetaData(item['collection']), SearchContext(item['search_query']), self.thread_id)
             elif item['action'] == 'upsert':
-                results = self.crud_service.upsert(CollectionMetaData(item['collection']), item['doc_id'], item['doc'])
+                results = self.crud_service.upsert(CollectionMetaData(item['collection']), item['doc'])
             elif item['action'] == 'delete':
                 results = self.crud_service.delete(CollectionMetaData(item['collection']), item['doc_id'])
 
             QueryStack.get_instance().push_results(results, self.query_id, self.thread_id)
         except Exception as e:
+            print(f'Query thread failed with {e}')
             QueryStack.get_instance().push_error(e, self.query_id)
 

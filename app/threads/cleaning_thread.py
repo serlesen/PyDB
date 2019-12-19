@@ -11,18 +11,21 @@ from app.tools.database_context import DatabaseContext
 class CleaningThread(Thread):
 
     def run(self):
-        item = CleaningStack.get_instance().pop()
-
-        col_meta_data = CollectionMetaData(item['collection'])
-        incoming_line = item['line']
-
-        CollectionLocker.lock_col(col_meta_data)
-
-        self.swift_data_docs(col_meta_data, incoming_line)
- 
-        self.update_indexes_file(col_meta_data, incoming_line)
-
-        CollectionLocker.unlock_col(col_meta_data)
+        try:
+            item = CleaningStack.get_instance().pop()
+    
+            col_meta_data = CollectionMetaData(item['collection'])
+            incoming_line = item['line']
+    
+            CollectionLocker.lock_col(col_meta_data)
+    
+            self.swift_data_docs(col_meta_data, incoming_line)
+     
+            self.update_indexes_file(col_meta_data, incoming_line)
+    
+            CollectionLocker.unlock_col(col_meta_data)
+        except Exception as e:
+            print(f'Cleaning thread failed with {e}')
 
     def swift_data_docs(self, col_meta_data, incoming_line):
         doc_to_move = None

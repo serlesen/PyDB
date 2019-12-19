@@ -2,10 +2,7 @@ import json
 import unittest
 
 from app.controllers import app
-from app.services.indexes_service import IndexesService
-from app.services.data_service import DataService
 from app.test.collections_simulator import CollectionsSimulator
-from app.tools.collection_meta_data import CollectionMetaData
 from app.tools.database_context import DatabaseContext
 from app.threads.threads_manager import ThreadsManager
 

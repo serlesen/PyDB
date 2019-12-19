@@ -147,11 +147,15 @@ python3 -m unittest -v
 
 ### TODO
 
+* correct bulk insert
+* bulk update
+* bulk delete
 * handle nested documents at filters
 * Sort by inner documents
 * Sort nested documents
 * At queries status, add source request to detect deadlocks
-* Master/Slave replication
+* Replication auth
+* Master/Slave complete sync
 * Master/Master replication
 * Sharding
 
