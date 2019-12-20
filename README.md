@@ -154,7 +154,6 @@ python3 -m unittest -v
 * Sort by inner documents
 * Sort nested documents
 * At queries status, add source request to detect deadlocks
-* Replication auth
 * Master/Slave complete sync
 * Master/Master replication
 * Sharding

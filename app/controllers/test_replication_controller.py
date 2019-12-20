@@ -28,7 +28,7 @@ class ReplicationControllerTest(unittest.TestCase):
         DatabaseContext.THREADS_MANAGER_CYCLING = False
 
     def test_sync_upsert(self):
-        response = self.app.post('/admin/replicate', data=json.dumps({'collection': 'col', 'doc': {'id': 3, 'first_name': 'serser'}, 'url': 'localhost:5001'}), content_type='application/json', headers={'Authorization': 'Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpYXQiOjE1NzY1OTExNTksInN1YiI6Mn0.Uf2tyw4vPxKQ95id2iOefp4GcO3UGnYXZLPyX8NoV1U'})
+        response = self.app.post('/admin/replicate/sync', data=json.dumps({'collection': 'col', 'doc': {'id': 3, 'first_name': 'serser'}, 'url': 'localhost:5001'}), content_type='application/json', headers={'Authorization': 'Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpYXQiOjE1NzY1OTExNTksInN1YiI6Mn0.Uf2tyw4vPxKQ95id2iOefp4GcO3UGnYXZLPyX8NoV1U'})
         self.assertEqual(response.status_code, 200)
 
         response = self.app.get('/col/3', headers={'Authorization': 'Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpYXQiOjE1NzY1OTIwNTcsInN1YiI6NH0.DdyUZYKPqpFtkfwCIZgI-H4da0Ux4H4yxvlCbHxOIyE'})
@@ -37,7 +37,7 @@ class ReplicationControllerTest(unittest.TestCase):
         self.assertEqual(json.loads(response.data)['first_name'], 'serser')
 
     def test_sync_delete(self):
-        response = self.app.delete('/admin/replicate', data=json.dumps({'collection': 'col', 'id': 5, 'url': 'localhost:5001'}), content_type='application/json', headers={'Authorization': 'Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpYXQiOjE1NzY1OTExNTksInN1YiI6Mn0.Uf2tyw4vPxKQ95id2iOefp4GcO3UGnYXZLPyX8NoV1U'})
+        response = self.app.delete('/admin/replicate/sync', data=json.dumps({'collection': 'col', 'id': 5, 'url': 'localhost:5001'}), content_type='application/json', headers={'Authorization': 'Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpYXQiOjE1NzY1OTExNTksInN1YiI6Mn0.Uf2tyw4vPxKQ95id2iOefp4GcO3UGnYXZLPyX8NoV1U'})
         self.assertEqual(response.status_code, 200)
 
         response = self.app.get('/col/5', headers={'Authorization': 'Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpYXQiOjE1NzY1OTIwNTcsInN1YiI6NH0.DdyUZYKPqpFtkfwCIZgI-H4da0Ux4H4yxvlCbHxOIyE'})

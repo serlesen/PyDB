@@ -14,11 +14,11 @@ class ReplicationStack(object):
         return ReplicationStack.instance
 
     def push_upsert(self, collection, doc):
-        for slave in DatabaseContext.SLAVES:
+        for slave in DatabaseContext.SLAVES.keys():
             self.queries.append({'collection': collection, 'url': slave, 'doc': doc})
 
     def push_delete(self, collection, id):
-        for slave in DatabaseContext.SLAVES:
+        for slave in DatabaseContext.SLAVES.keys():
             self.queries.append({'collection': collection, 'url': slave, 'id': id})
 
     def push_error(self, item):

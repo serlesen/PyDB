@@ -13,8 +13,6 @@ class ReplicationThreadTest(unittest.TestCase):
 
     @classmethod
     def setUpClass(cls):
-        DatabaseContext.SLAVES = ['localhost:5001', 'localhost:5002']
-
         if DatabaseContext.THREADS_MANAGER_CYCLING == False:
             DatabaseContext.THREADS_MANAGER_CYCLING = True
             ThreadsManager().start()
@@ -22,13 +20,16 @@ class ReplicationThreadTest(unittest.TestCase):
         CollectionsSimulator.build_single_col('col', ['id'])
 
     def setUp(self):
+        DatabaseContext.SLAVES = {'localhost:5001': 'first_token', 'localhost:5002': None}
         self.query_manager = QueryManager()
 
     @classmethod
     def tearDownClass(cls):
         CollectionsSimulator.clean()
         DatabaseContext.THREADS_MANAGER_CYCLING = False
-        DatabaseContext.SLAVES = []
+
+    def tearDown(self):
+        DatabaseContext.SLAVES = {}
 
     def mocked_requests(*args, **kwargs):
         class MockResponse:
@@ -39,8 +40,10 @@ class ReplicationThreadTest(unittest.TestCase):
             def json(self):
                 return self.json_data
 
-        if kwargs['url'] == 'localhost:5001/admin/replicate' or kwargs['url'] == 'localhost:5002/admin/replicate':
+        if kwargs['url'] == 'localhost:5001/admin/replicate/sync' or kwargs['url'] == 'localhost:5002/admin/replicate/sync':
             return MockResponse({}, 200)
+        if kwargs['url'] == 'localhost:5002/admin/replicate/auth':
+            return MockResponse({'login': 'replicator', 'token': 'second_token'}, 200)
 
         return MockResponse(None, 404)
 
@@ -54,13 +57,15 @@ class ReplicationThreadTest(unittest.TestCase):
 
         self.assertEqual(len(ReplicationStack.get_instance().errors), 0)
 
-        self.assertIn(mock.call(url='localhost:5001/admin/replicate', data={'collection': 'col', 'doc': {'id': 1, 'first_name': 'fn', 'last_name': 'ln'}, 'url': 'localhost:5001'}), mock_post.call_args_list)
-        self.assertIn(mock.call(url='localhost:5002/admin/replicate', data={'collection': 'col', 'doc': {'id': 1, 'first_name': 'fn', 'last_name': 'ln'}, 'url': 'localhost:5002'}), mock_post.call_args_list)
+        self.assertIn(mock.call(url='localhost:5002/admin/replicate/auth'), mock_post.call_args_list)
+        self.assertIn(mock.call(url='localhost:5001/admin/replicate/sync', data={'collection': 'col', 'doc': {'id': 1, 'first_name': 'fn', 'last_name': 'ln'}}, headers={'Authorization': 'Bearer first_token'}), mock_post.call_args_list)
+        self.assertIn(mock.call(url='localhost:5002/admin/replicate/sync', data={'collection': 'col', 'doc': {'id': 1, 'first_name': 'fn', 'last_name': 'ln'}}, headers={'Authorization': 'Bearer second_token'}), mock_post.call_args_list)
 
-        self.assertEqual(len(mock_post.call_args_list), 2)
+        self.assertEqual(len(mock_post.call_args_list), 3)
 
+    @mock.patch('requests.post', side_effect=mocked_requests)
     @mock.patch('requests.delete', side_effect=mocked_requests)
-    def test_replicate_delete(self, mock_delete):
+    def test_replicate_delete(self, mock_delete, mock_post):
         self.assertFalse(ReplicationStack.get_instance().contains_data())
         self.query_manager.delete('col', 3)
 
@@ -69,10 +74,12 @@ class ReplicationThreadTest(unittest.TestCase):
 
         self.assertEqual(len(ReplicationStack.get_instance().errors), 0)
 
-        self.assertIn(mock.call(url='localhost:5001/admin/replicate', data={'collection': 'col', 'id': 3, 'url': 'localhost:5001'}), mock_delete.call_args_list)
-        self.assertIn(mock.call(url='localhost:5002/admin/replicate', data={'collection': 'col', 'id': 3, 'url': 'localhost:5002'}), mock_delete.call_args_list)
+        self.assertIn(mock.call(url='localhost:5002/admin/replicate/auth'), mock_post.call_args_list)
+        self.assertIn(mock.call(url='localhost:5001/admin/replicate/sync', data={'collection': 'col', 'id': 3}, headers={'Authorization': 'Bearer first_token'}), mock_delete.call_args_list)
+        self.assertIn(mock.call(url='localhost:5002/admin/replicate/sync', data={'collection': 'col', 'id': 3}, headers={'Authorization': 'Bearer second_token'}), mock_delete.call_args_list)
 
         self.assertEqual(len(mock_delete.call_args_list), 2)
+        self.assertEqual(len(mock_post.call_args_list), 1)
 
 
     def suite():

@@ -40,6 +40,20 @@ class AuthService(object):
 
         return {'login': user['login'], 'token': token}
 
+    def login_for_api(self, login):
+        results = self.query_manager.search('users', {'$filter': {'login': login}})
+
+        if len(results) != 1:
+            raise AppException('Authentication failed', 401)
+
+        token = self.generate_auth_token(user['id'])
+        user['tokens'].append(token)
+
+        col_meta_data = CollectionMetaData('users')
+        self.crud_service.upsert(col_meta_data, user)
+
+        return {'login': user['login'], 'token': token}
+
     def get_user_by_token(self, token):
         payload = jwt.decode(token, DatabaseContext.PASSWORDS_SECRET_KEY, algorithms=['HS256'])
         results = self.query_manager.search('users', {'$filter': {'id': payload['sub'], 'tokens': token}})

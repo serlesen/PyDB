@@ -10,7 +10,8 @@ class DatabaseContext(object):
     LOCKING_CYCLE = 0.01
     THREADS_CYCLE = 0.1
     THREADS_MANAGER_CYCLING = True
+    MASTERS = []
     MAX_DOC_PER_FILE = 100000
     MAX_THREADS = 24
     PASSWORDS_SECRET_KEY = 'heLL0'
-    SLAVES = []
+    SLAVES = {}
