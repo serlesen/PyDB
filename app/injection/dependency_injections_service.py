@@ -1,4 +1,5 @@
 class DependencyInjectionsService(object):
+    """ Tool to inject dependent services as singletons.  """
 
     instance = None
 

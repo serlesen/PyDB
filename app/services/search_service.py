@@ -7,11 +7,10 @@ from app.services.indexes_service import IndexesService
 from app.threads.query_stack import QueryStack
 from app.tools.filter_tool import FilterTool
 
-#
-# Class to search over given documents to apply a search_context.
-# This class also sort and limit the results to be returned.
-#
 class SearchService(object):
+    """ Class to search over given documents to apply a search_context.
+    This class also sort and limit the results to be returned.
+    """
 
     def __init__(self):
         self.data_service = DependencyInjectionsService.get_instance().get_service(DataService)

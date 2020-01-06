@@ -1,7 +1,5 @@
-#
-# Parser to validate the input argument.
-#
 class ArgumentParser(object):
+    """ Parser to validate the input argument. """
 
     keywords = ['$filter', '$size', '$map', '$skip', '$sort', '$map']
 

@@ -6,6 +6,7 @@ from app.threads.replication_stack import ReplicationStack
 from app.tools.database_context import DatabaseContext
 
 class ReplicationThread(Thread):
+    """ Thread which sends the queries from ReplicationStack to update the connected slaves. """
 
     def run(self):
         try:

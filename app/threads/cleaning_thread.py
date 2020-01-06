@@ -9,6 +9,11 @@ from app.tools.collection_meta_data import CollectionMetaData
 from app.tools.database_context import DatabaseContext
 
 class CleaningThread(Thread):
+    """ Class to handle the cleaning of the deleted documents.
+    When deleting a document, it's replaced by an empty document and the index still unchanged.
+    This class (run in a separated thread) will check those empty documents, remove them and
+    update the indexes consequently.
+    """
 
     def run(self):
         try:

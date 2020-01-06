@@ -9,10 +9,8 @@ from app.services.query_manager import QueryManager
 from app.tools.search_context import SearchContext
 from app.threads.cleaning_stack import CleaningStack
 
-#
-# Class to create, update and delete a single document.
-#
 class CrudService(object):
+    """ Class to create, update and delete a single document. """
 
     def __init__(self):
         self.collections_service = DependencyInjectionsService.get_instance().get_service(CollectionsService)

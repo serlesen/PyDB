@@ -1,4 +1,6 @@
 class Roles(object):
+    """ User type when authenticating.  """
+
     ADMIN = 'admin'
     REPLICATOR = 'replicator'
     EDITOR = 'editor'

@@ -8,6 +8,7 @@ from app.tools.collection_meta_data import CollectionMetaData
 from app.tools.search_context import SearchContext
 
 class QueryThread(Thread):
+    """ Thread that run the search queries stored in QueryStack. """
 
     def __init__(self, query_id, thread_id):
         Thread.__init__(self)

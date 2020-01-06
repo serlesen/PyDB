@@ -1,6 +1,9 @@
 from app.tools.database_context import DatabaseContext
 
 class ReplicationStack(object):
+    """ Class which holds all the queries which imply a modification and needs to
+    be replicated to the slaves (if configured).
+    """
 
     instance = None
 

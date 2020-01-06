@@ -6,10 +6,8 @@ from app.tools.collection_locker import CollectionLocker, col_locking
 from app.tools.filter_tool import FilterTool
 from app.tools.database_context import DatabaseContext
 
-#
-# Class to read (without conditions or only some given lines), append and update a data file.
-#
 class DataService(object):
+    """ Class to read (without conditions or only some given lines), append and update a data file. """
 
     @col_locking
     def find_all(self, col_meta_data, thread_id):

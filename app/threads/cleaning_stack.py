@@ -1,4 +1,7 @@
 class CleaningStack(object):
+    """ Stack which contains the cleaning actions.
+    A cleaning action is the remove of an empty document after its deletion and the indexes update.
+    """
 
     instance = None
 

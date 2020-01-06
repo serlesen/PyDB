@@ -8,6 +8,10 @@ from app.tools.database_context import DatabaseContext
 
 
 class FilesReader(object):
+    """ Class to read and write the content of a file.
+    This class also handles a cache for frequently used files.
+    This class also handles the locking.
+    """
 
     instance = None
 

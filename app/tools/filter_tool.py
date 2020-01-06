@@ -1,9 +1,7 @@
 import re
 
-#
-# Class which handle the logic to filter a document
-#
 class FilterTool(object):
+    """ Class which handle the logic to filter a document. """
 
     def __init__(self, search_filter):
         self.search_filter = search_filter

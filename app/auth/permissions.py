@@ -1,4 +1,6 @@
 class Permissions(object):
+    """ Read or Write access for a role over a collection. """
+
     READ = 'r'
     WRITE = 'w'
 

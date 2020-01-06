@@ -1,7 +1,5 @@
-#
-# Class which creates the input of the sort() function.
-#
 class SortTool(object):
+    """ Class which creates the input of the sort() function. """
 
     def __init__(self, sort_dict):
         self.sort_dict = sort_dict

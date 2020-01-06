@@ -10,6 +10,7 @@ from app.threads.replication_thread import ReplicationThread
 from app.tools.database_context import DatabaseContext
 
 class ThreadsManager(Thread):
+    """ Class that create new threads to handle different actions asychronously. """
 
     def run(self):
         available_threads = DatabaseContext.MAX_THREADS

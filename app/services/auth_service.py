@@ -11,11 +11,10 @@ from app.services.query_manager import QueryManager
 from app.tools.collection_meta_data import CollectionMetaData
 from app.tools.database_context import DatabaseContext
 
-#
-# Class to handle the users authentication.
-# The authentication method is JWT.
-#
 class AuthService(object):
+    """ Class to handle the users authentication.
+    The authentication method is JWT.
+    """
 
     def __init__(self):
         self.crud_service = DependencyInjectionsService.get_instance().get_service(CrudService)

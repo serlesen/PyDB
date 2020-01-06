@@ -28,11 +28,10 @@ def file_locking(func):
         os.remove(CollectionLocker.LOCK_FILE.format(pname))
     return wrapper
 
-#
-# Class to handle the lock on collections and single files.
-# Only the decorator is outside the class (to ease the way to call it)
-#
 class CollectionLocker(object):
+    """ Class to handle the lock on collections and single files.
+    Only the decorator is outside the class (to ease the way to call it)
+    """
     
     LOCK_FILE = '{}.lock'
     LOCK_FOLDER = 'col.lock'

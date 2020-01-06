@@ -151,6 +151,7 @@ python3 -m unittest -v
 * bulk update
 * bulk delete
 * handle nested documents at filters
+* unfold nested documents at map
 * Sort by inner documents
 * Sort nested documents
 * At queries status, add source request to detect deadlocks

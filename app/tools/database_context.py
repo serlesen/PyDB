@@ -1,7 +1,6 @@
-#
-# Class which contains constants for the database behavior.
-#
 class DatabaseContext(object):
+    """ Class which contains constants for the database behavior. """
+
     BCRYPT_LOG_ROUNDS = 13
     CACHE_FILE_SIZE = 100 # in Mb
     DATA_FOLDER = 'data/'

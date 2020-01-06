@@ -1,7 +1,5 @@
-#
-# Class to map the resulting document to the desired output format.
-#
 class ResultsMapper(object):
+    """ Class to map the resulting document to the desired output format. """
 
     def map(results, search_context):
         if search_context.map == None:

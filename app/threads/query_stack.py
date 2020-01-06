@@ -5,6 +5,10 @@ from app.tools.collection_meta_data import CollectionMetaData
 from app.tools.database_context import DatabaseContext
 
 class QueryStack(object):
+    """ Class to hold all the search that must be made.
+    This class is necessarry to allow the searches being done in multiple threads
+    which will decrease the response time when searching for a document.
+    """
 
     instance = None
 

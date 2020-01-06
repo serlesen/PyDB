@@ -2,10 +2,8 @@ from app.tools.filter_tool import FilterTool
 from app.tools.database_context import DatabaseContext
 from app.tools.sort_tool import SortTool
 
-#
-# Class which contains all the context to manage a search (filter, size, sort...).
-#
 class SearchContext(object):
+    """ Class which contains all the context to manage a search (filter, size, sort...). """
 
     def __init__(self, raw_query):
         query = {}

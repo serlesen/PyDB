@@ -8,10 +8,8 @@ from app.threads.replication_stack import ReplicationStack
 from app.tools.collection_meta_data import CollectionMetaData
 from app.tools.database_context import DatabaseContext
 
-#
-# Class to return a status of the database
-#
 class DatabaseService(object):
+    """ Class to return a status of the database. """
 
     def __init__(self):
         self.collections_service = DependencyInjectionsService.get_instance().get_service(CollectionsService)
