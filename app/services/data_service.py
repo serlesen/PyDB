@@ -8,7 +8,6 @@ from app.tools.database_context import DatabaseContext
 
 #
 # Class to read (without conditions or only some given lines), append and update a data file.
-# A bulk append method is created, but only for debug purpose.
 #
 class DataService(object):
 
@@ -63,41 +62,34 @@ class DataService(object):
         return None
 
     @col_locking
-    def append_bulk(self, col_meta_data, input_docs):
+    def append(self, col_meta_data, input_docs):
         pname = DatabaseContext.DATA_FOLDER + col_meta_data.collection + '/' + col_meta_data.last_data_fname()
         if self.file_len(pname) >= DatabaseContext.MAX_DOC_PER_FILE:
-           pname = DatabaseContext.DATA_FOLDER + col_meta_data.collection + '/' + col_meta_data.next_data_fname() 
-
-        if os.path.exists(pname):
-            docs = FilesReader.get_instance().get_file_content(pname)
-        else:
-            docs = []
-
-        for doc in input_docs:
-            # FIXME inserts docs until max file is reached
-            docs.append(self.normalize(doc))
-
-        FilesReader.get_instance().write_file_content(pname, docs)
-
-        return "Done"
-
-    @col_locking
-    def append(self, col_meta_data, doc):
-        pname = DatabaseContext.DATA_FOLDER + col_meta_data.collection + '/' + col_meta_data.last_data_fname()
-        if self.file_len(pname) >= DatabaseContext.MAX_DOC_PER_FILE:
-           pname = DatabaseContext.DATA_FOLDER + col_meta_data.collection + '/' + col_meta_data.next_data_fname() 
+            pname = DatabaseContext.DATA_FOLDER + col_meta_data.collection + '/' + col_meta_data.next_data_fname() 
  
         if os.path.exists(pname):
             docs = FilesReader.get_instance().get_file_content(pname)
         else:
             docs = []
+            
+        docs_to_iterate = input_docs
+        output_docs = []
+        
+        remaining_capacity = DatabaseContext.MAX_DOC_PER_FILE - len(docs)
+        while len(docs_to_iterate) > 0:
+            normalized_docs = self.normalize(docs_to_iterate[:remaining_capacity])
+            docs.extend(normalized_docs)
+            output_docs.extend(normalized_docs)
 
-        normalized_doc = self.normalize(doc)
-        docs.append(normalized_doc)
+            docs_to_iterate = docs_to_iterate[remaining_capacity:]
+            
+            FilesReader.get_instance().write_file_content(pname, docs)
+            if len(docs_to_iterate) > 0:
+                docs = []
+                pname = DatabaseContext.DATA_FOLDER + col_meta_data.collection + '/' + col_meta_data.next_data_fname() 
+                remaining_capacity = DatabaseContext.MAX_DOC_PER_FILE
 
-        FilesReader.get_instance().write_file_content(pname, docs)
-
-        return normalized_doc
+        return output_docs
 
     def file_len(self, pname):
         if os.path.exists(pname) is False:
@@ -119,9 +111,9 @@ class DataService(object):
                 updated_docs = []
                 for i, doc in enumerate(docs):
                     if updated is None and doc["id"] == id:
-                        normalized_doc = self.normalize(input_doc)
-                        updated = {'line': i, 'doc': normalized_doc}
-                        updated_docs.append(normalized_doc)
+                        normalized_doc = self.normalize([input_doc])
+                        updated = {'line': i, 'doc': normalized_doc[0]}
+                        updated_docs.extend(normalized_doc)
                     else:
                         updated_docs.append(doc)
 
@@ -130,9 +122,12 @@ class DataService(object):
                 return updated
         return None
 
-    def normalize(self, doc):
-        normalized_doc = {}
-        for k in doc.keys():
-            normalized_doc[k.lower()] = doc[k]
-        return normalized_doc
+    def normalize(self, docs):
+        normalized_docs = []
+        for doc in docs:
+            normalized_doc = {}
+            for k in doc.keys():
+                normalized_doc[k.lower()] = doc[k]
+            normalized_docs.append(normalized_doc)
+        return normalized_docs
 

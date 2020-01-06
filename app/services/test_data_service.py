@@ -57,15 +57,25 @@ class DataServiceTest(unittest.TestCase):
 
     def test_append_doc_in_file(self):
         DatabaseContext.MAX_DOC_PER_FILE = 10000
-        self.data_service.append(CollectionMetaData('col'), {'id': 123})
+        self.data_service.append(CollectionMetaData('col'), [{'id': 123}])
         self.assertEqual(self.data_service.file_len('data-test/col/data2.bin'), 4)
 
     def test_append_doc_to_new_file(self):
         DatabaseContext.MAX_DOC_PER_FILE = 3
         col_meta_data = CollectionMetaData('col')
-        self.data_service.append(col_meta_data, {'id': 123})
+        self.data_service.append(col_meta_data, [{'id': 123}])
         self.assertEqual(self.data_service.file_len('data-test/col/data3.bin'), 1)
 
+        col_meta_data.remove_last_data_file()
+
+    def test_append_bulk(self):
+        DatabaseContext.MAX_DOC_PER_FILE = 3
+        col_meta_data = CollectionMetaData('col')
+        self.data_service.append(col_meta_data, [{'id': 201}, {'id': 202}, {'id': 203}, {'id': 204}, {'id': 205}])
+        self.assertEqual(self.data_service.file_len('data-test/col/data3.bin'), 3)
+        self.assertEqual(self.data_service.file_len('data-test/col/data4.bin'), 2)
+
+        col_meta_data.remove_last_data_file()
         col_meta_data.remove_last_data_file()
 
     def test_remove_doc_in_file(self):
