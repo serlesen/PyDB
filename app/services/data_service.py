@@ -99,16 +99,25 @@ class DataService(object):
     @col_locking
     def update(self, col_meta_data, ids, input_docs):
         updated = []
-        for idx in range(len(ids)):
-            id = ids[idx]
-            input_doc = input_docs[idx]
+
+        ids_it = iter(ids)
+        input_docs_it = iter(input_docs)
+
+        docs = None
+        try:
+            id = next(ids_it)
+            input_doc = next(input_docs_it)
 
             for fname in col_meta_data.enumerate_data_fnames(None):
                 pname = DatabaseContext.DATA_FOLDER + col_meta_data.collection + '/' + fname
+                
                 results = self.find_one_in_file(pname, FilterTool({'$filter': {'id': id}}))
-                if results is not None:
+
+                docs = None
+                while results is not None:
     
-                    docs = FilesReader.get_instance().get_file_content(pname)
+                    if docs is None:
+                        docs = FilesReader.get_instance().get_file_content(pname)
     
                     updated_docs = []
                     for i, doc in enumerate(docs):
@@ -119,7 +128,15 @@ class DataService(object):
                         else:
                             updated_docs.append(doc)
     
+                    id = next(ids_it)
+                    input_doc = next(input_docs_it)
+                    results = self.find_one_in_file(pname, FilterTool({'$filter': {'id': id}}))
+
+                if docs is not None:
                     FilesReader.get_instance().write_file_content(pname, updated_docs)
+        except StopIteration:
+            if docs is not None:
+                FilesReader.get_instance().write_file_content(pname, updated_docs)
     
         return updated
 

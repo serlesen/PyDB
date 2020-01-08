@@ -50,56 +50,67 @@ class IndexesService(object):
         for field in col_meta_data.indexes.keys():
             pname = DatabaseContext.DATA_FOLDER + col_meta_data.collection + '/' + col_meta_data.get_index_fname(field)
 
+            values = None
             for idx, doc in enumerate(docs):
                 if field not in doc:
                     pass
     
-                values = FilesReader.get_instance().get_file_content(pname)
+                if values is None:
+                    values = FilesReader.get_instance().get_file_content(pname)
     
                 v = doc[field]
                 if v not in values:
                     values[v] = []
                 values[v].append(first_line + idx)
 
+            if values is not None:
                 FilesReader.get_instance().write_file_content(pname, values)
 
     @col_locking
     def update_indexes(self, col_meta_data, old_docs, new_docs):
 
-        for i in range(len(old_docs)):
-            old_doc = old_docs[i]
-            new_doc = new_docs[i]
+        for field in col_meta_data.indexes.keys():
+            pname = DatabaseContext.DATA_FOLDER + col_meta_data.collection + '/' + col_meta_data.get_index_fname(field)
+            
+            old_docs_it = iter(old_docs)
+            new_docs_it = iter(new_docs)
+            
+            values = None
+            try:
+                while True:
+                    old_doc = next(old_docs_it)
+                    new_doc = next(new_docs_it)
 
-            # copy the list as it will be modified later
-            lines = list(self.get_lines(col_meta_data, old_doc['id']))
+                    if field not in old_doc and field not in new_doc:
+                        pass
     
-            for field in col_meta_data.indexes.keys():
-                pname = DatabaseContext.DATA_FOLDER + col_meta_data.collection + '/' + col_meta_data.get_index_fname(field)
+                    # remove from the index the value of the old document
+                    should_remove = True
+                    if field not in old_doc:
+                        should_remove = False
     
-                if field not in old_doc and field not in new_doc:
-                    pass
+                    # add to the index the value of the new document
+                    should_add = True
+                    if field not in new_doc:
+                        should_add = False
     
-                # remove from the index the value of the old document
-                should_remove = True
-                if field not in old_doc:
-                    should_remove = False
+                    # copy the list as it will be modified later
+                    lines = list(self.get_lines(col_meta_data, old_doc['id']))
+                    
+                    if values is None:
+                        values = FilesReader.get_instance().get_file_content(pname)
+
+                    if should_remove:
+                        values[old_doc[field]] = list(set(values[old_doc[field]]) - set(lines))
+                    
+                    if should_add:
+                        if new_doc[field] not in values:
+                            values[new_doc[field]] = []
+                        values[new_doc[field]].extend(lines)
     
-                # add to the index the value of the new document
-                should_add = True
-                if field not in new_doc:
-                    should_add = False
-    
-                values = FilesReader.get_instance().get_file_content(pname)
-                
-                if should_remove:
-                    values[old_doc[field]] = list(set(values[old_doc[field]]) - set(lines))
-                
-                if should_add:
-                    if new_doc[field] not in values:
-                        values[new_doc[field]] = []
-                    values[new_doc[field]].extend(lines)
-    
-                FilesReader.get_instance().write_file_content(pname, values)
+            except StopIteration:
+                if values is not None:
+                    FilesReader.get_instance().write_file_content(pname, values)
 
     @col_locking
     def find_all(self, col_meta_data, field, filter_tool):
