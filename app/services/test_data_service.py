@@ -79,7 +79,7 @@ class DataServiceTest(unittest.TestCase):
         col_meta_data.remove_last_data_file()
 
     def test_remove_doc_in_file(self):
-        result = self.data_service.update(CollectionMetaData('col'), 6, {})
+        result = self.data_service.update(CollectionMetaData('col'), [6], [{}])[0]
         self.assertEqual(result, {'line': 2, 'doc': {}})
 
         filter_tool = FilterTool({'$filter': {'id': 6}})
@@ -90,7 +90,7 @@ class DataServiceTest(unittest.TestCase):
         self.assertEqual(self.data_service.file_len('data-test/col/data1.bin'), 3)
 
     def test_update_value(self):
-        self.data_service.update(CollectionMetaData('col'), 2, {'id': 2, 'first_name': 'Joooooohn', 'last_name': 'Smith'})
+        self.data_service.update(CollectionMetaData('col'), [2], [{'id': 2, 'first_name': 'Joooooohn', 'last_name': 'Smith'}])
         self.assertEqual(self.data_service.file_len('data-test/col/data1.bin'), 3)
 
         filter_tool = FilterTool({'$filter': {'first_name': 'Joooooohn'}})
@@ -98,7 +98,7 @@ class DataServiceTest(unittest.TestCase):
         self.assertEqual(result['id'], 2)
         self.assertEqual(result['first_name'], 'Joooooohn')
 
-        self.data_service.update(CollectionMetaData('col'), 2, {'id': 2, 'first_name': 'John', 'last_name': 'Smith'})
+        self.data_service.update(CollectionMetaData('col'), [2], [{'id': 2, 'first_name': 'John', 'last_name': 'Smith'}])
         results = self.data_service.find_one_in_file('data-test/col/data1.bin', filter_tool)
         self.assertIsNone(results)
 

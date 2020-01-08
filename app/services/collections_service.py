@@ -9,7 +9,7 @@ from app.tools.collection_meta_data import CollectionMetaData
 from app.tools.database_context import DatabaseContext
 
 class CollectionsService(object):
-   """ Class to create and remove a collection. It also returns some meta data about a collections as the count. """
+    """ Class to create and remove a collection. It also returns some meta data about a collections as the count. """
 
     def __init__(self):
         self.indexes_service = DependencyInjectionsService.get_instance().get_service(IndexesService)

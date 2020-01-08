@@ -47,7 +47,7 @@ class IndexesServiceTest(unittest.TestCase):
         lines = self.indexes_service.find_all(col_meta_data, 'id', FilterTool({'$filter': {'id': 2}}))
 
         # this updates the index information, not the document itself
-        self.indexes_service.update_indexes(col_meta_data, {'id': 2}, {'id': 20})
+        self.indexes_service.update_indexes(col_meta_data, [{'id': 2}], [{'id': 20}])
 
         new_lines = self.indexes_service.find_all(col_meta_data, 'id', FilterTool({'$filter': {'id': 20}}))
 

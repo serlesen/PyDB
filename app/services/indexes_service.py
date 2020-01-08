@@ -46,56 +46,60 @@ class IndexesService(object):
         raise AppException('Unable to find document with id {}'.format(id), 400)
         
     @col_locking
-    def append_to_indexes(self, col_meta_data, doc, line):
+    def append_to_indexes(self, col_meta_data, docs, first_line):
         for field in col_meta_data.indexes.keys():
             pname = DatabaseContext.DATA_FOLDER + col_meta_data.collection + '/' + col_meta_data.get_index_fname(field)
 
-            if field not in doc:
-                pass
+            for idx, doc in enumerate(docs):
+                if field not in doc:
+                    pass
+    
+                values = FilesReader.get_instance().get_file_content(pname)
+    
+                v = doc[field]
+                if v not in values:
+                    values[v] = []
+                values[v].append(first_line + idx)
 
-            values = FilesReader.get_instance().get_file_content(pname)
-
-            v = doc[field]
-            if v not in values:
-                values[v] = []
-            values[v].append(line)
-
-            FilesReader.get_instance().write_file_content(pname, values)
+                FilesReader.get_instance().write_file_content(pname, values)
 
     @col_locking
-    def update_indexes(self, col_meta_data, old_doc, new_doc):
+    def update_indexes(self, col_meta_data, old_docs, new_docs):
 
-        # copy the list as it will be modified later
-        lines = list(self.get_lines(col_meta_data, old_doc['id']))
+        for i in range(len(old_docs)):
+            old_doc = old_docs[i]
+            new_doc = new_docs[i]
 
-        for field in col_meta_data.indexes.keys():
-            pname = DatabaseContext.DATA_FOLDER + col_meta_data.collection + '/' + col_meta_data.get_index_fname(field)
-
-            if field not in old_doc and field not in new_doc:
-                pass
-
-            # remove from the index the value of the old document
-            should_remove = True
-            if field not in old_doc:
-                should_remove = False
-
-            # add to the index the value of the new document
-            should_add = True
-            if field not in new_doc:
-                should_add = False
-
-            values = FilesReader.get_instance().get_file_content(pname)
-            
-            if should_remove:
-                for line in lines:
-                    values[old_doc[field]].remove(line)
-            
-            if should_add:
-                if new_doc[field] not in values:
-                    values[new_doc[field]] = []
-                values[new_doc[field]].extend(lines)
-
-            FilesReader.get_instance().write_file_content(pname, values)
+            # copy the list as it will be modified later
+            lines = list(self.get_lines(col_meta_data, old_doc['id']))
+    
+            for field in col_meta_data.indexes.keys():
+                pname = DatabaseContext.DATA_FOLDER + col_meta_data.collection + '/' + col_meta_data.get_index_fname(field)
+    
+                if field not in old_doc and field not in new_doc:
+                    pass
+    
+                # remove from the index the value of the old document
+                should_remove = True
+                if field not in old_doc:
+                    should_remove = False
+    
+                # add to the index the value of the new document
+                should_add = True
+                if field not in new_doc:
+                    should_add = False
+    
+                values = FilesReader.get_instance().get_file_content(pname)
+                
+                if should_remove:
+                    values[old_doc[field]] = list(set(values[old_doc[field]]) - set(lines))
+                
+                if should_add:
+                    if new_doc[field] not in values:
+                        values[new_doc[field]] = []
+                    values[new_doc[field]].extend(lines)
+    
+                FilesReader.get_instance().write_file_content(pname, values)
 
     @col_locking
     def find_all(self, col_meta_data, field, filter_tool):
@@ -106,7 +110,7 @@ class IndexesService(object):
         values = FilesReader.get_instance().get_file_content(pname)
         if isinstance(match_value, dict) or isinstance(match_value, list):
             for k in values.keys():
-                if filter_tool.match({field, k}):
+                if filter_tool.match({field: k}):
                     results.extend(values[k])
         else:
             if match_value in values:

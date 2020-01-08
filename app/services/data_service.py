@@ -97,28 +97,31 @@ class DataService(object):
         return len(docs)
 
     @col_locking
-    def update(self, col_meta_data, id, input_doc):
-        for fname in col_meta_data.enumerate_data_fnames(None):
-            pname = DatabaseContext.DATA_FOLDER + col_meta_data.collection + '/' + fname
-            results = self.find_one_in_file(pname, FilterTool({'$filter': {'id': id}}))
-            if results is not None:
+    def update(self, col_meta_data, ids, input_docs):
+        updated = []
+        for idx in range(len(ids)):
+            id = ids[idx]
+            input_doc = input_docs[idx]
 
-                docs = FilesReader.get_instance().get_file_content(pname)
-
-                updated = None
-                updated_docs = []
-                for i, doc in enumerate(docs):
-                    if updated is None and doc["id"] == id:
-                        normalized_doc = self.normalize([input_doc])
-                        updated = {'line': i, 'doc': normalized_doc[0]}
-                        updated_docs.extend(normalized_doc)
-                    else:
-                        updated_docs.append(doc)
-
-                FilesReader.get_instance().write_file_content(pname, updated_docs)
-
-                return updated
-        return None
+            for fname in col_meta_data.enumerate_data_fnames(None):
+                pname = DatabaseContext.DATA_FOLDER + col_meta_data.collection + '/' + fname
+                results = self.find_one_in_file(pname, FilterTool({'$filter': {'id': id}}))
+                if results is not None:
+    
+                    docs = FilesReader.get_instance().get_file_content(pname)
+    
+                    updated_docs = []
+                    for i, doc in enumerate(docs):
+                        if bool(doc) and doc["id"] == id:
+                            normalized_doc = self.normalize([input_doc])
+                            updated.append({'line': i, 'doc': normalized_doc[0]})
+                            updated_docs.extend(normalized_doc)
+                        else:
+                            updated_docs.append(doc)
+    
+                    FilesReader.get_instance().write_file_content(pname, updated_docs)
+    
+        return updated
 
     def normalize(self, docs):
         normalized_docs = []

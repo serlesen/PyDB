@@ -33,7 +33,7 @@ class CleaningThreadTest(unittest.TestCase):
 
         count = len(self.data_service.find_all(col_meta_data, None))
 
-        self.data_service.update(col_meta_data, 2, {})
+        self.data_service.update(col_meta_data, [2], [{}])
         CleaningStack.get_instance().push(col_meta_data, {}, 1)
 
         docs = self.data_service.find_all(col_meta_data, None)

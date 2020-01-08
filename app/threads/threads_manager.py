@@ -26,7 +26,9 @@ class ThreadsManager(Thread):
     
                 threads_by_query = QueryStack.get_instance().threads_needed()
                 if threads_by_query is not None:
-                    for t in threads_by_query['threads']:
+                    # copy the list to iterate over all the elements while first finish sooner
+                    threads = list(threads_by_query['threads'])
+                    for t in threads:
                         QueryThread(threads_by_query['query_id'], t).start()
     
                 time.sleep(DatabaseContext.THREADS_CYCLE)

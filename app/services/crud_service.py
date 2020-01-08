@@ -1,4 +1,5 @@
 import uuid
+from operator import itemgetter
 
 from app.injection.dependency_injections_service import DependencyInjectionsService
 from app.exceptions.app_exception import AppException
@@ -23,16 +24,47 @@ class CrudService(object):
         if previous_doc is None:
             updated = self.data_service.append(col_meta_data, [doc])
             appended_line = self.collections_service.count(col_meta_data) - 1
-            self.indexes_service.append_to_indexes(col_meta_data, doc, appended_line)
+            self.indexes_service.append_to_indexes(col_meta_data, [doc], appended_line)
             return updated[0]
         else:
-            self.indexes_service.update_indexes(col_meta_data, previous_doc, doc)
-            return self.data_service.update(col_meta_data, doc['id'], doc)['doc']
+            self.indexes_service.update_indexes(col_meta_data, [previous_doc], [doc])
+            return self.data_service.update(col_meta_data, [doc['id']], [doc])[0]['doc']
 
     def bulk_upsert(self, col_meta_data, docs):
-        return self.data_service.append(col_meta_data, docs)
+        ids = list(map(lambda d: d['id'], docs)) 
+
+        updated_docs = []
+
+        existing_docs = self.query_manager.search(col_meta_data.collection, {'$filter': {'id': ids}})
+        ids = list(map(lambda d: d['id'], existing_docs))
+
+        new_docs = []
+        updating_docs = []
+        for d in docs:
+            if d['id'] in ids:
+                updating_docs.append(d)
+            else:
+                new_docs.append(d)
+
+        if len(updating_docs) > 0:
+            # sort the lists, as the elements are read by an iterator
+            existing_docs = sorted(existing_docs, key=itemgetter('id'))
+            updating_docs= sorted(updating_docs, key=itemgetter('id'))
+            ids = sorted(ids)
+
+            self.indexes_service.update_indexes(col_meta_data, existing_docs, updating_docs)
+            results = self.data_service.update(col_meta_data, ids, updating_docs)
+            updated_docs.extend(list(map(lambda r: r['doc'], results)))
+
+        if len(new_docs) > 0:
+            updated_docs.extend(self.data_service.append(col_meta_data, new_docs))
+            appended_lines = self.collections_service.count(col_meta_data) - len(new_docs)
+            self.indexes_service.append_to_indexes(col_meta_data, new_docs, appended_lines)
+
+        return updated_docs
+
 
     def delete(self, col_meta_data, id):
-        deleted_doc = self.data_service.update(col_meta_data, id, {})
+        deleted_doc = self.data_service.update(col_meta_data, [id], [{}])[0]
         CleaningStack.get_instance().push(col_meta_data, deleted_doc['doc'], deleted_doc['line'])
         return deleted_doc['doc']

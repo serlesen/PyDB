@@ -28,7 +28,7 @@ class SearchControllerTest(unittest.TestCase):
         CollectionsSimulator.clean()
         DatabaseContext.THREADS_MANAGER_CYCLING = False
 
-    @timeout_decorator.timeout(4)
+    @timeout_decorator.timeout(2.5)
     def test_search_over_500000_docs(self):
         response = self.app.post('/col/search', data=json.dumps({'$filter': {'id': 449994}}), content_type='application/json', headers={'Authorization': 'Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpYXQiOjE1NzY1OTIwNTcsInN1YiI6NH0.DdyUZYKPqpFtkfwCIZgI-H4da0Ux4H4yxvlCbHxOIyE'})
         self.assertEqual(response.status_code, 200)
@@ -37,7 +37,7 @@ class SearchControllerTest(unittest.TestCase):
         self.assertEqual(len(response_data), 1)
         self.assertEqual(response_data[0]['id'], 449994)
 
-    @timeout_decorator.timeout(4)
+    @timeout_decorator.timeout(3)
     def test_not_found_search_over_500000_docs(self):
         response = self.app.post('/col/search', data=json.dumps({'$filter': {'id': 949994}}), content_type='application/json', headers={'Authorization': 'Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpYXQiOjE1NzY1OTIwNTcsInN1YiI6NH0.DdyUZYKPqpFtkfwCIZgI-H4da0Ux4H4yxvlCbHxOIyE'})
         self.assertEqual(response.status_code, 404)

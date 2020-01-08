@@ -10,6 +10,7 @@ from app.controllers.test_replication_controller import ReplicationControllerTes
 from app.controllers.test_search_controller import SearchControllerTest
 from app.services.test_auth_service import AuthServiceTest
 from app.services.test_collections_service import CollectionsServiceTest
+from app.services.test_crud_service import CrudServiceTest
 from app.services.test_database_service import DatabaseServiceTest
 from app.services.test_data_service import DataServiceTest
 from app.services.test_files_reader import FilesReaderTest
@@ -31,6 +32,7 @@ def suite():
         CollectionsControllerTest.suite(),
         CollectionsServiceTest.suite(),
         CrudControllerTest.suite(),
+        CrudServiceTest.suite(),
         DatabaseControllerTest.suite(),
         DatabaseServiceTest.suite(),
         DataServiceTest.suite(),
