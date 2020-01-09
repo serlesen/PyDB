@@ -3,6 +3,7 @@ import unittest
 from app.auth.test_permissions import PermissionsTest
 from app.auth.test_roles import RolesTest
 from app.controllers.test_auth_controller import AuthControllerTest
+from app.controllers.test_bulk_controller import BulkControllerTest
 from app.controllers.test_collections_controller import CollectionsControllerTest
 from app.controllers.test_crud_controller import CrudControllerTest
 from app.controllers.test_database_controller import DatabaseControllerTest
@@ -27,6 +28,7 @@ def suite():
     return unittest.TestSuite([
         AuthControllerTest.suite(),
         AuthServiceTest.suite(),
+        BulkControllerTest.suite(),
         CleaningThreadTest.suite(),
         CollectionMetaDataTest.suite(),
         CollectionsControllerTest.suite(),

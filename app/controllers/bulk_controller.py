@@ -1,4 +1,4 @@
-import random, string
+import random, string, uuid
 
 from flask import Flask, request, abort, make_response, jsonify
 from app.auth.decorators import has_permission
@@ -11,18 +11,12 @@ from app.tools.database_context import DatabaseContext
 @app.route('/<collection>/bulk', methods=['POST'])
 @has_permission(Permissions.WRITE)
 def bulk(collection):
-    # FIXME use the real input and check for id
-    for i in range(5):
-        l = []
-        for j in range(DatabaseContext.MAX_DOC_PER_FILE):
-            l.append({"id":((i*DatabaseContext.MAX_DOC_PER_FILE)+j),
-                         "first_name":"al",
-                         "last_name":"jym",
-                         "age":15,
-                         "address":"somewhere",
-                         "job":"something",
-                         "salary":15352,
-                         "email":"my.email@google.com"
-                    })
-        crud_service.bulk_upsert(CollectionMetaData(collection), l)
-    return "Done"
+    if not request.json:
+        abort(405)
+    docs = request.json
+    for idx, d in enumerate(docs):
+        if 'id' not in d:
+            print(d)
+            d['id'] = str(uuid.uuid4())
+    crud_service.bulk_upsert(CollectionMetaData(collection), docs)
+    return "Done", 200

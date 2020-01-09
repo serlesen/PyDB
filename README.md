@@ -147,7 +147,6 @@ python3 -m unittest -v
 
 ### TODO
 
-* correct bulk insert
 * bulk update
 * bulk delete
 * handle nested documents at filters
