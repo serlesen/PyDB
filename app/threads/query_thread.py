@@ -30,7 +30,7 @@ class QueryThread(Thread):
             elif self.item['action'] == 'patch':
                 results = self.crud_service.patch(CollectionMetaData(self.item['collection']), self.item['previous_doc'], self.item['doc'])
             elif self.item['action'] == 'delete':
-                results = self.crud_service.delete(CollectionMetaData(self.item['collection']), self.item['doc_id'])
+                results = self.crud_service.delete(CollectionMetaData(self.item['collection']), self.item['search_query'])
 
             QueryStack.get_instance().push_results(results, self.query_id, self.thread_id)
         except Exception as e:

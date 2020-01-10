@@ -26,4 +26,4 @@ def replicate_sync():
         return jsonify(query_manager.upsert(data['collection'], data['doc'])), 200
     if request.method == 'PATCH':
         return jsonify(query_manager.patch(data['collection'], data['previous_doc'], data['doc'])), 200
-    return jsonify(query_manager.delete(data['collection'], data['id'])), 200
+    return jsonify(query_manager.delete(data['collection'], data['search_query'])), 200

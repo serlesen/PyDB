@@ -24,9 +24,9 @@ class ReplicationStack(object):
         for slave in DatabaseContext.SLAVES.keys():
             self.queries.append({'collection': collection, 'url': slave, 'previous_doc': previous_doc, 'doc': doc})
 
-    def push_delete(self, collection, id):
+    def push_delete(self, collection, search_query):
         for slave in DatabaseContext.SLAVES.keys():
-            self.queries.append({'collection': collection, 'url': slave, 'id': id})
+            self.queries.append({'collection': collection, 'url': slave, 'search_query': search_query})
 
     def push_error(self, item):
         self.errors.append(item)

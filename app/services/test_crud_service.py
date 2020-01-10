@@ -1,3 +1,4 @@
+import time
 import unittest
 
 from app.services.collections_service import CollectionsService
@@ -6,6 +7,7 @@ from app.services.files_reader import FilesReader
 from app.services.indexes_service import IndexesService
 from app.services.query_manager import QueryManager
 from app.test.collections_simulator import CollectionsSimulator
+from app.threads.cleaning_stack import CleaningStack
 from app.threads.threads_manager import ThreadsManager
 from app.tools.collection_meta_data import CollectionMetaData
 from app.tools.database_context import DatabaseContext
@@ -77,8 +79,14 @@ class CrudServiceTest(unittest.TestCase):
         search_query = {'$filter': {'id': [3, 4]}}
         col_meta_data = CollectionMetaData('col')
 
-        self.crud_service.bulk_delete(col_meta_data, search_query)
+        count = self.collections_service.count(col_meta_data)
 
+        self.crud_service.delete(col_meta_data, search_query)
+
+        while CleaningStack.get_instance().contains_data():
+            time.sleep(DatabaseContext.THREADS_CYCLE)
+
+        self.assertEqual(self.collections_service.count(col_meta_data), count - 2)
         results = self.query_manager.search(col_meta_data.collection, search_query)
         self.assertEqual(len(results), 0)
 

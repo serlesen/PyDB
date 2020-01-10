@@ -27,7 +27,7 @@ class CrudService(object):
             self.indexes_service.append_to_indexes(col_meta_data, [doc], appended_line)
             return updated[0]
         else:
-            return self.patch(col_meta_data, [previous_doc], [doc])[0]['doc']
+            return self.patch(col_meta_data, [previous_doc], [doc])[0]
 
     def patch(self, col_meta_data, previous_docs, docs):
         # sort the lists, as the elements are read by an iterator
@@ -36,7 +36,7 @@ class CrudService(object):
         ids = sorted(list(map(lambda d: d['id'], previous_docs)))
 
         self.indexes_service.update_indexes(col_meta_data, previous_docs, docs)
-        return self.data_service.update(col_meta_data, ids, docs)
+        return list(map(lambda d: d['doc'], self.data_service.update(col_meta_data, ids, docs)))
 
     def bulk_upsert(self, col_meta_data, docs):
         ids = list(map(lambda d: d['id'], docs)) 
@@ -56,7 +56,7 @@ class CrudService(object):
 
         if len(updating_docs) > 0:
             results = self.patch(col_meta_data, existing_docs, updating_docs)
-            updated_docs.extend(list(map(lambda r: r['doc'], results)))
+            updated_docs.extend(results)
 
         if len(new_docs) > 0:
             updated_docs.extend(self.data_service.append(col_meta_data, new_docs))
@@ -65,13 +65,7 @@ class CrudService(object):
 
         return updated_docs
 
-
-    def delete(self, col_meta_data, id):
-        deleted_doc = self.data_service.update(col_meta_data, [id], [{}])[0]
-        CleaningStack.get_instance().push(col_meta_data, deleted_doc['doc'], deleted_doc['line'])
-        return deleted_doc['doc']
-
-    def bulk_delete(self, col_meta_data, search_query):
+    def delete(self, col_meta_data, search_query):
         docs = self.query_manager.search(col_meta_data.collection, search_query)
         ids = sorted(list(map(lambda d: d['id'], docs)))
 
@@ -82,3 +76,4 @@ class CrudService(object):
         deleted_docs = self.data_service.update(col_meta_data, ids, empty_docs)
         for deleted_doc in deleted_docs:
             CleaningStack.get_instance().push(col_meta_data, deleted_doc['doc'], deleted_doc['line'])
+        return list(map(lambda d: d['doc'], deleted_docs))

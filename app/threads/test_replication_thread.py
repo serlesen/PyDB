@@ -67,7 +67,7 @@ class ReplicationThreadTest(unittest.TestCase):
     @mock.patch('requests.delete', side_effect=mocked_requests)
     def test_replicate_delete(self, mock_delete, mock_post):
         self.assertFalse(ReplicationStack.get_instance().contains_data())
-        self.query_manager.delete('col', 3)
+        self.query_manager.delete('col', {'$filter': {'id': 3}})
 
         while ReplicationStack.get_instance().contains_data() is True:
             time.sleep(DatabaseContext.THREADS_CYCLE)
@@ -75,8 +75,8 @@ class ReplicationThreadTest(unittest.TestCase):
         self.assertEqual(len(ReplicationStack.get_instance().errors), 0)
 
         self.assertIn(mock.call(url='localhost:5002/admin/replicate/auth'), mock_post.call_args_list)
-        self.assertIn(mock.call(url='localhost:5001/admin/replicate/sync', data={'collection': 'col', 'id': 3}, headers={'Authorization': 'Bearer first_token'}), mock_delete.call_args_list)
-        self.assertIn(mock.call(url='localhost:5002/admin/replicate/sync', data={'collection': 'col', 'id': 3}, headers={'Authorization': 'Bearer second_token'}), mock_delete.call_args_list)
+        self.assertIn(mock.call(url='localhost:5001/admin/replicate/sync', data={'collection': 'col', 'search_query': {'$filter': {'id': 3}}}, headers={'Authorization': 'Bearer first_token'}), mock_delete.call_args_list)
+        self.assertIn(mock.call(url='localhost:5002/admin/replicate/sync', data={'collection': 'col', 'search_query': {'$filter': {'id': 3}}}, headers={'Authorization': 'Bearer second_token'}), mock_delete.call_args_list)
 
         self.assertEqual(len(mock_delete.call_args_list), 2)
         self.assertEqual(len(mock_post.call_args_list), 1)

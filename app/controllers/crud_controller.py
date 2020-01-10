@@ -50,12 +50,12 @@ def patch(collection, id):
     for k in patch.keys():
         doc[k] = patch[k]
 
-    return jsonify(query_manager.patch(collection, [previous_doc], [doc])[0]['doc'])
+    return jsonify(query_manager.patch(collection, [previous_doc], [doc])[0])
 
 @app.route('/<collection>/<id>', methods=['DELETE'])
 @has_permission(Permissions.WRITE)
 def delete(collection, id):
-    result = query_manager.delete(collection, int(id))
-    if result is None:
+    results = query_manager.delete(collection, {'$filter': {'id': int(id)}})
+    if results is None:
         raise AppException('Unable to find document {}'.format(id), 404)
-    return jsonify(result)
+    return jsonify(results[0])
