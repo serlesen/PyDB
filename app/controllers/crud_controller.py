@@ -41,15 +41,16 @@ def update(collection, id):
 def patch(collection, id):
     if not request.json:
         abort(405)
-    result = query_manager.get_one(collection, int(id))
-    if result is None:
+    previous_doc = query_manager.get_one(collection, int(id))
+    if previous_doc is None:
         raise AppException('Unable to find document {}'.format(id), 404)
 
+    doc = dict(previous_doc)
     patch = request.json
     for k in patch.keys():
-        result[k] = patch[k]
+        doc[k] = patch[k]
 
-    return jsonify(query_manager.upsert(collection, result))
+    return jsonify(query_manager.patch(collection, [previous_doc], [doc])[0]['doc'])
 
 @app.route('/<collection>/<id>', methods=['DELETE'])
 @has_permission(Permissions.WRITE)

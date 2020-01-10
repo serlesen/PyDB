@@ -27,8 +27,16 @@ class CrudService(object):
             self.indexes_service.append_to_indexes(col_meta_data, [doc], appended_line)
             return updated[0]
         else:
-            self.indexes_service.update_indexes(col_meta_data, [previous_doc], [doc])
-            return self.data_service.update(col_meta_data, [doc['id']], [doc])[0]['doc']
+            return self.patch(col_meta_data, [previous_doc], [doc])[0]['doc']
+
+    def patch(self, col_meta_data, previous_docs, docs):
+        # sort the lists, as the elements are read by an iterator
+        previous_docs = sorted(previous_docs, key=itemgetter('id'))
+        docs = sorted(docs, key=itemgetter('id'))
+        ids = sorted(list(map(lambda d: d['id'], previous_docs)))
+
+        self.indexes_service.update_indexes(col_meta_data, previous_docs, docs)
+        return self.data_service.update(col_meta_data, ids, docs)
 
     def bulk_upsert(self, col_meta_data, docs):
         ids = list(map(lambda d: d['id'], docs)) 
@@ -47,13 +55,7 @@ class CrudService(object):
                 new_docs.append(d)
 
         if len(updating_docs) > 0:
-            # sort the lists, as the elements are read by an iterator
-            existing_docs = sorted(existing_docs, key=itemgetter('id'))
-            updating_docs= sorted(updating_docs, key=itemgetter('id'))
-            ids = sorted(ids)
-
-            self.indexes_service.update_indexes(col_meta_data, existing_docs, updating_docs)
-            results = self.data_service.update(col_meta_data, ids, updating_docs)
+            results = self.patch(col_meta_data, existing_docs, updating_docs)
             updated_docs.extend(list(map(lambda r: r['doc'], results)))
 
         if len(new_docs) > 0:

@@ -18,10 +18,12 @@ def replicate_auth():
     result = auth_service.login_for_api('replicator')
     return jsonify(result)
 
-@app.route('/admin/replicate/sync', methods=['POST', 'DELETE'])
+@app.route('/admin/replicate/sync', methods=['POST', 'PATCH', 'DELETE'])
 @has_role(Roles.REPLICATOR)
 def replicate_sync():
     data = request.json
     if request.method == 'POST':
         return jsonify(query_manager.upsert(data['collection'], data['doc'])), 200
+    if request.method == 'PATCH':
+        return jsonify(query_manager.patch(data['collection'], data['previous_doc'], data['doc'])), 200
     return jsonify(query_manager.delete(data['collection'], data['id'])), 200

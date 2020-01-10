@@ -35,6 +35,8 @@ class ReplicationThread(Thread):
                 ReplicationStack.get_instance().push_error(self.item)
 
     def make_query(self, url):
+        if 'previous_doc' in self.item:
+            return requests.patch(url = url + '/admin/replicate/sync', data = self.item, headers={'Authorization': f'Bearer {DatabaseContext.SLAVES[url]}'})
         if 'doc' in self.item:
             return requests.post(url = url + '/admin/replicate/sync', data = self.item, headers={'Authorization': f'Bearer {DatabaseContext.SLAVES[url]}'})
         return requests.delete(url = url + '/admin/replicate/sync', data = self.item, headers={'Authorization': f'Bearer {DatabaseContext.SLAVES[url]}'})

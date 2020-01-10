@@ -20,6 +20,11 @@ class QueryManager(object):
         ReplicationStack.get_instance().push_upsert(collection, doc)
         return QueryStack.get_instance().pop_results(query_id)
 
+    def patch(self, collection, previous_doc, doc):
+        query_id = QueryStack.get_instance().push_patch(collection, previous_doc, doc)
+        ReplicationStack.get_instance().push_patch(collection, previous_doc, doc)
+        return QueryStack.get_instance().pop_results(query_id)
+
     def delete(self, collection, doc_id):
         query_id = QueryStack.get_instance().push_delete(collection, doc_id)
         ReplicationStack.get_instance().push_delete(collection, doc_id)
