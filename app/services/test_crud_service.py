@@ -38,7 +38,7 @@ class CrudServiceTest(unittest.TestCase):
 
         count = self.collections_service.count(col_meta_data)
 
-        self.crud_service.bulk_upsert(col_meta_data, docs)
+        self.crud_service.upsert(col_meta_data, docs)
 
         self.assertEqual(self.collections_service.count(col_meta_data), count + 5)
         self.assertEqual(self.indexes_service.get_lines(col_meta_data, 11), [count])
@@ -53,7 +53,7 @@ class CrudServiceTest(unittest.TestCase):
 
         count = self.collections_service.count(col_meta_data)
 
-        self.crud_service.bulk_upsert(col_meta_data, docs)
+        self.crud_service.upsert(col_meta_data, docs)
 
         self.assertEqual(self.collections_service.count(col_meta_data), count)
 
@@ -66,7 +66,7 @@ class CrudServiceTest(unittest.TestCase):
 
         count = self.collections_service.count(col_meta_data)
 
-        self.crud_service.bulk_upsert(col_meta_data, docs)
+        self.crud_service.upsert(col_meta_data, docs)
 
         self.assertEqual(self.collections_service.count(col_meta_data), count + 3)
         self.assertEqual(self.query_manager.get_one(col_meta_data.collection, 2), docs[1])

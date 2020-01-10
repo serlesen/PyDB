@@ -16,9 +16,9 @@ class ReplicationStack(object):
             ReplicationStack.instance = ReplicationStack()
         return ReplicationStack.instance
 
-    def push_upsert(self, collection, doc):
+    def push_upsert(self, collection, docs):
         for slave in DatabaseContext.SLAVES.keys():
-            self.queries.append({'collection': collection, 'url': slave, 'doc': doc})
+            self.queries.append({'collection': collection, 'url': slave, 'docs': docs})
 
     def push_patch(self, collection, previous_doc, doc):
         for slave in DatabaseContext.SLAVES.keys():

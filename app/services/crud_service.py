@@ -19,26 +19,7 @@ class CrudService(object):
         self.indexes_service = DependencyInjectionsService.get_instance().get_service(IndexesService)
         self.query_manager = DependencyInjectionsService.get_instance().get_service(QueryManager)
 
-    def upsert(self, col_meta_data, doc):
-        previous_doc = self.query_manager.get_one(col_meta_data.collection, doc['id'])
-        if previous_doc is None:
-            updated = self.data_service.append(col_meta_data, [doc])
-            appended_line = self.collections_service.count(col_meta_data) - 1
-            self.indexes_service.append_to_indexes(col_meta_data, [doc], appended_line)
-            return updated[0]
-        else:
-            return self.patch(col_meta_data, [previous_doc], [doc])[0]
-
-    def patch(self, col_meta_data, previous_docs, docs):
-        # sort the lists, as the elements are read by an iterator
-        previous_docs = sorted(previous_docs, key=itemgetter('id'))
-        docs = sorted(docs, key=itemgetter('id'))
-        ids = sorted(list(map(lambda d: d['id'], previous_docs)))
-
-        self.indexes_service.update_indexes(col_meta_data, previous_docs, docs)
-        return list(map(lambda d: d['doc'], self.data_service.update(col_meta_data, ids, docs)))
-
-    def bulk_upsert(self, col_meta_data, docs):
+    def upsert(self, col_meta_data, docs):
         ids = list(map(lambda d: d['id'], docs)) 
 
         updated_docs = []
@@ -60,10 +41,19 @@ class CrudService(object):
 
         if len(new_docs) > 0:
             updated_docs.extend(self.data_service.append(col_meta_data, new_docs))
-            appended_lines = self.collections_service.count(col_meta_data) - len(new_docs)
-            self.indexes_service.append_to_indexes(col_meta_data, new_docs, appended_lines)
+            appended_line = self.collections_service.count(col_meta_data) - len(new_docs)
+            self.indexes_service.append_to_indexes(col_meta_data, new_docs, appended_line)
 
         return updated_docs
+
+    def patch(self, col_meta_data, previous_docs, docs):
+        # sort the lists, as the elements are read by an iterator
+        previous_docs = sorted(previous_docs, key=itemgetter('id'))
+        docs = sorted(docs, key=itemgetter('id'))
+        ids = sorted(list(map(lambda d: d['id'], previous_docs)))
+
+        self.indexes_service.update_indexes(col_meta_data, previous_docs, docs)
+        return list(map(lambda d: d['doc'], self.data_service.update(col_meta_data, ids, docs)))
 
     def delete(self, col_meta_data, search_query):
         docs = self.query_manager.search(col_meta_data.collection, search_query)

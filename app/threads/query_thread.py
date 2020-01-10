@@ -26,7 +26,7 @@ class QueryThread(Thread):
             if self.item['action'] == 'search':
                 results = self.search_service.search_by_thread(CollectionMetaData(self.item['collection']), SearchContext(self.item['search_query']), self.thread_id)
             elif self.item['action'] == 'upsert':
-                results = self.crud_service.upsert(CollectionMetaData(self.item['collection']), self.item['doc'])
+                results = self.crud_service.upsert(CollectionMetaData(self.item['collection']), self.item['docs'])
             elif self.item['action'] == 'patch':
                 results = self.crud_service.patch(CollectionMetaData(self.item['collection']), self.item['previous_doc'], self.item['doc'])
             elif self.item['action'] == 'delete':

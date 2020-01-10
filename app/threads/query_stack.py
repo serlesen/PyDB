@@ -24,22 +24,22 @@ class QueryStack(object):
         return QueryStack.instance
 
     def push_search(self, collection, search_query):
-        return self.push_action(collection, search_query, None, None, 'search')
+        return self.push_action(collection, search_query, None, None, None, 'search')
 
-    def push_upsert(self, collection, doc):
-        return self.push_action(collection, None, None, doc, 'upsert')
+    def push_upsert(self, collection, docs):
+        return self.push_action(collection, None, None, None, docs, 'upsert')
 
     def push_patch(self, collection, previous_doc, doc):
-        return self.push_action(collection, None, previous_doc, doc, 'patch')
+        return self.push_action(collection, None, previous_doc, doc, None, 'patch')
 
     def push_delete(self, collection, search_query):
-        return self.push_action(collection, search_query, None, None, 'delete')
+        return self.push_action(collection, search_query, None, None, None, 'delete')
 
-    def push_action(self, collection, search_query, previous_doc, doc, action):
+    def push_action(self, collection, search_query, previous_doc, doc, docs, action):
         query_id = str(uuid.uuid4())
         self.pending_results[query_id] = self.build_threads_need(collection, action)
         self.results[query_id] = []
-        self.queries[query_id] = {'collection': collection, 'action': action, 'search_query': search_query, 'previous_doc': previous_doc, 'doc': doc, 'started': False}
+        self.queries[query_id] = {'collection': collection, 'action': action, 'search_query': search_query, 'previous_doc': previous_doc, 'doc': doc, 'docs': docs, 'started': False}
         return query_id
 
     def build_threads_need(self, collection, action):

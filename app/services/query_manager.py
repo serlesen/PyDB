@@ -15,9 +15,9 @@ class QueryManager(object):
             return None
         return results[0]
 
-    def upsert(self, collection, doc):
-        query_id = QueryStack.get_instance().push_upsert(collection, doc)
-        ReplicationStack.get_instance().push_upsert(collection, doc)
+    def upsert(self, collection, docs):
+        query_id = QueryStack.get_instance().push_upsert(collection, docs)
+        ReplicationStack.get_instance().push_upsert(collection, docs)
         return QueryStack.get_instance().pop_results(query_id)
 
     def patch(self, collection, previous_doc, doc):

@@ -23,7 +23,7 @@ def replicate_auth():
 def replicate_sync():
     data = request.json
     if request.method == 'POST':
-        return jsonify(query_manager.upsert(data['collection'], data['doc'])), 200
+        return jsonify(query_manager.upsert(data['collection'], data['docs'])), 200
     if request.method == 'PATCH':
         return jsonify(query_manager.patch(data['collection'], data['previous_doc'], data['doc'])), 200
     return jsonify(query_manager.delete(data['collection'], data['search_query'])), 200
