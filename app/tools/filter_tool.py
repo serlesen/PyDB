@@ -7,6 +7,8 @@ class FilterTool(object):
         self.search_filter = search_filter
 
     def match(self, doc):
+        if not doc:
+            return False
         f = self.search_filter['$filter']
         return self.match_filter(doc, f)
 

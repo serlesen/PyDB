@@ -99,14 +99,14 @@ class DataService(object):
     @col_locking
     def update(self, col_meta_data, ids, input_docs):
         updated = []
-
-        ids_it = iter(ids)
-        input_docs_it = iter(input_docs)
+        counter = 0
+        line_counter = 0
 
         docs = None
         try:
-            id = next(ids_it)
-            input_doc = next(input_docs_it)
+            id = ids[counter]
+            input_doc = input_docs[counter]
+            counter += 1
 
             for fname in col_meta_data.enumerate_data_fnames(None):
                 pname = DatabaseContext.DATA_FOLDER + col_meta_data.collection + '/' + fname
@@ -114,26 +114,27 @@ class DataService(object):
                 results = self.find_one_in_file(pname, FilterTool({'$filter': {'id': id}}))
 
                 docs = None
-                while results is not None:
+                if results is not None:
     
                     if docs is None:
                         docs = FilesReader.get_instance().get_file_content(pname)
-    
+
                     updated_docs = []
                     for i, doc in enumerate(docs):
                         if bool(doc) and doc["id"] == id:
                             normalized_doc = self.normalize([input_doc])
-                            updated.append({'line': i, 'doc': normalized_doc[0]})
+                            updated.append({'line': i + line_counter, 'doc': normalized_doc[0]})
                             updated_docs.extend(normalized_doc)
+
+                            if counter < len(ids):
+                                id = ids[counter]
+                                input_doc = input_docs[counter]
+                                counter += 1
                         else:
                             updated_docs.append(doc)
     
-                    id = next(ids_it)
-                    input_doc = next(input_docs_it)
-                    results = self.find_one_in_file(pname, FilterTool({'$filter': {'id': id}}))
-
-                if docs is not None:
                     FilesReader.get_instance().write_file_content(pname, updated_docs)
+                line_counter += DatabaseContext.MAX_DOC_PER_FILE
         except StopIteration:
             if docs is not None:
                 FilesReader.get_instance().write_file_content(pname, updated_docs)

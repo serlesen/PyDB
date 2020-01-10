@@ -19,7 +19,6 @@ class CleaningThreadTest(unittest.TestCase):
 
     def setUp(self):
         # instanciate the service to test
-        self.cleaning_thread = CleaningThread()
         self.data_service = DataService()
         self.search_service = SearchService()
         self.indexes_service = IndexesService()
@@ -44,7 +43,7 @@ class CleaningThreadTest(unittest.TestCase):
         self.assertEqual(len(self.search_service.find_in_docs(docs, SearchContext({'$filter': {'id': 2}}))), 0)
         self.assertEqual(len(lines), 1)
 
-        self.cleaning_thread.run()
+        CleaningThread().run()
         
         docs = self.data_service.find_all(col_meta_data, None)
         lines = self.indexes_service.find_all(col_meta_data, 'id', FilterTool({'$filter': {'id': 2}}))

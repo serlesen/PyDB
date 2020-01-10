@@ -68,3 +68,15 @@ class CrudService(object):
         deleted_doc = self.data_service.update(col_meta_data, [id], [{}])[0]
         CleaningStack.get_instance().push(col_meta_data, deleted_doc['doc'], deleted_doc['line'])
         return deleted_doc['doc']
+
+    def bulk_delete(self, col_meta_data, search_query):
+        docs = self.query_manager.search(col_meta_data.collection, search_query)
+        ids = sorted(list(map(lambda d: d['id'], docs)))
+
+        empty_docs = []
+        for i in ids:
+            empty_docs.append({})
+
+        deleted_docs = self.data_service.update(col_meta_data, ids, empty_docs)
+        for deleted_doc in deleted_docs:
+            CleaningStack.get_instance().push(col_meta_data, deleted_doc['doc'], deleted_doc['line'])

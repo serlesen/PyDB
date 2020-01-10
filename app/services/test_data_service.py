@@ -80,7 +80,7 @@ class DataServiceTest(unittest.TestCase):
 
     def test_remove_doc_in_file(self):
         result = self.data_service.update(CollectionMetaData('col'), [6], [{}])[0]
-        self.assertEqual(result, {'line': 2, 'doc': {}})
+        self.assertEqual(result, {'line': 5, 'doc': {}})
 
         filter_tool = FilterTool({'$filter': {'id': 6}})
         result = self.data_service.find_one_in_file('data-test/col/data2.bin', filter_tool)

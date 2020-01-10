@@ -57,6 +57,16 @@ class BulkControllerTest(unittest.TestCase):
         response = self.app.get('/collections/col/status', headers={'Authorization': 'Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpYXQiOjE1NzY1OTIwNTcsInN1YiI6NH0.DdyUZYKPqpFtkfwCIZgI-H4da0Ux4H4yxvlCbHxOIyE'})
         self.assertEqual(json.loads(response.data)['count'], count + 5)
 
+    def test_bulk_delete(self):
+        response = self.app.post('/col/search', data=json.dumps({'$filter': {'first_name': 'John'}}), content_type='application/json', headers={'Authorization': 'Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpYXQiOjE1NzY1OTIwNTcsInN1YiI6NH0.DdyUZYKPqpFtkfwCIZgI-H4da0Ux4H4yxvlCbHxOIyE'})
+        self.assertTrue(len(json.loads(response.data)) > 0)
+
+        response = self.app.delete('/col/bulk', data=json.dumps({'$filter': {'first_name': 'John'}}), content_type='application/json', headers={'Authorization': 'Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpYXQiOjE1NzY1OTIwNTcsInN1YiI6NH0.DdyUZYKPqpFtkfwCIZgI-H4da0Ux4H4yxvlCbHxOIyE'})
+        self.assertEqual(response.status_code, 200)
+
+        response = self.app.post('/col/search', data=json.dumps({'$filter': {'first_name': 'John'}}), content_type='application/json', headers={'Authorization': 'Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpYXQiOjE1NzY1OTIwNTcsInN1YiI6NH0.DdyUZYKPqpFtkfwCIZgI-H4da0Ux4H4yxvlCbHxOIyE'})
+        self.assertEqual(len(json.loads(response.data)), 0)
+
 
     def suite():
         return unittest.TestLoader().loadTestsFromTestCase(BulkControllerTest)

@@ -1,4 +1,6 @@
 import unittest
+import re
+
 from app.tools.filter_tool import FilterTool
 
 class FilterToolTest(unittest.TestCase):
@@ -144,6 +146,10 @@ class FilterToolTest(unittest.TestCase):
 
         self.assertFalse(search_filter.match({'last_name': 'Doe', 'first_name': 'John'}))
         self.assertTrue(search_filter.match({'last_name': 'Doe', 'first_name': 'Joe'}))
+
+    def test_search_on_empty_doc(self):
+        search_filter = FilterTool({'$filter': {'$not': {'first_name': 'John'}}})
+        self.assertFalse(search_filter.match({}))
 
     def suite():
         return unittest.TestLoader().loadTestsFromTestCase(FilterToolTest)

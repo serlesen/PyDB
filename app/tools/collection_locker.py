@@ -1,4 +1,5 @@
 import os
+import re
 import time
 
 from app.tools.database_context import DatabaseContext
@@ -18,6 +19,8 @@ def file_locking(func):
         # first arg is self, second arg is pname
         pname = args[1]
 
+        m = re.match(r'(.*)/([-_a-zA-Z]*)/([-_a-zA-Z0-9]*)\.(bin|idx)', pname)
+        CollectionLocker.wait_for_lock(m.group(1) + '/' + m.group(2) + '/' + CollectionLocker.LOCK_FOLDER)
         CollectionLocker.wait_for_lock(pname)
 
         with open(CollectionLocker.LOCK_FILE.format(pname), 'w') as file:
@@ -38,6 +41,9 @@ class CollectionLocker(object):
 
     @staticmethod
     def lock_col(col_meta_data):
+        # check collection is not locked
+        pname = DatabaseContext.DATA_FOLDER + col_meta_data.collection + '/' + CollectionLocker.LOCK_FOLDER
+        CollectionLocker.wait_for_lock(pname)
 
         # check data files are not locked
         for f in col_meta_data.enumerate_data_fnames(None):
@@ -47,10 +53,6 @@ class CollectionLocker(object):
         for f in col_meta_data.enumerate_index_fnames():
             CollectionLocker.wait_for_lock(DatabaseContext.DATA_FOLDER + col_meta_data.collection + '/' + f)
         
-        # check collection is not locked
-        pname = DatabaseContext.DATA_FOLDER + col_meta_data.collection + '/' + CollectionLocker.LOCK_FOLDER
-        CollectionLocker.wait_for_lock(pname)
-
         with open(pname, 'w') as file:
             file.write('x')
 
