@@ -147,8 +147,8 @@ python3 -m unittest -v
 
 ### TODO
 
+* add logging
 * locks must be managed in separated file, to allow reads finish before starting writes
-* bulk update
 * cleaning thread handle list instead of single documents
 * handle nested documents at filters
 * unfold nested documents at map

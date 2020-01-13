@@ -68,5 +68,20 @@ class BulkControllerTest(unittest.TestCase):
         self.assertEqual(len(json.loads(response.data)), 0)
 
 
+    def test_bulk_patch(self):
+        response = self.app.patch('/col/bulk', data=json.dumps([{'id': 3, 'first_name': 'Joe'}, {'id': 5, 'first_name': 'Emmetttttt'}]), content_type='application/json', headers={'Authorization': 'Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpYXQiOjE1NzY1OTIwNTcsInN1YiI6NH0.DdyUZYKPqpFtkfwCIZgI-H4da0Ux4H4yxvlCbHxOIyE'})
+        self.assertEqual(response.status_code, 200)
+
+        response = self.app.post('/col/search', data=json.dumps({'$filter': {'id': [3, 5]}, '$sort': {'id': 'ASC'}}), content_type='application/json', headers={'Authorization': 'Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpYXQiOjE1NzY1OTIwNTcsInN1YiI6NH0.DdyUZYKPqpFtkfwCIZgI-H4da0Ux4H4yxvlCbHxOIyE'})
+        self.assertEqual(response.status_code, 200)
+        
+        docs = json.loads(response.data)
+        self.assertEqual(docs[0]['id'], 3)
+        self.assertEqual(docs[0]['first_name'], 'Joe')
+        self.assertEqual(docs[0]['last_name'], 'Lema')
+        self.assertEqual(docs[1]['id'], 5)
+        self.assertEqual(docs[1]['first_name'], 'Emmetttttt')
+        self.assertEqual(docs[1]['last_name'], 'Brown')
+
     def suite():
         return unittest.TestLoader().loadTestsFromTestCase(BulkControllerTest)
