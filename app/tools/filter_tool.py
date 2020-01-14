@@ -66,6 +66,23 @@ class FilterTool(object):
                 return False
         elif inner_dict_key == '$not':
             return doc[field] != inner_dict[inner_dict_key]
+        elif isinstance(doc[field], list):
+            for d in doc[field]:
+                if inner_dict_key == '$any':
+                    if self.match_and(d, inner_dict[inner_dict_key]):
+                        return True
+                if inner_dict_key == '$all':
+                    if not self.match_and(d, inner_dict[inner_dict_key]):
+                        return False
+                if inner_dict_key == '$none':
+                    if self.match_and(d, inner_dict[inner_dict_key]):
+                        return False
+            if inner_dict_key == '$any':
+                return False
+            if inner_dict_key == '$all':
+                return True
+            if inner_dict_key == '$none':
+                return True
         return True
 
     def match_regex(self, doc, field, regex):

@@ -41,7 +41,6 @@ def bulk_patch(collection):
     docs = sorted(list(previous_docs), key=itemgetter('id'))
 
     patch = sorted(request.json, key=itemgetter('id'))
-    print(f'previous {previous_docs} vs patch {patch}')
     for i, p in enumerate(patch):
         for k in p.keys():
             docs[i][k] = p[k]

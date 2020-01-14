@@ -70,6 +70,15 @@ Won't return the documents where the field 'first_name' is 'John'
 2. {'$filter': {'$not': {'first_name': 'John'}}}
 Has the same result as the previous, but this way we negate the comparison 'first_name' == 'John'. Which can also be a more complexe filter
 
+Filters can also impact nested documents:
+1. {'$filter': {'family': {'$all': {'last_name': 'Smith'}}}}
+Will return the documents where all the members of the family (family contains a list of JSON documents) have 'last_name' == 'Smith'
+2. {'$filter': {'family': {'$any': {'last_name': 'Smith'}}}}
+Will return the documents where almost one member of the family have 'last_name' == 'Smith'
+3. {'$filter': {'family': {'$none': {'last_name': 'Smith'}}}}
+Will return the documents where no members of the family have 'last_name' == 'Smith'
+
+
 ## Mapper
 
 The results can be mapped to a desired structure. In the '$map' field, you have to specify each field you want to map
@@ -150,7 +159,6 @@ python3 -m unittest -v
 * add logging
 * locks must be managed in separated file, to allow reads finish before starting writes
 * cleaning thread handle list instead of single documents
-* handle nested documents at filters
 * unfold nested documents at map
 * Sort by inner documents
 * Sort nested documents

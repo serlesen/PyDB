@@ -151,5 +151,23 @@ class FilterToolTest(unittest.TestCase):
         search_filter = FilterTool({'$filter': {'$not': {'first_name': 'John'}}})
         self.assertFalse(search_filter.match({}))
 
+    def test_search_on_any_nested_docs(self):
+        search_filter = FilterTool({'$filter': {'family': {'$any': {'first_name': 'Joe'}}}})
+
+        self.assertTrue(search_filter.match({'first_name': 'John', 'last_name': 'Smith', 'family': [{'first_name': 'Jack', 'last_name': 'Smith'}, {'first_name': 'Joe', 'last_name': 'Smith'}]}))
+        self.assertFalse(search_filter.match({'first_name': 'John', 'last_name': 'Smith', 'family': [{'first_name': 'Jack', 'last_name': 'Smith'}, {'first_name': 'Joseph', 'last_name': 'Smith'}]}))
+
+    def test_search_on_all_nested_docs(self):
+        search_filter = FilterTool({'$filter': {'family': {'$all': {'last_name': 'Smith'}}}})
+
+        self.assertTrue(search_filter.match({'first_name': 'John', 'last_name': 'Smith', 'family': [{'first_name': 'Jack', 'last_name': 'Smith'}, {'first_name': 'Joe', 'last_name': 'Smith'}]}))
+        self.assertFalse(search_filter.match({'first_name': 'John', 'last_name': 'Smith', 'family': [{'first_name': 'Jack', 'last_name': 'Smith'}, {'first_name': 'Joe', 'last_name': 'Simpsons'}]}))
+
+    def test_search_on_none_nested_docs(self):
+        search_filter = FilterTool({'$filter': {'family': {'$none': {'first_name': 'Jym'}}}})
+
+        self.assertTrue(search_filter.match({'first_name': 'John', 'last_name': 'Smith', 'family': [{'first_name': 'Jack', 'last_name': 'Smith'}, {'first_name': 'Joe', 'last_name': 'Smith'}]}))
+        self.assertFalse(search_filter.match({'first_name': 'John', 'last_name': 'Smith', 'family': [{'first_name': 'Jack', 'last_name': 'Smith'}, {'first_name': 'Jym', 'last_name': 'Smith'}]}))
+
     def suite():
         return unittest.TestLoader().loadTestsFromTestCase(FilterToolTest)
