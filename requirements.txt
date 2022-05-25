@@ -21,7 +21,7 @@ pycodestyle==2.5.0
 pycparser==2.19
 pyflakes==2.1.1
 Pygments==2.7.4
-PyJWT==1.7.1
+PyJWT==2.4.0
 pypandoc==1.4
 readme-renderer==24.0
 requests==2.22.0
