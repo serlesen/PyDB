@@ -35,4 +35,4 @@ twine==1.15.0
 unittest-xml-reporting==2.5.1
 urllib3==1.26.5
 webencodings==0.5.1
-Werkzeug==0.16.0
+Werkzeug==2.2.3
